@@ -1,0 +1,7 @@
+in: query
+name: 'uniqueness'
+required: true
+description: "Type of verification uniqueness"
+example: "true"
+schema:
+  type: boolean

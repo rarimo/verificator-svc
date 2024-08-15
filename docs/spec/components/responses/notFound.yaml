@@ -1,0 +1,5 @@
+description: Requested resource does not exist.
+content:
+  application/vnd.api+json:
+    schema:
+      $ref: '#/components/schemas/Errors'

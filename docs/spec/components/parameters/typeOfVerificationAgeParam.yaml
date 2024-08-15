@@ -1,0 +1,7 @@
+in: query
+name: 'age_lower_bound'
+required: true
+description: "Type of verification age"
+example: 18
+schema:
+  type: integer

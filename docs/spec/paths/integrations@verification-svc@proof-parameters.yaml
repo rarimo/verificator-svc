@@ -1,0 +1,29 @@
+get:
+    tags:
+      - Verification Parameters
+    summary: Request user verification parameters
+    description: |
+      Sends a request for user verification with provided parameters.
+    operationId: getVerificationParameters
+    parameters:
+      - $ref: '#/components/parameters/idParam'
+      - $ref: '#/components/parameters/typeOfVerificationAgeParam'
+      - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
+    responses:
+      200:
+        description: Success
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Parameters'
+      400:
+        $ref: '#/components/responses/invalidParameter'
+      404:
+        $ref: '#/components/responses/notFound'
+      500:
+        $ref: '#/components/responses/internalError'

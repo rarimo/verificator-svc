@@ -1,0 +1,153 @@
+{{- if .Values.config.createBucket -}}
+{{- if  .Values.global.localstorage -}}
+apiVersion:                                  v1
+kind:                                        ConfigMap
+metadata:
+  name:                                      {{ include "template.fullname" . }}-s3
+  labels:
+    app:                                     {{ include "template.fullname" . }}
+data:
+  s3.sh: |
+          #!/bin/sh
+          if aws s3 ls --endpoint-url http://tokend-minio:9000 "s3://{{  .Values.config.data.storage.bucket }}" 2>&1 | grep -q 'NoSuchBucket'; then
+             echo "Create {{ .Values.config.data.storage.bucket }}..."
+             aws s3 mb --endpoint-url http://tokend-minio:9000 --region {{  .Values.config.data.aws.region }} s3://{{ .Values.config.data.storage.bucket }}
+             echo "Set bucket cors policy..."
+             aws s3api --endpoint-url http://tokend-minio:9000 put-bucket-cors --bucket {{ .Values.config.data.storage.bucket }} --cors-configuration file://bash/cors.json
+             echo "Set bucket policy..."
+             aws s3api --endpoint-url http://tokend-minio:9000 put-bucket-policy --bucket {{ .Values.config.data.storage.bucket }} --policy file://bash/policy.json
+             echo "Set bucket tag..."
+             aws s3api --endpoint-url http://tokend-minio:9000 put-bucket-tagging --bucket {{ .Values.config.data.storage.bucket }} --tagging file://bash/tagging.json
+             tail -f /dev/null
+          else
+             echo "Bucket {{ .Values.config.data.storage.bucket }} alredy exites"
+             tail -f /dev/null
+          fi
+  policy.json: |
+                {
+                  "Statement": [
+                      {
+                          "Sid": "PublicReadGetObject",
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": "s3:GetObject",
+                          "Resource": "arn:aws:s3:::{{ .Values.config.data.storage.bucket }}/*"
+                      },
+                      {
+                          "Sid": "Stmt1532177149376",
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": [
+                              "s3:GetBucketCORS",
+                              "s3:PutBucketCORS"
+                          ],
+                          "Resource": "arn:aws:s3:::{{ .Values.config.data.storage.bucket }}"
+                      }
+                  ]
+                }
+  cors.json: |
+              {
+                "CORSRules": [
+                  {
+                      "AllowedHeaders": [
+                          "*"
+                      ],
+                      "AllowedMethods": [
+                          "GET",
+                          "POST",
+                          "PUT"
+                      ],
+                      "AllowedOrigins": [
+                          "*"
+                      ],
+                      "ExposeHeaders": [],
+                      "MaxAgeSeconds": 3000
+                  }
+                ]
+              }
+  tagging.json: |
+                  {
+                    "TagSet": [
+                      {
+                        "Key": "KubernetesCluster",
+                        "Value": "{{ .Values.global.ProjectName }}"
+                      }
+                    ]
+                  }
+{{ else }}
+apiVersion:                                  v1
+kind:                                        ConfigMap
+metadata:
+  name:                                      {{ include "template.fullname" . }}-s3
+  labels:
+    app:                                     {{ include "template.fullname" . }}
+data:
+  s3.sh: |
+          #!/bin/sh
+          if aws s3 ls "s3://{{  .Values.config.data.storage.bucket }}" 2>&1 | grep -q 'NoSuchBucket'; then
+             echo "Create {{ .Values.config.data.storage.bucket }}..."
+             aws s3 mb --region {{  .Values.config.data.aws.region }} s3://{{ .Values.config.data.storage.bucket }}
+             echo "Set bucket cors policy..."
+             aws s3api put-bucket-cors --bucket {{ .Values.config.data.storage.bucket }} --cors-configuration file://bash/cors.json
+             echo "Set bucket policy..."
+             aws s3api put-bucket-policy --bucket {{ .Values.config.data.storage.bucket }} --policy file://bash/policy.json
+             echo "Set bicket tag..."
+             aws s3api put-bucket-tagging --bucket {{ .Values.config.data.storage.bucket }} --tagging file://bash/tagging.json
+             tail -f /dev/null
+          else
+             echo "Bucket {{ .Values.config.data.storage.bucket }} alredy exites"
+             tail -f /dev/null
+          fi
+  policy.json: |
+                {
+                  "Statement": [
+                      {
+                          "Sid": "PublicReadGetObject",
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": "s3:GetObject",
+                          "Resource": "arn:aws:s3:::{{ .Values.config.data.storage.bucket }}/*"
+                      },
+                      {
+                          "Sid": "Stmt1532177149376",
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": [
+                              "s3:GetBucketCORS",
+                              "s3:PutBucketCORS"
+                          ],
+                          "Resource": "arn:aws:s3:::{{ .Values.config.data.storage.bucket }}"
+                      }
+                  ]
+                }
+  cors.json: |
+              {
+                "CORSRules": [
+                  {
+                      "AllowedHeaders": [
+                          "*"
+                      ],
+                      "AllowedMethods": [
+                          "GET",
+                          "POST",
+                          "PUT"
+                      ],
+                      "AllowedOrigins": [
+                          "*"
+                      ],
+                      "ExposeHeaders": [],
+                      "MaxAgeSeconds": 3000
+                  }
+                ]
+              }
+  tagging.json: |
+                  {
+                    "TagSet": [
+                      {
+                        "Key": "KubernetesCluster",
+                        "Value": "{{ .Values.global.ProjectName }}"
+                      }
+                    ]
+                  }
+{{ end }}
+{{ end }}

@@ -1,0 +1,53 @@
+allOf:
+  - $ref: '#/components/schemas/ParametersKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - eventID
+          - eventData
+          - selector
+          - identityCounter
+          - timestampLowerBound
+          - timestampUpperBound
+          - identityCounterLowerBound
+          - identityCounterUpperBound
+          - expirationDateLowerBound
+          - expirationDateUpperBound
+          - birthDateLowerBound
+          - birthDateUpperBound
+          - citizenshipMask
+          - callbackUrl
+        properties:
+          eventId:
+            type: string
+          eventData:
+            type: string
+          selector:
+            type: string
+          identityCounter:
+            type: integer
+          timestampLowerBound:
+            type: string
+          timestampUpperBound:
+            type: string
+          identityCounterLowerBound:
+            type: integer
+          identityCounterUpperBound:
+            type: integer 
+          expirationDateLowerBound:
+            type: string
+          expirationDateUpperBound:
+            type: string
+          birthDateLowerBound:
+            type: string
+          birthDateUpperBound:
+            type: string
+          citizenshipMask: 
+            type: string          
+          callbackUrl:
+            type: string
+            example: "https://example.com/integrations/verificator-svc/receive-proof/callback/c15ad8f88949"

@@ -1,0 +1,5 @@
+description: One of the parameters is invalid. Refer to the response body for details.
+content:
+  application/vnd.api+json:
+    schema:
+      $ref: '#/components/schemas/Errors'

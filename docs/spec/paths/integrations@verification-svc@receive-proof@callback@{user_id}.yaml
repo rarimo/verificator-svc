@@ -1,0 +1,29 @@
+post:
+  tags:
+    - Receive Proof
+  summary: Receive Proof by callback
+  description: >-
+    It receives the proof by callback url
+  operationId: receiveProofByCallback
+  parameters:
+    - $ref: '#/components/parameters/pathID'
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/Proof'
+  responses:
+    200:
+      description: "Success"
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'

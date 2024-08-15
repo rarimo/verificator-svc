@@ -1,0 +1,16 @@
+allOf:
+  - $ref: '#/components/schemas/ProofKey'
+  - type: object
+    x-go-is-request: true
+    required:
+      - attributes
+    properties:
+      attributes:
+        required:
+          - proof
+        properties:
+          proof:
+            type: object
+            format: types.ZKProof
+            description: |
+              Query ZK passport verification proof.
