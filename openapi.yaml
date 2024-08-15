@@ -1,0 +1,340 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: verificator-svc
+  description: ''
+servers:
+  - url: 'https://api.demo.tokend.io'
+    description: TokenD Developer Environment
+paths:
+  /integrations/verification-svc/proof-parameters:
+    get:
+      tags:
+        - Verification Parameters
+      summary: Request user verification parameters
+      description: |
+        Sends a request for user verification with provided parameters.
+      operationId: getVerificationParameters
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+        - $ref: '#/components/parameters/typeOfVerificationAgeParam'
+        - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Parameters'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verification-svc/receive-proof/callback/{user_id}':
+    post:
+      tags:
+        - Receive Proof
+      summary: Receive Proof by callback
+      description: It receives the proof by callback url
+      operationId: receiveProofByCallback
+      parameters:
+        - $ref: '#/components/parameters/pathID'
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Proof'
+      responses:
+        '200':
+          description: Success
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verification-svc/verification-status/{user_id}':
+    get:
+      tags:
+        - Verification Status
+      summary: Get user verification status
+      description: |
+        Get user verification status by UserID.
+      operationId: getUserStatus
+      parameters:
+        - $ref: '#/components/parameters/pathID'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Status'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+components:
+  schemas:
+    Errors:
+      description: 'Standard JSON:API error'
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          description: Non empty array of errors occurred during request processing
+          items:
+            type: object
+            required:
+              - title
+              - status
+            properties:
+              title:
+                type: string
+                description: 'Title is a short, human-readable summary of the problem'
+                example: Bad Request
+              detail:
+                type: string
+                description: Detail is a human-readable explanation specific to this occurrence of the problem
+                example: Request body was expected
+              status:
+                type: integer
+                description: Status is the HTTP status code applicable to this problem
+                example: 400
+                enum:
+                  - 400
+                  - 401
+                  - 403
+                  - 404
+                  - 409
+                  - 500
+    Parameters:
+      allOf:
+        - $ref: '#/components/schemas/ParametersKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - eventID
+                - eventData
+                - selector
+                - identityCounter
+                - timestampLowerBound
+                - timestampUpperBound
+                - identityCounterLowerBound
+                - identityCounterUpperBound
+                - expirationDateLowerBound
+                - expirationDateUpperBound
+                - birthDateLowerBound
+                - birthDateUpperBound
+                - citizenshipMask
+                - callbackUrl
+              properties:
+                eventId:
+                  type: string
+                eventData:
+                  type: string
+                selector:
+                  type: string
+                identityCounter:
+                  type: integer
+                timestampLowerBound:
+                  type: string
+                timestampUpperBound:
+                  type: string
+                identityCounterLowerBound:
+                  type: integer
+                identityCounterUpperBound:
+                  type: integer
+                expirationDateLowerBound:
+                  type: string
+                expirationDateUpperBound:
+                  type: string
+                birthDateLowerBound:
+                  type: string
+                birthDateUpperBound:
+                  type: string
+                citizenshipMask:
+                  type: string
+                callbackUrl:
+                  type: string
+                  example: 'https://example.com/integrations/verificator-svc/receive-proof/callback/c15ad8f88949'
+    ParametersKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: 059c81dd-2a54-44a8-8142-c15ad8f88949
+        type:
+          type: string
+          enum:
+            - proof_parameters
+    Proof:
+      allOf:
+        - $ref: '#/components/schemas/ProofKey'
+        - type: object
+          x-go-is-request: true
+          required:
+            - attributes
+          properties:
+            attributes:
+              required:
+                - proof
+              properties:
+                proof:
+                  type: object
+                  format: types.ZKProof
+                  description: |
+                    Query ZK passport verification proof.
+    ProofKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: 059c81dd-2a54-44a8-8142-c15ad8f88949
+        type:
+          type: string
+          enum:
+            - receive_proof
+    Status:
+      allOf:
+        - $ref: '#/components/schemas/StatusKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - verified
+                    - not_verified
+    StatusKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: 059c81dd-2a54-44a8-8142-c15ad8f88949
+        type:
+          type: string
+          enum:
+            - user_status
+  responses:
+    internalError:
+      description: Internal server error
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    invalidParameter:
+      description: One of the parameters is invalid. Refer to the response body for details.
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    notFound:
+      description: Requested resource does not exist.
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+  parameters:
+    idParam:
+      in: query
+      name: user_id
+      required: true
+      description: 'User identifier (e.g., email, address).'
+      example: user@example.com
+      schema:
+        type: string
+        format: string
+    pageLimitParam:
+      in: query
+      name: 'page[limit]'
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 15
+        description: Numbers of items per page to return.
+    pageNumberParam:
+      in: query
+      name: 'page[number]'
+      required: false
+      schema:
+        type: integer
+      description: The number of a page to return.
+    pageOrder:
+      in: query
+      name: 'page[order]'
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+        description: 'Order of records on the page. If sortingParam is not specified, order of records is by default sorted by ID.'
+    pathID:
+      in: path
+      name: user_id
+      required: true
+      example: dc3d2b96-9ff1-4f54-9fb6-005a518089fe
+      schema:
+        type: string
+        fomat: string
+    typeOfVerificationAgeParam:
+      in: query
+      name: age_lower_bound
+      required: true
+      description: Type of verification age
+      example: 18
+      schema:
+        type: integer
+    typeOfVerificationUniquenessParam:
+      in: query
+      name: uniqueness
+      required: true
+      description: Type of verification uniqueness
+      example: 'true'
+      schema:
+        type: boolean
