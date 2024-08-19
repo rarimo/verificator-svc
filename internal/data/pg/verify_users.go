@@ -2,6 +2,7 @@ package pg
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/fatih/structs"
@@ -62,12 +63,15 @@ func (q *VerifyUsersQ) Get() (*data.VerifyUsers, error) {
 }
 
 func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
-	err := q.db.Exec(
-		sq.Insert(verifyUsersTableName).
-			SetMap(structs.Map(VerifyUsers)),
-	)
-	if err != nil {
-		return errors.Wrap(err, "failed to insert rows")
+	stmt := sq.Insert(verifyUsersTableName).SetMap(map[string]interface{}{
+		"user_id":      VerifyUsers.UserID,
+		"user_id_hash": VerifyUsers.UserIdHash,
+		"created_at":   VerifyUsers.CreatedAt,
+		"status":       VerifyUsers.Status,
+	})
+
+	if err := q.db.Exec(stmt); err != nil {
+		return fmt.Errorf("insert balance %+v: %w", VerifyUsers, err)
 	}
 
 	return nil

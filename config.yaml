@@ -3,7 +3,7 @@ log:
   disable_sentry: true
 
 db:
-  url: db_url
+  url: postgres://verificator:verificator@127.0.0.1:5455/verificator?sslmode=disable
 
 listener:
   addr: :8000
@@ -14,3 +14,12 @@ cop:
   upstream: "http://..."
   service_name: verificator-svc
   service_port: 80
+
+verifier:
+  allowed_age: 18
+  allowed_identity_timestamp: 1715698750
+
+poseidonsmt_root_verifier:
+  rpc: evm_rpc_url
+  contract: poseidon_smt_contract_address
+  request_timeout: 10s

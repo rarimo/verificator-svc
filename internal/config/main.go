@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/rarimo/zkverifier-kit/root"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus"
 	"gitlab.com/distributed_lab/kit/copus/types"
@@ -13,6 +14,7 @@ type Config interface {
 	pgdb.Databaser
 	types.Copuser
 	comfig.Listenerer
+	Verifiers() Verifiers
 }
 
 type config struct {
@@ -20,7 +22,9 @@ type config struct {
 	pgdb.Databaser
 	types.Copuser
 	comfig.Listenerer
-	getter kv.Getter
+	getter   kv.Getter
+	verifier comfig.Once
+	passport root.VerifierProvider
 }
 
 func New(getter kv.Getter) Config {
@@ -30,5 +34,6 @@ func New(getter kv.Getter) Config {
 		Copuser:    copus.NewCopuser(getter),
 		Listenerer: comfig.NewListenerer(getter),
 		Logger:     comfig.NewLogger(getter, comfig.LoggerOpts{}),
+		passport:   root.NewVerifierProvider(getter, root.PoseidonSMT),
 	}
 }

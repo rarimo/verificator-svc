@@ -2,19 +2,22 @@ package service
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/rarimo/verificator-svc/internal/config"
+	"github.com/rarimo/verificator-svc/internal/data/pg"
 	"github.com/rarimo/verificator-svc/internal/service/handlers"
 	"gitlab.com/distributed_lab/ape"
 )
 
-func (s *service) router() chi.Router {
+func (s *service) router(cfg config.Config) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(
 		ape.RecoverMiddleware(s.log),
 		ape.LoganMiddleware(s.log),
 		ape.CtxMiddleware(
-			handlers.CtxLog(s.log),
-			//handlers.VerifyUsersQ()
+			handlers.CtxLog(cfg.Log()),
+			handlers.CtxVerifyUsersQ(pg.NewVerifyUsersQ(cfg.DB().Clone())),
+			handlers.CtxVerifiers(cfg.Verifiers()),
 		),
 	)
 	r.Route("/integrations/verificator-svc", func(r chi.Router) {
