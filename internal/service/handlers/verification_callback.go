@@ -23,7 +23,15 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if proof == nil {
-		log.Debug("Proof is not provided: performing logic of joining program instead of full verification")
+		log.Debug("Proof is not provided")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
+	if proof.PubSignals == nil || len(proof.PubSignals) == 0 || len(proof.PubSignals) != 22 {
+		log.Debug("PubSignals is not provided or empty")
+		ape.RenderErr(w, problems.InternalError())
+		return
 	}
 
 	getter := zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}

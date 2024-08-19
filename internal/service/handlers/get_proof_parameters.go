@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"github.com/iden3/go-iden3-crypto/poseidon"
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/resources"
@@ -21,26 +21,30 @@ const (
 func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	userInputs, err := requests.NewGetUserInputs(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	userIdHash := md5.Sum([]byte(userInputs.UserId))
+	userIdHash, err := StringToPoseidonHash(userInputs.UserId)
+	if err != nil {
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
 	user := &data.VerifyUsers{
 		UserID:     userInputs.UserId,
-		UserIdHash: hex.EncodeToString(userIdHash[:]),
+		UserIdHash: userIdHash,
 		CreatedAt:  time.Now().UTC(),
 		Status:     "false",
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIdHash).Get()
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", hex.EncodeToString(userIdHash[:]))
+		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIdHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if existingUser != nil {
-		Log(r).WithError(err).Errorf("User already exists with userID [%s]", hex.EncodeToString(userIdHash[:]))
+		Log(r).WithError(err).Errorf("User already exists with userID [%s]", userIdHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -49,6 +53,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to insert user with userID [%s]", user.UserIdHash)
 		ape.RenderErr(w, problems.InternalError())
+		return
 	}
 
 	ape.Render(w, NewProofParametersResponse(*user))
@@ -79,4 +84,17 @@ func NewProofParametersResponse(user data.VerifyUsers) resources.ParametersRespo
 			},
 		},
 	}
+}
+
+func StringToPoseidonHash(inputString string) (string, error) {
+	inputBytes, err := hex.DecodeString(inputString)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode input string: %s", err)
+	}
+	hash, err := poseidon.HashBytes(inputBytes)
+	if err != nil {
+		return "", fmt.Errorf("failde to convert input bytes to hash: %s", err)
+
+	}
+	return hex.EncodeToString(hash.Bytes()), nil
 }

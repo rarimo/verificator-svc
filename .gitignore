@@ -6,4 +6,3 @@ docs/web_deploy
 vendor/
 main
 docker-compose.yaml
-verificator-svc-chart
