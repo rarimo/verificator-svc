@@ -44,7 +44,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if existingUser != nil {
-		ape.Render(w, NewProofParametersResponse(*existingUser))
+		ape.Render(w, NewProofParametersResponse(*existingUser, r.Host))
 		return
 	}
 
@@ -55,10 +55,10 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, NewProofParametersResponse(*user))
+	ape.Render(w, NewProofParametersResponse(*user, r.Host))
 }
 
-func NewProofParametersResponse(user data.VerifyUsers) resources.ParametersResponse {
+func NewProofParametersResponse(user data.VerifyUsers, host string) resources.ParametersResponse {
 	return resources.ParametersResponse{
 		Data: resources.Parameters{
 			Key: resources.Key{
@@ -68,7 +68,7 @@ func NewProofParametersResponse(user data.VerifyUsers) resources.ParametersRespo
 			Attributes: resources.ParametersAttributes{
 				BirthDateLowerBound:       "313031303130",
 				BirthDateUpperBound:       "323031303130",
-				CallbackUrl:               fmt.Sprintf("http://localhost:8000/integrations/verificator-svc/public/callback/%s", user.UserIdHash),
+				CallbackUrl:               fmt.Sprintf("http://%s/integrations/verificator-svc/public/callback/%s", host, user.UserIdHash),
 				CitizenshipMask:           "0",
 				EventData:                 user.UserIdHash,
 				EventId:                   "111186066134341633902189494613533900917417361106374681011849132651019822199",
