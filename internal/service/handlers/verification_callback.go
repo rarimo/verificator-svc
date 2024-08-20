@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/log"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
+	"math/big"
 	"net/http"
 )
 
@@ -22,20 +25,15 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		proof = req.Data.Attributes.Proof
 	)
 
-	if proof == nil {
-		log.Debug("Proof is not provided")
-		ape.RenderErr(w, problems.InternalError())
+	getter := zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GeorgianPassport}
+	userIdHashDecimal, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
+	if !ok {
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{"user_id_hash": fmt.Errorf("failed to parse event data")})...)
 		return
 	}
+	var userIdHash [32]byte
+	userIdHashDecimal.FillBytes(userIdHash[:])
 
-	if proof.PubSignals == nil || len(proof.PubSignals) == 0 || len(proof.PubSignals) != 22 {
-		log.Debug("PubSignals is not provided or empty")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	getter := zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
-	userIdHash := getter.Get(zk.EventData)
 	err = Verifiers(r).Passport.VerifyProof(*proof)
 	if err != nil {
 		var vErr validation.Errors
@@ -43,11 +41,18 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 			Log(r).WithError(err).Error("Failed to verify proof")
 			ape.RenderErr(w, problems.InternalError())
 		}
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{"proof": err})...)
 		return
 	}
-	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIdHash).Get()
+
+	verifiedUser, err := VerifyUsersQ(r).WhereHashID(hex.EncodeToString(userIdHash[:])).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("Failed to get user by userHashId")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	if verifiedUser == nil {
+		Log(r).Error("User is empty")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -60,5 +65,5 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debug("Proof successfully verified")
-	ape.Render(w, "Success")
+	ape.Render(w, NewVerificationStatusByIdResponse(*verifiedUser))
 }

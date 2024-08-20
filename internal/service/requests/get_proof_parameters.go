@@ -8,8 +8,8 @@ import (
 )
 
 type UserInputs struct {
-	UserId        string `url:"userId"`
-	AgeLowerBound int    `url:"ageLowerBound"`
+	UserId        string `url:"user_id"`
+	AgeLowerBound int    `url:"age_lower_bound"`
 	Uniqueness    bool   `url:"uniqueness"`
 }
 

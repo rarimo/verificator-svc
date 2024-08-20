@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	proofEventIDValue       = "proofEventIDValue"
-	proofSelectorValue      = "proofSelectorValue"
+	proofEventIDValue       = "111186066134341633902189494613533900917417361106374681011849132651019822199"
+	proofSelectorValue      = "236065"
 	maxIdentityCount        = 1
 	documentTypeID          = "ID"
 	passportVerificationKey = "./proof_keys/passport.json"
@@ -35,8 +35,8 @@ func (c *config) Verifiers() Verifiers {
 		}
 
 		pass, err := zk.NewVerifier(nil,
-			zk.WithProofType(zk.GlobalPassport),
-			zk.WithCitizenships("GLOBAL"),
+			zk.WithProofType(zk.GeorgianPassport),
+			zk.WithCitizenships("GEO"),
 			zk.WithVerificationKeyFile(passportVerificationKey),
 			zk.WithAgeAbove(cfg.AllowedAge),
 			zk.WithPassportRootVerifier(c.passport.ProvideVerifier()),

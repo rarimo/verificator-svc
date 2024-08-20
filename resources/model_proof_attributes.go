@@ -8,5 +8,5 @@ import "github.com/iden3/go-rapidsnark/types"
 
 type ProofAttributes struct {
 	// Query ZK passport verification proof.
-	Proof *types.ZKProof `json:"proof,omitempty"`
+	Proof *types.ZKProof `json:"proof"`
 }

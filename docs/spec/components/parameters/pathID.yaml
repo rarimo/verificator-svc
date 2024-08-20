@@ -1,7 +1,7 @@
 in: path
 name: 'user_id'
 required: true
-example: "dc3d2b96-9ff1-4f54-9fb6-005a518089fe"
+example: "user@example.com"
 schema:
   type: string
   fomat: string

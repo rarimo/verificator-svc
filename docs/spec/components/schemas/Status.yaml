@@ -11,4 +11,4 @@ allOf:
         properties:
           status:
             type: string
-            enum: [verified, not_verified]
+            enum: [true, false]

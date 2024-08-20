@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fatih/structs"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/kit/pgdb"
 
@@ -66,7 +65,6 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 	stmt := sq.Insert(verifyUsersTableName).SetMap(map[string]interface{}{
 		"user_id":      VerifyUsers.UserID,
 		"user_id_hash": VerifyUsers.UserIdHash,
-		"created_at":   VerifyUsers.CreatedAt,
 		"status":       VerifyUsers.Status,
 	})
 
@@ -80,7 +78,9 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 func (q *VerifyUsersQ) Update(VerifyUsers *data.VerifyUsers) error {
 	err := q.db.Exec(
 		sq.Update(verifyUsersTableName).
-			SetMap(structs.Map(VerifyUsers)).
+			SetMap(map[string]interface{}{
+				"status": VerifyUsers.Status,
+			}).
 			Where(sq.Eq{userIdColumnName: VerifyUsers.UserID}),
 	)
 	if err != nil {

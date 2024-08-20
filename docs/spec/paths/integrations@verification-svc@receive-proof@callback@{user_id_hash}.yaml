@@ -20,7 +20,16 @@ post:
               $ref: '#/components/schemas/Proof'
   responses:
     200:
-      description: "Success"
+      description: Success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Status'
     400:
       $ref: '#/components/responses/invalidParameter'
     404:

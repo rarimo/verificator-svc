@@ -3,7 +3,7 @@ log:
   disable_sentry: true
 
 db:
-  url: postgres://verificator:verificator@127.0.0.1:5455/verificator?sslmode=disable
+  url: pg_url
 
 listener:
   addr: :8000
@@ -20,6 +20,6 @@ verifier:
   allowed_identity_timestamp: 1715698750
 
 poseidonsmt_root_verifier:
-  rpc: evm_rpc_url
-  contract: poseidon_smt_contract_address
+  rpc: rpc_url
+  contract: contract_address
   request_timeout: 10s

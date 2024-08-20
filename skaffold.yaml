@@ -3,6 +3,7 @@ kind: Config
 build:
   artifacts:
     - image: verificator-svc # Change it on your own repo-name
+
 profiles:
 - name: dev
   deploy:

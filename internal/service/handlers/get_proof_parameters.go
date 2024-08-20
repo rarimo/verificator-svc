@@ -15,7 +15,7 @@ import (
 
 const (
 	maxIdentityCount   = 1
-	proofSelectorValue = "23073"
+	proofSelectorValue = "236065"
 )
 
 func GetProofParameters(w http.ResponseWriter, r *http.Request) {
@@ -44,8 +44,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if existingUser != nil {
-		Log(r).WithError(err).Errorf("User already exists with userID [%s]", userIdHash)
-		ape.RenderErr(w, problems.InternalError())
+		ape.Render(w, NewProofParametersResponse(*existingUser))
 		return
 	}
 
@@ -67,30 +66,28 @@ func NewProofParametersResponse(user data.VerifyUsers) resources.ParametersRespo
 				Type: resources.PROOF_PARAMETERS,
 			},
 			Attributes: resources.ParametersAttributes{
-				BirthDateLowerBound:       "18",
-				BirthDateUpperBound:       "24",
+				BirthDateLowerBound:       "313031303130",
+				BirthDateUpperBound:       "323031303130",
 				CallbackUrl:               fmt.Sprintf("http://localhost:8000/integrations/verificator-svc/public/callback/%s", user.UserIdHash),
-				CitizenshipMask:           "city_mask",
+				CitizenshipMask:           "0",
 				EventData:                 user.UserIdHash,
-				EventId:                   "event_id",
-				ExpirationDateLowerBound:  "ExpirationDateLowerBound",
-				ExpirationDateUpperBound:  "ExpirationDateUpperBound",
-				IdentityCounter:           maxIdentityCount,
+				EventId:                   "111186066134341633902189494613533900917417361106374681011849132651019822199",
+				ExpirationDateLowerBound:  "313031303130",
+				ExpirationDateUpperBound:  "333031303130",
+				IdentityCounter:           0,
 				IdentityCounterLowerBound: 0,
 				IdentityCounterUpperBound: maxIdentityCount,
 				Selector:                  proofSelectorValue,
-				TimestampLowerBound:       "time_when_app_started",
-				TimestampUpperBound:       "time_when_app",
+				TimestampLowerBound:       "10000000000",
+				TimestampUpperBound:       "19000000000",
 			},
 		},
 	}
 }
 
 func StringToPoseidonHash(inputString string) (string, error) {
-	inputBytes, err := hex.DecodeString(inputString)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode input string: %s", err)
-	}
+	inputBytes := []byte(inputString)
+
 	hash, err := poseidon.HashBytes(inputBytes)
 	if err != nil {
 		return "", fmt.Errorf("failde to convert input bytes to hash: %s", err)
