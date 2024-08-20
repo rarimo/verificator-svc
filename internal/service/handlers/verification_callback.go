@@ -38,7 +38,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var vErr validation.Errors
 		if !errors.As(err, &vErr) {
-			Log(r).WithError(err).Error("Failed to verify proof")
+			Log(r).WithError(err).Error("failed to verify proof")
 			ape.RenderErr(w, problems.InternalError())
 		}
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{"proof": err})...)
@@ -47,12 +47,12 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(hex.EncodeToString(userIdHash[:])).Get()
 	if err != nil {
-		Log(r).WithError(err).Error("Failed to get user by userHashId")
+		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIdHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if verifiedUser == nil {
-		Log(r).Error("User is empty")
+		Log(r).Error("user is empty")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

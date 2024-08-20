@@ -6,7 +6,7 @@ post:
     It receives the proof by callback url
   operationId: receiveProofByCallback
   parameters:
-    - $ref: '#/components/parameters/pathID'
+    - $ref: '#/components/parameters/pathIDHash'
   requestBody:
     required: true
     content:

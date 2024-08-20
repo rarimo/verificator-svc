@@ -2,7 +2,8 @@ package requests
 
 import (
 	"fmt"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
+	val "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"gitlab.com/distributed_lab/urlval/v4"
 	"net/http"
 )
@@ -18,11 +19,17 @@ func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
 		err = newDecodeError("query", err)
 		return
 	}
+	err = val.Errors{
+		"user_id":         val.Validate(userInputs.UserId, val.Required, is.Email),
+		"age_lower_bound": val.Validate(userInputs.AgeLowerBound, val.Required),
+		"uniqueness":      val.Validate(userInputs.Uniqueness, val.Required),
+	}.
+		Filter()
 	return
 }
 
 func newDecodeError(what string, err error) error {
-	return validation.Errors{
+	return val.Errors{
 		what: fmt.Errorf("decode request %s: %w", what, err),
 	}
 }
