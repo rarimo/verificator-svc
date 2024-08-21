@@ -1,0 +1,7 @@
+in: query
+name: 'nationality'
+required: true
+description: "Type of verification nationality"
+example: "UKR"
+schema:
+  type: string

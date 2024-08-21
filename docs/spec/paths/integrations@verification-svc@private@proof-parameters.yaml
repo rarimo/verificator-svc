@@ -9,6 +9,7 @@ get:
       - $ref: '#/components/parameters/idParam'
       - $ref: '#/components/parameters/typeOfVerificationAgeParam'
       - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
+      - $ref: '#/components/parameters/nationalityParam'
     responses:
       200:
         description: Success
