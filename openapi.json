@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/integrations/verification-svc/proof-parameters": {
+    "/integrations/verification-svc/private/proof-parameters": {
       "get": {
         "tags": [
           "Verification Parameters"
@@ -29,6 +29,9 @@
           },
           {
             "$ref": "#/components/parameters/typeOfVerificationUniquenessParam"
+          },
+          {
+            "$ref": "#/components/parameters/nationalityParam"
           }
         ],
         "responses": {
@@ -62,7 +65,51 @@
         }
       }
     },
-    "/integrations/verification-svc/receive-proof/callback/{user_id}": {
+    "/integrations/verification-svc/private/verification-status/{user_id}": {
+      "get": {
+        "tags": [
+          "Verification Status"
+        ],
+        "summary": "Get user verification status",
+        "description": "Get user verification status by UserID.\n",
+        "operationId": "getUserStatus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pathID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/integrations/verification-svc/public/receive-proof/callback/{user_id_hash}": {
       "post": {
         "tags": [
           "Receive Proof"
@@ -72,7 +119,7 @@
         "operationId": "receiveProofByCallback",
         "parameters": [
           {
-            "$ref": "#/components/parameters/pathID"
+            "$ref": "#/components/parameters/pathIDHash"
           }
         ],
         "requestBody": {
@@ -93,35 +140,6 @@
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/integrations/verification-svc/verification-status/{user_id}": {
-      "get": {
-        "tags": [
-          "Verification Status"
-        ],
-        "summary": "Get user verification status",
-        "description": "Get user verification status by UserID.\n",
-        "operationId": "getUserStatus",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pathID"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -272,7 +290,7 @@
                   },
                   "callbackUrl": {
                     "type": "string",
-                    "example": "https://example.com/integrations/verificator-svc/receive-proof/callback/c15ad8f88949"
+                    "example": "https://example.com/integrations/verificator-svc/public/receive-proof/callback/c15ad8f88949"
                   }
                 }
               }
@@ -289,7 +307,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "059c81dd-2a54-44a8-8142-c15ad8f88949"
+            "example": "user@example.com"
           },
           "type": {
             "type": "string",
@@ -336,7 +354,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "059c81dd-2a54-44a8-8142-c15ad8f88949"
+            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff"
           },
           "type": {
             "type": "string",
@@ -366,8 +384,9 @@
                   "status": {
                     "type": "string",
                     "enum": [
+                      "not_verified",
                       "verified",
-                      "not_verified"
+                      "failed_verification"
                     ]
                   }
                 }
@@ -385,7 +404,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "059c81dd-2a54-44a8-8142-c15ad8f88949"
+            "example": "user@example.com"
           },
           "type": {
             "type": "string",
@@ -440,6 +459,16 @@
           "format": "string"
         }
       },
+      "nationalityParam": {
+        "in": "query",
+        "name": "nationality",
+        "required": true,
+        "description": "Type of verification nationality",
+        "example": "UKR",
+        "schema": {
+          "type": "string"
+        }
+      },
       "pageLimitParam": {
         "in": "query",
         "name": "page[limit]",
@@ -479,7 +508,17 @@
         "in": "path",
         "name": "user_id",
         "required": true,
-        "example": "dc3d2b96-9ff1-4f54-9fb6-005a518089fe",
+        "example": "user@example.com",
+        "schema": {
+          "type": "string",
+          "fomat": "string"
+        }
+      },
+      "pathIDHash": {
+        "in": "path",
+        "name": "user_id_hash",
+        "required": true,
+        "example": "user@example.com",
         "schema": {
           "type": "string",
           "fomat": "string"
