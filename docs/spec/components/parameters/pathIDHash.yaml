@@ -1,0 +1,7 @@
+in: path
+name: 'user_id_hash'
+required: true
+example: "user@example.com"
+schema:
+  type: string
+  fomat: string

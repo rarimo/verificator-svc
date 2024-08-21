@@ -5,7 +5,7 @@ required:
 properties:
   id:
     type: string
-    example: "059c81dd-2a54-44a8-8142-c15ad8f88949"
+    example: "user@example.com"
   type:
     type: string
     enum:

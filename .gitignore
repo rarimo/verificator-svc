@@ -4,3 +4,5 @@ config.*.yaml
 docs/node_modules
 docs/web_deploy
 vendor/
+main
+docker-compose.yaml

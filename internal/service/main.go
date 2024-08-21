@@ -11,6 +11,7 @@ import (
 )
 
 type service struct {
+	cfg      config.Config
 	log      *logan.Entry
 	copus    types.Copus
 	listener net.Listener
@@ -18,7 +19,7 @@ type service struct {
 
 func (s *service) run() error {
 	s.log.Info("Service started")
-	r := s.router()
+	r := s.router(s.cfg)
 
 	if err := s.copus.RegisterChi(r); err != nil {
 		return errors.Wrap(err, "cop failed")
@@ -29,6 +30,7 @@ func (s *service) run() error {
 
 func newService(cfg config.Config) *service {
 	return &service{
+		cfg:      cfg,
 		log:      cfg.Log(),
 		copus:    cfg.Copus(),
 		listener: cfg.Listener(),

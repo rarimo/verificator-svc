@@ -16,14 +16,14 @@ func GetVerificationStatusById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userId).Get()
+	verifiedUser, err := VerifyUsersQ(r).WhereID(userId).Get()
 	if err != nil {
-		Log(r).WithError(err).Error("Failed to get user by userHashId")
+		Log(r).WithError(err).Error("Failed to get user by userId")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if verifiedUser == nil {
-		Log(r).Debugf("User for userHash=%s not found", userId)
+		Log(r).Debugf("User for userId=%s not found", userId)
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}

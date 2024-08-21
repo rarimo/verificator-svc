@@ -50,4 +50,4 @@ allOf:
             type: string          
           callbackUrl:
             type: string
-            example: "https://example.com/integrations/verificator-svc/receive-proof/callback/c15ad8f88949"
+            example: "https://example.com/integrations/verificator-svc/public/receive-proof/callback/c15ad8f88949"
