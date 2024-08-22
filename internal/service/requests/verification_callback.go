@@ -24,7 +24,7 @@ func GetVerificationCallbackByID(r *http.Request) (req resources.ProofRequest, e
 		"data/id":                           val.Validate(req.Data.ID, val.Required),
 		"data/attributes/proof":             val.Validate(attr.Proof, val.When(attr.Proof != nil, val.Required)),
 		"data/attributes/proof/proof":       val.Validate(proof.Proof, val.When(proof.Proof != nil, val.Required)),
-		"data/attributes/proof/pub_signals": val.Validate(proof.PubSignals, val.When(proof.Proof != nil, val.Required, val.Length(24, 24))),
+		"data/attributes/proof/pub_signals": val.Validate(proof.PubSignals, val.When(proof.Proof != nil, val.Required, val.Length(22, 22))),
 	}.Filter()
 
 }

@@ -7,22 +7,43 @@ import (
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/resources"
+	"github.com/status-im/keycard-go/hexutils"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"net/http"
+	"strconv"
 	"time"
 )
 
-const (
-	maxIdentityCount   = 1
-	proofSelectorValue = "236065"
-)
+type ProofParams struct {
+	host                      string
+	eventID                   string
+	proofSelector             string
+	citizenshipMask           string
+	birthDateLowerBound       string
+	birthDateUpperBound       string
+	timestampUpperBound       string
+	timestampLowerBound       string
+	identityCounterUpperBound int32
+	expirationDateUpperBound  string
+	expirationDateLowerBound  string
+}
 
 func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	userInputs, err := requests.NewGetUserInputs(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		Log(r).Debug(userInputs.Uniqueness)
 		return
+	}
+	proofSelector := ProofParameters(r).SelectorUnique
+	var IdentityCounterUpperBound int32 = 1
+	TimestampUpperBound := "19000000000"
+
+	if !userInputs.Uniqueness {
+		proofSelector = ProofParameters(r).SelectorNotUnique
+		IdentityCounterUpperBound = 0
+		TimestampUpperBound = "0"
 	}
 
 	userIdHash, err := StringToPoseidonHash(userInputs.UserId)
@@ -31,10 +52,27 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := &data.VerifyUsers{
-		UserID:     userInputs.UserId,
-		UserIdHash: userIdHash,
-		CreatedAt:  time.Now().UTC(),
-		Status:     "false",
+		UserID:        userInputs.UserId,
+		UserIdHash:    userIdHash,
+		CreatedAt:     time.Now().UTC(),
+		Status:        "not_verified",
+		Nationality:   userInputs.Nationality,
+		AgeLowerBound: userInputs.AgeLowerBound,
+		Uniqueness:    userInputs.Uniqueness,
+	}
+
+	proofParams := ProofParams{
+		host:                      Callback(r).Url,
+		eventID:                   ProofParameters(r).EventID,
+		proofSelector:             proofSelector,
+		identityCounterUpperBound: IdentityCounterUpperBound,
+		timestampUpperBound:       TimestampUpperBound,
+		citizenshipMask:           utf8ToHex(userInputs.Nationality),
+		timestampLowerBound:       ProofParameters(r).TimestampLowerBound,
+		expirationDateUpperBound:  ProofParameters(r).ExpirationDateUpperBound,
+		expirationDateLowerBound:  ProofParameters(r).ExpirationDateLowerBound,
+		birthDateLowerBound:       calculateBirthDateHex(userInputs.AgeLowerBound),
+		birthDateUpperBound:       ProofParameters(r).BirthDateUpperBound,
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIdHash).Get()
@@ -44,7 +82,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if existingUser != nil {
-		ape.Render(w, NewProofParametersResponse(*existingUser, r.Host))
+		ape.Render(w, NewProofParametersResponse(*existingUser, proofParams))
 		return
 	}
 
@@ -55,10 +93,10 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, NewProofParametersResponse(*user, r.Host))
+	ape.Render(w, NewProofParametersResponse(*user, proofParams))
 }
 
-func NewProofParametersResponse(user data.VerifyUsers, host string) resources.ParametersResponse {
+func NewProofParametersResponse(user data.VerifyUsers, params ProofParams) resources.ParametersResponse {
 	return resources.ParametersResponse{
 		Data: resources.Parameters{
 			Key: resources.Key{
@@ -66,20 +104,20 @@ func NewProofParametersResponse(user data.VerifyUsers, host string) resources.Pa
 				Type: resources.PROOF_PARAMETERS,
 			},
 			Attributes: resources.ParametersAttributes{
-				BirthDateLowerBound:       "313031303130",
-				BirthDateUpperBound:       "323031303130",
-				CallbackUrl:               fmt.Sprintf("http://%s/integrations/verificator-svc/public/callback/%s", host, user.UserIdHash),
-				CitizenshipMask:           "0",
+				BirthDateLowerBound:       params.birthDateLowerBound,
+				BirthDateUpperBound:       params.birthDateUpperBound,
+				CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", params.host, user.UserIdHash),
+				CitizenshipMask:           params.citizenshipMask,
 				EventData:                 user.UserIdHash,
-				EventId:                   "111186066134341633902189494613533900917417361106374681011849132651019822199",
-				ExpirationDateLowerBound:  "313031303130",
-				ExpirationDateUpperBound:  "333031303130",
+				EventId:                   params.eventID,
+				ExpirationDateLowerBound:  params.expirationDateLowerBound,
+				ExpirationDateUpperBound:  params.expirationDateUpperBound,
 				IdentityCounter:           0,
 				IdentityCounterLowerBound: 0,
-				IdentityCounterUpperBound: maxIdentityCount,
-				Selector:                  proofSelectorValue,
-				TimestampLowerBound:       "10000000000",
-				TimestampUpperBound:       "19000000000",
+				IdentityCounterUpperBound: params.identityCounterUpperBound,
+				Selector:                  params.proofSelector,
+				TimestampLowerBound:       params.timestampLowerBound,
+				TimestampUpperBound:       params.timestampUpperBound,
 			},
 		},
 	}
@@ -94,4 +132,20 @@ func StringToPoseidonHash(inputString string) (string, error) {
 
 	}
 	return hex.EncodeToString(hash.Bytes()), nil
+}
+
+func utf8ToHex(input string) string {
+	bytes := []byte(input)
+	hexString := hexutils.BytesToHex(bytes)
+	return hexString
+}
+
+func calculateBirthDateHex(ageLowerBound int) string {
+	currentDate := time.Now().UTC()
+
+	birthYear := (currentDate.Year() - ageLowerBound) % 1e2
+	birthDateLowerBound := []byte(strconv.Itoa(birthYear) + "0101")
+	hexString := hexutils.BytesToHex(birthDateLowerBound)
+
+	return hexString
 }

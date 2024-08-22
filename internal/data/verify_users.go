@@ -5,10 +5,13 @@ import (
 )
 
 type VerifyUsers struct {
-	UserID     string    `db:"user_id"`
-	UserIdHash string    `db:"user_id_hash"`
-	CreatedAt  time.Time `db:"created_at"`
-	Status     string    `db:"status"`
+	UserID        string    `db:"user_id"`
+	UserIdHash    string    `db:"user_id_hash"`
+	AgeLowerBound int       `db:"age_lower_bound"`
+	Nationality   string    `db:"nationality"`
+	CreatedAt     time.Time `db:"created_at"`
+	Uniqueness    bool      `db:"uniqueness"`
+	Status        string    `db:"status"`
 }
 
 type VerifyUsersQ interface {
