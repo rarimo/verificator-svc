@@ -22,8 +22,9 @@ type Verifiers struct {
 func (c *config) Verifiers() Verifiers {
 	return c.verifier.Do(func() interface{} {
 		var cfg struct {
-			AllowedAge               int   `fig:"allowed_age,required"`
-			AllowedIdentityTimestamp int64 `fig:"allowed_identity_timestamp,required"`
+			AllowedAge               int    `fig:"allowed_age,required"`
+			VerificationKeyPath      string `fig:"verification_key_path,required"`
+			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
 		}
 
 		err := figure.
@@ -35,8 +36,8 @@ func (c *config) Verifiers() Verifiers {
 		}
 
 		pass, err := zk.NewVerifier(nil,
-			zk.WithProofType(zk.GeorgianPassport),
-			zk.WithVerificationKeyFile(passportVerificationKey),
+			zk.WithProofType(zk.GlobalPassport),
+			zk.WithVerificationKeyFile(cfg.VerificationKeyPath),
 			zk.WithPassportRootVerifier(c.passport.ProvideVerifier()),
 			zk.WithIdentitiesCreationTimestampLimit(cfg.AllowedIdentityTimestamp),
 		)

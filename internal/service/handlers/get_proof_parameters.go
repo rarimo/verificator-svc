@@ -36,14 +36,13 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		Log(r).Debug(userInputs.Uniqueness)
 		return
 	}
-	proofSelector := ProofParameters(r).SelectorUnique
-	var IdentityCounterUpperBound int32 = 1
-	TimestampUpperBound := "19000000000"
 
-	if !userInputs.Uniqueness {
-		proofSelector = ProofParameters(r).SelectorNotUnique
-		IdentityCounterUpperBound = 0
-		TimestampUpperBound = "0"
+	TimestampUpperBound := "0"
+	var IdentityCounterUpperBound int32 = 0
+	proofSelector := CalculateProofSelector(userInputs.Uniqueness)
+	if proofSelector&(1<<9) != 0 && proofSelector&(1<<11) != 0 {
+		TimestampUpperBound = ProofParameters(r).TimestampUpperBound
+		IdentityCounterUpperBound = 1
 	}
 
 	userIdHash, err := StringToPoseidonHash(userInputs.UserId)
@@ -64,7 +63,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	proofParams := ProofParams{
 		host:                      Callback(r).Url,
 		eventID:                   ProofParameters(r).EventID,
-		proofSelector:             proofSelector,
+		proofSelector:             strconv.Itoa(proofSelector),
 		identityCounterUpperBound: IdentityCounterUpperBound,
 		timestampUpperBound:       TimestampUpperBound,
 		citizenshipMask:           utf8ToHex(userInputs.Nationality),
@@ -142,10 +141,18 @@ func utf8ToHex(input string) string {
 
 func calculateBirthDateHex(ageLowerBound int) string {
 	currentDate := time.Now().UTC()
+	birthDateLoweBound := []byte(fmt.Sprintf("%02d", (currentDate.Year()-ageLowerBound)%100) + "0101")
+	hexBirthDateLoweBound := hexutils.BytesToHex(birthDateLoweBound)
 
-	birthYear := (currentDate.Year() - ageLowerBound) % 1e2
-	birthDateLowerBound := []byte(strconv.Itoa(birthYear) + "0101")
-	hexString := hexutils.BytesToHex(birthDateLowerBound)
+	return hexBirthDateLoweBound
+}
 
-	return hexString
+func CalculateProofSelector(uniqueness bool) int {
+	var bitLine uint32 = 0
+	if uniqueness {
+		bitLine |= 1 << 9
+		bitLine |= 1 << 11
+	}
+
+	return int(bitLine)
 }

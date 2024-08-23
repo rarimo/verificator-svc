@@ -13,8 +13,6 @@ type ProofParametersConfiger interface {
 
 type ProofParametersConfig struct {
 	EventID                  string `fig:"event_id,required"`
-	SelectorUnique           string `fig:"selector_unique"`
-	SelectorNotUnique        string `fig:"selector_not_unique"`
 	TimestampLowerBound      string `fig:"timestamp_lower_bound,required"`
 	TimestampUpperBound      string `fig:"timestamp_upper_bound,required"`
 	ExpirationDateLowerBound string `fig:"expiration_date_lower_bound,required"`

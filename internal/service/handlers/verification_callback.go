@@ -48,13 +48,19 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if verifiedUser == nil {
 		Log(r).Error("user is empty")
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
-	selectorInt, err := strconv.Atoi(selector)
+	selectorInt, err := strconv.Atoi(proof.PubSignals[zk.Selector])
 	if err != nil {
 		fmt.Println("Error during conversion")
+		return
+	}
+	identityCounterUpperBound, err := strconv.ParseInt(proof.PubSignals[zk.IdentityCounterUpperBound], 10, 64)
+	if err != nil {
+		Log(r).Error("cannot extract identityUpperBound from public signals")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if verifiedUser.Uniqueness {
@@ -76,8 +82,8 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	var verifyOpts = []zk.VerifyOption{
 		zk.WithCitizenships(verifiedUser.Nationality),
-		zk.WithProofSelectorValue(selector),
-		zk.WithIdentitiesCounter(1),
+		zk.WithProofSelectorValue(proof.PubSignals[zk.Selector]),
+		zk.WithIdentitiesCounter(identityCounterUpperBound),
 		zk.WithAgeAbove(verifiedUser.AgeLowerBound),
 		zk.WithEventID(ProofParameters(r).EventID),
 	}
