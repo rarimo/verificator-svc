@@ -1,8 +1,6 @@
 module github.com/rarimo/verificator-svc
 
-go 1.22
-
-toolchain go1.22.6
+go 1.22.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

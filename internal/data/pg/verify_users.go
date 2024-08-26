@@ -64,7 +64,7 @@ func (q *VerifyUsersQ) Get() (*data.VerifyUsers, error) {
 func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 	stmt := sq.Insert(verifyUsersTableName).SetMap(map[string]interface{}{
 		"user_id":         VerifyUsers.UserID,
-		"user_id_hash":    VerifyUsers.UserIdHash,
+		"user_id_hash":    VerifyUsers.UserIDHash,
 		"age_lower_bound": VerifyUsers.AgeLowerBound,
 		"nationality":     VerifyUsers.Nationality,
 		"uniqueness":      VerifyUsers.Uniqueness,

@@ -18,10 +18,6 @@ import (
 	"strconv"
 )
 
-const (
-	selector = "1"
-)
-
 func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.GetVerificationCallbackByID(r)
 	if err != nil {
@@ -54,7 +50,8 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	selectorInt, err := strconv.Atoi(proof.PubSignals[zk.Selector])
 	if err != nil {
-		fmt.Println("Error during conversion")
+		Log(r).Error("cannot extract identityUpperBound from public signals")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	identityCounterUpperBound, err := strconv.ParseInt(proof.PubSignals[zk.IdentityCounterUpperBound], 10, 64)
@@ -63,20 +60,17 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-	if verifiedUser.Uniqueness {
-		if proof.PubSignals[zk.TimestampUpperBound] == ProofParameters(r).TimestampUpperBound {
-			if selectorInt&1<<9 == 0 {
-				Log(r).Error("cannot extract timestampUpperBound from public signals")
-				ape.RenderErr(w, problems.InternalError())
-				return
-			}
-			if proof.PubSignals[zk.IdentityCounterUpperBound] == "0" {
-				if selectorInt&1<<11 == 0 {
-					Log(r).Error("cannot extract identityUpperBound from public signals")
-					ape.RenderErr(w, problems.InternalError())
-					return
-				}
-			}
+	if verifiedUser.Uniqueness &&
+		proof.PubSignals[zk.TimestampUpperBound] == ProofParameters(r).TimestampUpperBound {
+		if selectorInt&(1<<9) == 0 {
+			Log(r).Error("cannot extract timestampUpperBound from public signals")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
+		if proof.PubSignals[zk.IdentityCounterUpperBound] != "1" || selectorInt&(1<<11) == 0 {
+			Log(r).Error("cannot extract identityUpperBound from public signals")
+			ape.RenderErr(w, problems.InternalError())
+			return
 		}
 	}
 
@@ -94,7 +88,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 			verifiedUser.Status = "failed_verification"
 			err = VerifyUsersQ(r).Update(verifiedUser)
 			if err != nil {
-				Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIdHash)
+				Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
 				return
 			}
 			Log(r).WithError(err).Error("failed to verify proof")
@@ -106,7 +100,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	verifiedUser.Status = "verified"
 	err = VerifyUsersQ(r).Update(verifiedUser)
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIdHash)
+		Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -131,12 +125,12 @@ func NewVerificationCallbackResponse(user data.VerifyUsers) resources.StatusResp
 
 func ExtractEventData(proof zkptypes.ZKProof) ([]byte, error) {
 	getter := zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
-	userIdHashDecimal, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
+	userIDHashDecimal, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
 	if !ok {
 		return nil, fmt.Errorf("failed to parse event data")
 	}
-	var userIdHash [32]byte
-	userIdHashDecimal.FillBytes(userIdHash[:])
+	var userIDHash [32]byte
+	userIDHashDecimal.FillBytes(userIDHash[:])
 
-	return userIdHash[:], nil
+	return userIDHash[:], nil
 }

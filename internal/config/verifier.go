@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	zk "github.com/rarimo/zkverifier-kit"
-	"github.com/rarimo/zkverifier-kit/root"
 	"gitlab.com/distributed_lab/figure/v3"
 	"gitlab.com/distributed_lab/kit/kv"
 )
@@ -15,8 +14,6 @@ const (
 
 type Verifiers struct {
 	Passport *zk.Verifier
-	Poll     *zk.Verifier
-	PollRoot *root.ProposalSMTVerifier
 }
 
 func (c *config) Verifiers() Verifiers {

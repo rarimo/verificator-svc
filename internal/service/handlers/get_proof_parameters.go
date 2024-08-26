@@ -33,12 +33,11 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	userInputs, err := requests.NewGetUserInputs(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
-		Log(r).Debug(userInputs.Uniqueness)
 		return
 	}
 
 	TimestampUpperBound := "0"
-	var IdentityCounterUpperBound int32 = 0
+	var IdentityCounterUpperBound int32
 	proofSelector := CalculateProofSelector(userInputs.Uniqueness)
 	if proofSelector&(1<<9) != 0 && proofSelector&(1<<11) != 0 {
 		TimestampUpperBound = ProofParameters(r).TimestampUpperBound
@@ -52,7 +51,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	}
 	user := &data.VerifyUsers{
 		UserID:        userInputs.UserId,
-		UserIdHash:    userIdHash,
+		UserIDHash:    userIdHash,
 		CreatedAt:     time.Now().UTC(),
 		Status:        "not_verified",
 		Nationality:   userInputs.Nationality,
@@ -61,7 +60,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proofParams := ProofParams{
-		host:                      Callback(r).Url,
+		host:                      Callback(r).URL,
 		eventID:                   ProofParameters(r).EventID,
 		proofSelector:             strconv.Itoa(proofSelector),
 		identityCounterUpperBound: IdentityCounterUpperBound,
@@ -74,7 +73,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		birthDateUpperBound:       ProofParameters(r).BirthDateUpperBound,
 	}
 
-	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIdHash).Get()
+	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIdHash)
 		ape.RenderErr(w, problems.InternalError())
@@ -87,7 +86,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 
 	err = VerifyUsersQ(r).Insert(user)
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to insert user with userID [%s]", user.UserIdHash)
+		Log(r).WithError(err).Errorf("failed to insert user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -105,9 +104,9 @@ func NewProofParametersResponse(user data.VerifyUsers, params ProofParams) resou
 			Attributes: resources.ParametersAttributes{
 				BirthDateLowerBound:       params.birthDateLowerBound,
 				BirthDateUpperBound:       params.birthDateUpperBound,
-				CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", params.host, user.UserIdHash),
+				CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", params.host, user.UserIDHash),
 				CitizenshipMask:           params.citizenshipMask,
-				EventData:                 user.UserIdHash,
+				EventData:                 user.UserIDHash,
 				EventId:                   params.eventID,
 				ExpirationDateLowerBound:  params.expirationDateLowerBound,
 				ExpirationDateUpperBound:  params.expirationDateUpperBound,
@@ -127,7 +126,7 @@ func StringToPoseidonHash(inputString string) (string, error) {
 
 	hash, err := poseidon.HashBytes(inputBytes)
 	if err != nil {
-		return "", fmt.Errorf("failde to convert input bytes to hash: %s", err)
+		return "", fmt.Errorf("failde to convert input bytes to hash: %w", err)
 
 	}
 	return hex.EncodeToString(hash.Bytes()), nil
@@ -148,7 +147,7 @@ func calculateBirthDateHex(ageLowerBound int) string {
 }
 
 func CalculateProofSelector(uniqueness bool) int {
-	var bitLine uint32 = 0
+	var bitLine uint32
 	if uniqueness {
 		bitLine |= 1 << 9
 		bitLine |= 1 << 11

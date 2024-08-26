@@ -14,7 +14,6 @@ type ctxKey int
 const (
 	logCtxKey ctxKey = iota
 	verifyUserQCtxKey
-	verifiersSMTCtxKey
 	verifiersCtxKey
 	callbackCtxKey
 	proofParametersCtxKey

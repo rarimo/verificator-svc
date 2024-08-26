@@ -12,7 +12,7 @@ type CallbackConfiger interface {
 }
 
 type CallbackConfig struct {
-	Url string `fig:"url,required"`
+	URL string `fig:"url,required"`
 }
 
 type Callback struct {
