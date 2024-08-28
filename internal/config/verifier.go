@@ -15,7 +15,6 @@ type Verifiers struct {
 func (c *config) Verifiers() Verifiers {
 	return c.verifier.Do(func() interface{} {
 		var cfg struct {
-			AllowedAge               int    `fig:"allowed_age,required"`
 			VerificationKeyPath      string `fig:"verification_key_path,required"`
 			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
 		}

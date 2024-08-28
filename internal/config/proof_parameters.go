@@ -12,12 +12,8 @@ type ProofParametersConfiger interface {
 }
 
 type ProofParametersConfig struct {
-	EventID                  string `fig:"event_id,required"`
-	TimestampLowerBound      string `fig:"timestamp_lower_bound,required"`
-	TimestampUpperBound      string `fig:"timestamp_upper_bound,required"`
-	ExpirationDateLowerBound string `fig:"expiration_date_lower_bound"`
-	ExpirationDateUpperBound string `fig:"expiration_date_upper_bound"`
-	BirthDateUpperBound      string `fig:"birth_date_upper_bound,required"`
+	EventID             string `fig:"event_id,required"`
+	TimestampUpperBound string `fig:"timestamp_upper_bound,required"`
 }
 
 type ProofParameters struct {

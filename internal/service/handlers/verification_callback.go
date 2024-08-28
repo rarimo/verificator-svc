@@ -50,14 +50,14 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	selectorInt, err := strconv.Atoi(getter.Get(zk.Selector))
 	if err != nil {
-		Log(r).Error("cannot extract selector from public signals")
+		Log(r).WithError(err).Errorf("cannot extract selector from public signals")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	identityCounterUpperBound, err := strconv.ParseInt(getter.Get(zk.IdentityCounterUpperBound), 10, 64)
 	if err != nil {
-		Log(r).Error("cannot extract identityUpperBound from public signals")
+		Log(r).WithError(err).Errorf("cannot extract identityUpperBound from public signals")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -86,7 +86,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		zk.WithCitizenships(verifiedUser.Nationality),
 		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
 		zk.WithIdentitiesCounter(identityCounterUpperBound),
-		//zk.WithAgeAbove(verifiedUser.AgeLowerBound),
+		zk.WithAgeAbove(verifiedUser.AgeLowerBound),
 	}
 	err = Verifiers(r).Passport.VerifyProof(*proof, verifyOpts...)
 	if err != nil {

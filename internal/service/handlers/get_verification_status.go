@@ -19,7 +19,7 @@ func GetVerificationStatusById(w http.ResponseWriter, r *http.Request) {
 	verifiedUser, err := VerifyUsersQ(r).WhereID(userID).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get user by userID")
-		ape.RenderErr(w, problems.NotFound())
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if verifiedUser == nil {

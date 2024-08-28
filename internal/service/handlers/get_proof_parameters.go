@@ -20,6 +20,8 @@ const (
 	citizenshipBit               = 5
 	timestampUpperBoundBit       = 9
 	identityCounterUpperBoundBit = 11
+	birthDateLowerboundBit       = 19
+	birthDateUpperboundBit       = 20
 	expirationDateLowerboundBit  = 21
 	expirationDateUpperbound     = 22
 )
@@ -79,9 +81,11 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		identityCounterUpperBound: IdentityCounterUpperBound,
 		timestampUpperBound:       TimestampUpperBound,
 		citizenshipMask:           Utf8ToHex(userInputs.Nationality),
-		timestampLowerBound:       ProofParameters(r).TimestampLowerBound,
-		birthDateLowerBound:       CalculateBirthDateHex(userInputs.AgeLowerBound),
-		birthDateUpperBound:       ProofParameters(r).BirthDateUpperBound,
+		timestampLowerBound:       "0",
+		birthDateLowerBound:       "0x303030303030",
+		birthDateUpperBound:       CalculateBirthDateHex(userInputs.AgeLowerBound),
+		expirationDateUpperBound:  "52983525027888",
+		expirationDateLowerBound:  "52983525027888",
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
@@ -118,8 +122,8 @@ func NewProofParametersResponse(user data.VerifyUsers, params ProofParams) resou
 				CitizenshipMask:           params.citizenshipMask,
 				EventData:                 user.UserIDHash,
 				EventId:                   params.eventID,
-				ExpirationDateLowerBound:  "52983525027888",
-				ExpirationDateUpperBound:  "52983525027888",
+				ExpirationDateLowerBound:  params.expirationDateLowerBound,
+				ExpirationDateUpperBound:  params.expirationDateUpperBound,
 				IdentityCounter:           0,
 				IdentityCounterLowerBound: 0,
 				IdentityCounterUpperBound: params.identityCounterUpperBound,
@@ -160,6 +164,7 @@ func CalculateProofSelector(uniqueness bool) int {
 	var bitLine uint32
 	bitLine |= 1 << nullifierBit
 	bitLine |= 1 << citizenshipBit
+	bitLine |= 1 << birthDateLowerboundBit
 	if uniqueness {
 		bitLine |= 1 << timestampUpperBoundBit
 		bitLine |= 1 << identityCounterUpperBoundBit
