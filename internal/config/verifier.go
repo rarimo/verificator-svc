@@ -2,17 +2,10 @@ package config
 
 import (
 	"fmt"
+
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/figure/v3"
 	"gitlab.com/distributed_lab/kit/kv"
-)
-
-const (
-	proofEventIDValue       = "111186066134341633902189494613533900917417361106374681011849132651019822199"
-	proofSelectorValue      = "236065"
-	maxIdentityCount        = 1
-	documentTypeID          = "ID"
-	passportVerificationKey = "./proof_keys/passport.json"
 )
 
 type Verifiers struct {
@@ -22,8 +15,8 @@ type Verifiers struct {
 func (c *config) Verifiers() Verifiers {
 	return c.verifier.Do(func() interface{} {
 		var cfg struct {
-			AllowedAge               int   `fig:"allowed_age,required"`
-			AllowedIdentityTimestamp int64 `fig:"allowed_identity_timestamp,required"`
+			VerificationKeyPath      string `fig:"verification_key_path,required"`
+			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
 		}
 
 		err := figure.
@@ -35,16 +28,11 @@ func (c *config) Verifiers() Verifiers {
 		}
 
 		pass, err := zk.NewVerifier(nil,
-			zk.WithProofType(zk.GeorgianPassport),
-			zk.WithCitizenships("GEO"),
-			zk.WithVerificationKeyFile(passportVerificationKey),
-			zk.WithAgeAbove(cfg.AllowedAge),
+			zk.WithProofType(zk.GlobalPassport),
+			zk.WithVerificationKeyFile(cfg.VerificationKeyPath),
 			zk.WithPassportRootVerifier(c.passport.ProvideVerifier()),
-			zk.WithProofSelectorValue(proofSelectorValue),
-			zk.WithEventID(proofEventIDValue),
-			zk.WithIdentitiesCounter(maxIdentityCount),
 			zk.WithIdentitiesCreationTimestampLimit(cfg.AllowedIdentityTimestamp),
-			zk.WithDocumentType(documentTypeID),
+			zk.WithEventID(c.ProofParametersConfig().EventID),
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to initialize passport verifier: %w", err))

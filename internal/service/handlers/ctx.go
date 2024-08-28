@@ -15,6 +15,8 @@ const (
 	logCtxKey ctxKey = iota
 	verifyUserQCtxKey
 	verifiersCtxKey
+	callbackCtxKey
+	proofParametersCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -45,4 +47,24 @@ func CtxVerifiers(v config.Verifiers) func(context.Context) context.Context {
 
 func Verifiers(r *http.Request) config.Verifiers {
 	return r.Context().Value(verifiersCtxKey).(config.Verifiers)
+}
+
+func CtxCallback(c config.CallbackConfig) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, callbackCtxKey, c)
+	}
+}
+
+func Callback(r *http.Request) config.CallbackConfig {
+	return r.Context().Value(callbackCtxKey).(config.CallbackConfig)
+}
+
+func CtxProofParameters(c config.ProofParametersConfig) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, proofParametersCtxKey, c)
+	}
+}
+
+func ProofParameters(r *http.Request) config.ProofParametersConfig {
+	return r.Context().Value(proofParametersCtxKey).(config.ProofParametersConfig)
 }

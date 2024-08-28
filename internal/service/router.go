@@ -18,12 +18,16 @@ func (s *service) router(cfg config.Config) chi.Router {
 			handlers.CtxLog(cfg.Log()),
 			handlers.CtxVerifyUsersQ(pg.NewVerifyUsersQ(cfg.DB().Clone())),
 			handlers.CtxVerifiers(cfg.Verifiers()),
+			handlers.CtxCallback(cfg.CallbackConfig()),
+			handlers.CtxProofParameters(cfg.ProofParametersConfig()),
 		),
 	)
 	r.Route("/integrations/verificator-svc", func(r chi.Router) {
-		r.Route("/public", func(r chi.Router) {
+		r.Route("/private", func(r chi.Router) {
 			r.Get("/proof-parameters", handlers.GetProofParameters)
 			r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
+		})
+		r.Route("/public", func(r chi.Router) {
 			r.Post("/callback/{user_id}", handlers.VerificationCallback)
 		})
 	})
