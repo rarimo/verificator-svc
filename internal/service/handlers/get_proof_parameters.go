@@ -20,10 +20,11 @@ const (
 	citizenshipBit               = 5
 	timestampUpperBoundBit       = 9
 	identityCounterUpperBoundBit = 11
-	birthDateLowerboundBit       = 19
-	birthDateUpperboundBit       = 20
-	expirationDateLowerboundBit  = 21
-	expirationDateUpperbound     = 22
+	expirationDateLowerboundBit  = 12
+	expirationDateUpperbound     = 13
+	birthDateLowerboundBit       = 14
+	birthDateUpperboundBit       = 15
+	birthDateFormat              = "060102"
 )
 
 type ProofParams struct {
@@ -153,9 +154,9 @@ func Utf8ToHex(input string) string {
 }
 
 func CalculateBirthDateHex(ageLowerBound int) string {
-	currentDate := time.Now().UTC()
-	birthDateLoweBound := []byte(fmt.Sprintf("%02d", (currentDate.Year()-ageLowerBound)%100) + "0101")
-	hexBirthDateLoweBound := hexutils.BytesToHex(birthDateLoweBound)
+	allowedBirthDate := time.Now().UTC().AddDate(-ageLowerBound, 0, 0)
+	formattedDate := []byte(allowedBirthDate.Format(birthDateFormat))
+	hexBirthDateLoweBound := hexutils.BytesToHex(formattedDate)
 
 	return fmt.Sprintf("0x%s", hexBirthDateLoweBound)
 }
@@ -164,7 +165,7 @@ func CalculateProofSelector(uniqueness bool) int {
 	var bitLine uint32
 	bitLine |= 1 << nullifierBit
 	bitLine |= 1 << citizenshipBit
-	bitLine |= 1 << birthDateLowerboundBit
+	bitLine |= 1 << birthDateUpperboundBit
 	if uniqueness {
 		bitLine |= 1 << timestampUpperBoundBit
 		bitLine |= 1 << identityCounterUpperBoundBit

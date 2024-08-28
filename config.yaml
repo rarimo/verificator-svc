@@ -20,13 +20,10 @@ callback:
 
 proof_parameters:
   event_id: "event_id"
-  timestamp_lower_bound: "10000000000"
   timestamp_upper_bound: "19000000000"
-  birth_date_upper_bound: "0x323031303130"
 
 verifier:
   verification_key_path: "./proof_keys/passport.json"
-  allowed_age: 18
   allowed_identity_timestamp: 1715698750
 
 poseidonsmt_root_verifier:
