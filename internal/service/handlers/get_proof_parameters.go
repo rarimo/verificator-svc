@@ -15,6 +15,15 @@ import (
 	"time"
 )
 
+const (
+	nullifierBit                 = 0
+	citizenshipBit               = 5
+	timestampUpperBoundBit       = 9
+	identityCounterUpperBoundBit = 11
+	expirationDateLowerboundBit  = 21
+	expirationDateUpperbound     = 22
+)
+
 type ProofParams struct {
 	host                      string
 	eventID                   string
@@ -36,16 +45,20 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	TimestampUpperBound := "0"
-	var IdentityCounterUpperBound int32
+	var (
+		TimestampUpperBound       = "0"
+		IdentityCounterUpperBound int32
+	)
 	proofSelector := CalculateProofSelector(userInputs.Uniqueness)
-	if proofSelector&(1<<9) != 0 && proofSelector&(1<<11) != 0 {
+	if proofSelector&(1<<timestampUpperBoundBit) != 0 &&
+		proofSelector&(1<<identityCounterUpperBoundBit) != 0 {
 		TimestampUpperBound = ProofParameters(r).TimestampUpperBound
 		IdentityCounterUpperBound = 1
 	}
 
 	userIdHash, err := StringToPoseidonHash(userInputs.UserId)
 	if err != nil {
+		Log(r).WithError(err).Errorf("failed to convert user with userID [%s] to poseidon hash", userInputs.UserId)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -65,11 +78,9 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		proofSelector:             strconv.Itoa(proofSelector),
 		identityCounterUpperBound: IdentityCounterUpperBound,
 		timestampUpperBound:       TimestampUpperBound,
-		citizenshipMask:           utf8ToHex(userInputs.Nationality),
+		citizenshipMask:           Utf8ToHex(userInputs.Nationality),
 		timestampLowerBound:       ProofParameters(r).TimestampLowerBound,
-		expirationDateUpperBound:  ProofParameters(r).ExpirationDateUpperBound,
-		expirationDateLowerBound:  ProofParameters(r).ExpirationDateLowerBound,
-		birthDateLowerBound:       calculateBirthDateHex(userInputs.AgeLowerBound),
+		birthDateLowerBound:       CalculateBirthDateHex(userInputs.AgeLowerBound),
 		birthDateUpperBound:       ProofParameters(r).BirthDateUpperBound,
 	}
 
@@ -84,8 +95,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = VerifyUsersQ(r).Insert(user)
-	if err != nil {
+	if err = VerifyUsersQ(r).Insert(user); err != nil {
 		Log(r).WithError(err).Errorf("failed to insert user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
@@ -108,8 +118,8 @@ func NewProofParametersResponse(user data.VerifyUsers, params ProofParams) resou
 				CitizenshipMask:           params.citizenshipMask,
 				EventData:                 user.UserIDHash,
 				EventId:                   params.eventID,
-				ExpirationDateLowerBound:  params.expirationDateLowerBound,
-				ExpirationDateUpperBound:  params.expirationDateUpperBound,
+				ExpirationDateLowerBound:  "52983525027888",
+				ExpirationDateUpperBound:  "52983525027888",
 				IdentityCounter:           0,
 				IdentityCounterLowerBound: 0,
 				IdentityCounterUpperBound: params.identityCounterUpperBound,
@@ -129,28 +139,30 @@ func StringToPoseidonHash(inputString string) (string, error) {
 		return "", fmt.Errorf("failde to convert input bytes to hash: %w", err)
 
 	}
-	return hex.EncodeToString(hash.Bytes()), nil
+	return fmt.Sprintf("0x%s", hex.EncodeToString(hash.Bytes())), nil
 }
 
-func utf8ToHex(input string) string {
+func Utf8ToHex(input string) string {
 	bytes := []byte(input)
 	hexString := hexutils.BytesToHex(bytes)
-	return hexString
+	return fmt.Sprintf("0x%s", hexString)
 }
 
-func calculateBirthDateHex(ageLowerBound int) string {
+func CalculateBirthDateHex(ageLowerBound int) string {
 	currentDate := time.Now().UTC()
 	birthDateLoweBound := []byte(fmt.Sprintf("%02d", (currentDate.Year()-ageLowerBound)%100) + "0101")
 	hexBirthDateLoweBound := hexutils.BytesToHex(birthDateLoweBound)
 
-	return hexBirthDateLoweBound
+	return fmt.Sprintf("0x%s", hexBirthDateLoweBound)
 }
 
 func CalculateProofSelector(uniqueness bool) int {
 	var bitLine uint32
+	bitLine |= 1 << nullifierBit
+	bitLine |= 1 << citizenshipBit
 	if uniqueness {
-		bitLine |= 1 << 9
-		bitLine |= 1 << 11
+		bitLine |= 1 << timestampUpperBoundBit
+		bitLine |= 1 << identityCounterUpperBoundBit
 	}
 
 	return int(bitLine)

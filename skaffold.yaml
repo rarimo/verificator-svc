@@ -4,29 +4,29 @@ build:
   artifacts:
     - image: verificator-svc # Change it on your own repo-name
 
-profiles:
-- name: dev
-  deploy:
-   helm:
-     releases:
-       - name: verificator-svc # Change it on your own repo-name
-         setValueTemplates:
-           image.repository: "{{.IMAGE_REPO_verificator_svc}}" # Change <backend> on your own repo-name
-           image.tag: "{{.IMAGE_TAG_verificator_svc}}" # Change <backend> on your own repo-name
-         namespace: dev # Change it on your own namespace
-         createNamespace: true
-         chartPath: ./verificator-svc-chart # Change it on your own path to helm chart
-         valuesFiles:
-           - ./verificator-svc-chart/values.yaml # Change it on your own path to helm chart values.yaml file
-         skipBuildDependencies: true
-     flags:
-       upgrade:
-         - -i
-  portForward:
-   - resourceType: deployment
-     resourceName: verificator-svc # Change it on your own name in Chart.yaml
-     port: 8000
-     localPort: 8000
+#profiles:
+#- name: dev
+#  deploy:
+#   helm:
+#     releases:
+#       - name: verificator-svc # Change it on your own repo-name
+#         setValueTemplates:
+#           image.repository: "{{.IMAGE_REPO_verificator_svc}}" # Change <backend> on your own repo-name
+#           image.tag: "{{.IMAGE_TAG_verificator_svc}}" # Change <backend> on your own repo-name
+#         namespace: dev # Change it on your own namespace
+#         createNamespace: true
+#         chartPath: ./verificator-svc-chart # Change it on your own path to helm chart
+#         valuesFiles:
+#           - ./verificator-svc-chart/values.yaml # Change it on your own path to helm chart values.yaml file
+#         skipBuildDependencies: true
+#     flags:
+#       upgrade:
+#         - -i
+#  portForward:
+#   - resourceType: deployment
+#     resourceName: verificator-svc # Change it on your own name in Chart.yaml
+#     port: 8000
+#     localPort: 8000
 
 # - name: stage
 #   deploy:

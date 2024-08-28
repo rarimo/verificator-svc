@@ -8,10 +8,6 @@ import (
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
-const (
-	passportVerificationKey = "./proof_keys/passport.json"
-)
-
 type Verifiers struct {
 	Passport *zk.Verifier
 }
@@ -37,6 +33,7 @@ func (c *config) Verifiers() Verifiers {
 			zk.WithVerificationKeyFile(cfg.VerificationKeyPath),
 			zk.WithPassportRootVerifier(c.passport.ProvideVerifier()),
 			zk.WithIdentitiesCreationTimestampLimit(cfg.AllowedIdentityTimestamp),
+			zk.WithEventID(c.ProofParametersConfig().EventID),
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to initialize passport verifier: %w", err))

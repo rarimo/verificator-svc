@@ -11,7 +11,7 @@ require (
 	github.com/iden3/go-iden3-crypto v0.0.15
 	github.com/iden3/go-rapidsnark/types v0.0.3
 	github.com/pkg/errors v0.9.1
-	github.com/rarimo/zkverifier-kit v1.2.0
+	github.com/rarimo/zkverifier-kit v1.2.1
 	github.com/rubenv/sql-migrate v1.7.0
 	github.com/status-im/keycard-go v0.0.0-20190316090335-8537d3370df4
 	gitlab.com/distributed_lab/ape v1.7.1

@@ -10,20 +10,20 @@ import (
 )
 
 func GetVerificationStatusById(w http.ResponseWriter, r *http.Request) {
-	userId, err := requests.GetVerificationStatusByID(r)
+	userID, err := requests.GetVerificationStatusByID(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	verifiedUser, err := VerifyUsersQ(r).WhereID(userId).Get()
+	verifiedUser, err := VerifyUsersQ(r).WhereID(userID).Get()
 	if err != nil {
-		Log(r).WithError(err).Error("Failed to get user by userId")
-		ape.RenderErr(w, problems.InternalError())
+		Log(r).WithError(err).Error("failed to get user by userID")
+		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 	if verifiedUser == nil {
-		Log(r).Debugf("User for userId=%s not found", userId)
+		Log(r).Debugf("User with userID=%s not found", userID)
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
