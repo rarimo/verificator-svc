@@ -1,0 +1,12 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    example: "example@example.com"
+  type:
+    type: string
+    enum:
+      - user

@@ -1,0 +1,36 @@
+post:
+  tags:
+    - Verifications Links
+  summary: Request verifications links
+  description: |
+    Request verification links for user.
+  operationId: getVerificationLink
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/User'
+  responses:
+    200:
+      description: Success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Links'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'

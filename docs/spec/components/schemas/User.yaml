@@ -1,0 +1,25 @@
+allOf:
+  - $ref: '#/components/schemas/UserKey'
+  - type: object
+    x-go-is-request: true
+    required:
+      - attributes
+    properties:
+      attributes:
+        required:
+          - ageLowerBound
+          - uniqueness
+          - nationality
+        properties:
+          ageLowerBound:
+            type: integer
+            example: 18
+          uniqueness:
+            type: boolean
+            example: true
+          nationality:
+            type: string
+            example: "UKR"
+          event_id:
+            type: string
+            example: "2234556494903931186902189494613533900917417361106374681011849132651019822199"

@@ -1,0 +1,12 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    example: "user@example.com"
+  type:
+    type: string
+    enum:
+      - get_proof_params

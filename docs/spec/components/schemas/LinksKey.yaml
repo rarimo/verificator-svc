@@ -1,0 +1,12 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    example: "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff"
+  type:
+    type: string
+    enum:
+      - verification_link
