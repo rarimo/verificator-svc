@@ -10,6 +10,7 @@ get:
       - $ref: '#/components/parameters/typeOfVerificationAgeParam'
       - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
       - $ref: '#/components/parameters/nationalityParam'
+      - $ref: '#/components/parameters/eventIdParam'
     responses:
       200:
         description: Success

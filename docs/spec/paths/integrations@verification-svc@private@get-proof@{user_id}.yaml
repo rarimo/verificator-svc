@@ -1,0 +1,27 @@
+get:
+  tags:
+    - Get proof by userID
+  summary: Get proof by userID
+  description: |
+    Get proof for user
+  operationId: getProof
+  parameters:
+    - $ref: '#/components/parameters/idParam'
+  responses:
+    200:
+      description: Success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/GetProof'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'

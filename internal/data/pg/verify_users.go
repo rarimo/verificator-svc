@@ -2,6 +2,7 @@ package pg
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -62,6 +63,11 @@ func (q *VerifyUsersQ) Get() (*data.VerifyUsers, error) {
 }
 
 func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
+	proofJSON, err := json.Marshal(VerifyUsers.Proof)
+	if err != nil {
+		return fmt.Errorf("failed to marshal proof for user %s: %w", VerifyUsers.UserID, err)
+	}
+
 	stmt := sq.Insert(verifyUsersTableName).SetMap(map[string]interface{}{
 		"user_id":         VerifyUsers.UserID,
 		"user_id_hash":    VerifyUsers.UserIDHash,
@@ -69,10 +75,11 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 		"nationality":     VerifyUsers.Nationality,
 		"uniqueness":      VerifyUsers.Uniqueness,
 		"status":          VerifyUsers.Status,
+		"proof":           proofJSON,
 	})
 
-	if err := q.db.Exec(stmt); err != nil {
-		return fmt.Errorf("insert balance %+v: %w", VerifyUsers, err)
+	if err = q.db.Exec(stmt); err != nil {
+		return fmt.Errorf("insert user %+v: %w", VerifyUsers, err)
 	}
 
 	return nil
@@ -83,6 +90,7 @@ func (q *VerifyUsersQ) Update(VerifyUsers *data.VerifyUsers) error {
 		sq.Update(verifyUsersTableName).
 			SetMap(map[string]interface{}{
 				"status": VerifyUsers.Status,
+				"proof":  VerifyUsers.Proof,
 			}).
 			Where(sq.Eq{userIdColumnName: VerifyUsers.UserID}),
 	)
@@ -100,6 +108,17 @@ func (q *VerifyUsersQ) Delete() error {
 	}
 
 	return nil
+}
+
+func (q *VerifyUsersQ) DeleteByID(VerifyUsers *data.VerifyUsers) error {
+	err := q.db.Exec(
+		sq.Delete(verifyUsersTableName).Where(sq.Eq{userIdColumnName: VerifyUsers.UserID}),
+	)
+	if err != nil {
+		return errors.Wrap(err, "failed to delete user by userID")
+	}
+	return nil
+
 }
 
 func (q *VerifyUsersQ) WhereID(userId string) data.VerifyUsersQ {

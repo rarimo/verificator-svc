@@ -49,9 +49,15 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
+		eventID                   = ProofParameters(r).EventID
 		TimestampUpperBound       = "0"
 		IdentityCounterUpperBound int32
 	)
+
+	if userInputs.EventID != "" {
+		eventID = userInputs.EventID
+	}
+
 	proofSelector := CalculateProofSelector(userInputs.Uniqueness)
 	if proofSelector&(1<<timestampUpperBoundBit) != 0 &&
 		proofSelector&(1<<identityCounterUpperBoundBit) != 0 {
@@ -73,11 +79,12 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		Nationality:   userInputs.Nationality,
 		AgeLowerBound: userInputs.AgeLowerBound,
 		Uniqueness:    userInputs.Uniqueness,
+		Proof:         []byte{},
 	}
 
 	proofParams := ProofParams{
 		host:                      Callback(r).URL,
-		eventID:                   ProofParameters(r).EventID,
+		eventID:                   eventID,
 		proofSelector:             strconv.Itoa(proofSelector),
 		identityCounterUpperBound: IdentityCounterUpperBound,
 		timestampUpperBound:       TimestampUpperBound,
