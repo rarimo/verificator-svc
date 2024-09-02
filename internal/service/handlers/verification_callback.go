@@ -133,7 +133,7 @@ func NewVerificationCallbackResponse(user data.VerifyUsers) resources.StatusResp
 		Data: resources.Status{
 			Key: resources.Key{
 				ID:   user.UserID,
-				Type: resources.RECEIVE_PROOF,
+				Type: resources.USER_STATUS,
 			},
 			Attributes: resources.StatusAttributes{
 				Status: user.Status,

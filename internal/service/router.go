@@ -23,23 +23,17 @@ func (s *service) router(cfg config.Config) chi.Router {
 		),
 	)
 	r.Route("/integrations/verificator-svc", func(r chi.Router) {
-		r.Route("/v1", func(r chi.Router) {
-			r.Route("/private", func(r chi.Router) {
-				r.Get("/proof-parameters", handlers.GetProofParameters)
-				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
-				r.Delete("/delete-user/{user_id}", handlers.DeleteUser)
-				r.Get("/get-proof/{user_id}", handlers.GetProofByUserID)
-			})
-			r.Route("/public", func(r chi.Router) {
-				r.Post("/callback/{user_id}", handlers.VerificationCallback)
-			})
+		r.Route("/private", func(r chi.Router) {
+			r.Get("/get-proof/{user_id}", handlers.GetProofByUserID)
+			r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
+			r.Delete("/delete-user/{user_id}", handlers.DeleteUser)
+			r.Post("/verification-link", handlers.VerificationLink)
 		})
+		r.Route("/public", func(r chi.Router) {
+			r.Post("/callback/{user_id}", handlers.VerificationCallback)
+			r.Get("/proof-params/{user_id_hash}", handlers.GetProofParamsById)
+			r.Get("/proof-parameters", handlers.GetProofParameters)
 
-		r.Route("/v2", func(r chi.Router) {
-			r.Route("/private", func(r chi.Router) {
-				r.Post("/verification-link", handlers.VerificationLink)
-				r.Get("/proof-params/{user_id_hash}", handlers.GetProofParamsById)
-			})
 		})
 
 	})
