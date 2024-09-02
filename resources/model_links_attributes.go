@@ -5,6 +5,6 @@
 package resources
 
 type LinksAttributes struct {
-	CallbackUrl    string `json:"callbackUrl"`
-	GetProofParams string `json:"getProofParams"`
+	CallbackUrl    string `json:"callback_url"`
+	GetProofParams string `json:"get_proof_params"`
 }

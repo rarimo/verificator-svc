@@ -19,11 +19,11 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 	)
 
 	return req, val.Errors{
-		"data/id":                       val.Validate(req.Data.ID, val.Required),
-		"data/type":                     val.Validate(req.Data.Type, val.Required, val.In(resources.USER)),
-		"data/attributes/ageLowerBound": val.Validate(attr.AgeLowerBound, val.Required),
-		"data/attributes/uniqueness":    val.Validate(attr.Uniqueness, val.Required),
-		"data/attributes/nationality":   val.Validate(attr.Nationality, val.Required),
-		"data/attributes/event_id":      val.Validate(attr.Nationality, val.Required),
+		"data/id":                         val.Validate(req.Data.ID, val.Required),
+		"data/type":                       val.Validate(req.Data.Type, val.Required, val.In(resources.USER)),
+		"data/attributes/age_lower_bound": val.Validate(attr.AgeLowerBound, val.Required),
+		"data/attributes/uniqueness":      val.Validate(attr.Uniqueness, val.Required),
+		"data/attributes/nationality":     val.Validate(attr.Nationality, val.Required),
+		"data/attributes/event_id":        val.Validate(attr.Nationality, val.Required),
 	}.Filter()
 }

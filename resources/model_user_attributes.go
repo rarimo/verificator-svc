@@ -5,7 +5,7 @@
 package resources
 
 type UserAttributes struct {
-	AgeLowerBound int32  `json:"ageLowerBound"`
+	AgeLowerBound int32  `json:"age_lower_bound"`
 	EventId       string `json:"event_id,omitempty"`
 	Nationality   string `json:"nationality"`
 	Uniqueness    bool   `json:"uniqueness"`
