@@ -11,6 +11,7 @@ type VerifyUsers struct {
 	Nationality   string    `db:"nationality"`
 	CreatedAt     time.Time `db:"created_at"`
 	Uniqueness    bool      `db:"uniqueness"`
+	EventId       string    `db:"event_id"`
 	Status        string    `db:"status"`
 	Proof         []byte    `db:"proof"`
 }

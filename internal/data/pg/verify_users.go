@@ -74,6 +74,7 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 		"age_lower_bound": VerifyUsers.AgeLowerBound,
 		"nationality":     VerifyUsers.Nationality,
 		"uniqueness":      VerifyUsers.Uniqueness,
+		"event_id":        VerifyUsers.EventId,
 		"status":          VerifyUsers.Status,
 		"proof":           proofJSON,
 	})
