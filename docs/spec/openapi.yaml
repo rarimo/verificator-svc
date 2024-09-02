@@ -4,5 +4,5 @@ info:
   title: verificator-svc
   description: ''
 servers:
-  - url: 'https://api.demo.tokend.io'
-    description: TokenD Developer Environment
+  - url: 'https://api.stage.rarime.com'
+    description: Rarimo Developer Environment
