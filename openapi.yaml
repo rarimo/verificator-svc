@@ -7,19 +7,16 @@ servers:
   - url: 'https://api.demo.tokend.io'
     description: TokenD Developer Environment
 paths:
-  /integrations/verification-svc/private/proof-parameters:
+  '/integrations/verification-svc/private/proof/{user_id}':
     get:
       tags:
-        - Verification Parameters
-      summary: Request user verification parameters
+        - User verification
+      summary: Get verified proof
       description: |
-        Sends a request for user verification with provided parameters.
-      operationId: getVerificationParameters
+        Get verified proof by userID.
+      operationId: getProof
       parameters:
         - $ref: '#/components/parameters/idParam'
-        - $ref: '#/components/parameters/typeOfVerificationAgeParam'
-        - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
-        - $ref: '#/components/parameters/nationalityParam'
       responses:
         '200':
           description: Success
@@ -31,7 +28,7 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: '#/components/schemas/Parameters'
+                    $ref: '#/components/schemas/GetProof'
         '400':
           $ref: '#/components/responses/invalidParameter'
         '404':
@@ -41,7 +38,7 @@ paths:
   '/integrations/verification-svc/private/verification-status/{user_id}':
     get:
       tags:
-        - Verification Status
+        - User verification
       summary: Get user verification status
       description: |
         Get user verification status by UserID.
@@ -66,12 +63,12 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalError'
-  '/integrations/verification-svc/public/receive-proof/callback/{user_id_hash}':
+  '/integrations/verification-svc/public/callback/{user_id_hash}':
     post:
       tags:
-        - Receive Proof
-      summary: Receive Proof by callback
-      description: It receives the proof by callback url
+        - Proof
+      summary: Receive Proof by callback(mobile)
+      description: It receives the proof for verification by callback url
       operationId: receiveProofByCallback
       parameters:
         - $ref: '#/components/parameters/pathIDHash'
@@ -98,6 +95,122 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Status'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  /integrations/verification-svc/public/proof-parameters:
+    get:
+      tags:
+        - Proof
+      summary: Get Proof Parameters(internal)
+      description: |
+        Get proof parameters for user with provided query parameters(internal, better to use verification links to get proof-parameters).
+      operationId: getVerificationParameters
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+        - $ref: '#/components/parameters/typeOfVerificationAgeParam'
+        - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
+        - $ref: '#/components/parameters/nationalityParam'
+        - $ref: '#/components/parameters/eventIdParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Parameters'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verificator-svc/private/user/{user_id}':
+    delete:
+      tags:
+        - User verification
+      summary: Delete user
+      description: |
+        Delete user by UserID.
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/pathID'
+      responses:
+        '204':
+          description: User deleted
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  /integrations/verificator-svc/private/verification-link:
+    post:
+      tags:
+        - User verification
+      summary: Request verification links for qr-code generation
+      description: |
+        Requests verification links for user to generate qr-code, returns: callback_url and get_proof_params.
+      operationId: getVerificationLink
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Links'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verificator-svc/public/proof-params/{user_id_hash}':
+    get:
+      tags:
+        - Proof
+      summary: Get Proof Parameters(mobile)
+      description: |
+        Get proof parameters by userIDHash.
+      operationId: getProofParameters
+      parameters:
+        - $ref: '#/components/parameters/pathIDHash'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProofParams'
         '400':
           $ref: '#/components/responses/invalidParameter'
         '404':
@@ -140,6 +253,68 @@ components:
                   - 404
                   - 409
                   - 500
+    GetProof:
+      allOf:
+        - $ref: '#/components/schemas/GetProofKey'
+        - type: object
+          x-go-is-request: true
+          required:
+            - attributes
+          properties:
+            attributes:
+              required:
+                - proof
+              properties:
+                proof:
+                  type: object
+                  format: types.ZKProof
+                  description: |
+                    Query ZK passport verification proof.
+    GetProofKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: 18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff
+        type:
+          type: string
+          enum:
+            - get_proof
+    Links:
+      allOf:
+        - $ref: '#/components/schemas/LinksKey'
+        - type: object
+          x-go-is-request: true
+          required:
+            - attributes
+          properties:
+            attributes:
+              required:
+                - callback_url
+                - get_proof_params
+              properties:
+                callback_url:
+                  type: string
+                  example: 'https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949'
+                get_proof_params:
+                  type: string
+                  example: 'https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949'
+    LinksKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: 18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff
+        type:
+          type: string
+          enum:
+            - verification_link
     Parameters:
       allOf:
         - $ref: '#/components/schemas/ParametersKey'
@@ -150,48 +325,61 @@ components:
             attributes:
               type: object
               required:
-                - eventID
-                - eventData
+                - event_id
+                - event_data
                 - selector
-                - identityCounter
-                - timestampLowerBound
-                - timestampUpperBound
-                - identityCounterLowerBound
-                - identityCounterUpperBound
-                - expirationDateLowerBound
-                - expirationDateUpperBound
-                - birthDateLowerBound
-                - birthDateUpperBound
-                - citizenshipMask
-                - callbackUrl
+                - identity_counter
+                - timestamp_lower_bound
+                - timestamp_upper_bound
+                - identity_counter_lower_bound
+                - identity_counter_upper_bound
+                - expiration_date_lower_bound
+                - expiration_date_upper_bound
+                - birth_date_lower_bound
+                - birth_date_upper_bound
+                - citizenship_mask
+                - callback_url
               properties:
-                eventId:
+                event_id:
                   type: string
-                eventData:
+                  example: '134934934030489134341633902189494613533900917417361106374681011849132651019822199'
+                event_data:
                   type: string
+                  example: '0x28906909b4f974d958f10cf00ff182f8942e75fb57caa1083a942350d6d7c930b'
                 selector:
                   type: string
-                identityCounter:
+                  example: '27065'
+                identity_counter:
                   type: integer
-                timestampLowerBound:
+                  example: 0
+                timestamp_lower_bound:
                   type: string
-                timestampUpperBound:
+                  example: '0'
+                timestamp_upper_bound:
                   type: string
-                identityCounterLowerBound:
+                  example: '19000000000'
+                identity_counter_lower_bound:
                   type: integer
-                identityCounterUpperBound:
+                  example: 0
+                identity_counter_upper_bound:
                   type: integer
-                expirationDateLowerBound:
+                  example: 1
+                expiration_date_lower_bound:
                   type: string
-                expirationDateUpperBound:
+                  example: '52983525027888'
+                expiration_date_upper_bound:
                   type: string
-                birthDateLowerBound:
+                  example: '52983525027888'
+                birth_date_lower_bound:
                   type: string
-                birthDateUpperBound:
+                  example: '0x303030303030'
+                birth_date_upper_bound:
                   type: string
-                citizenshipMask:
+                  example: '0x303630393032'
+                citizenship_mask:
                   type: string
-                callbackUrl:
+                  example: '0x554B52'
+                callback_url:
                   type: string
                   example: 'https://example.com/integrations/verificator-svc/public/receive-proof/callback/c15ad8f88949'
     ParametersKey:
@@ -237,6 +425,82 @@ components:
           type: string
           enum:
             - receive_proof
+    ProofParams:
+      allOf:
+        - $ref: '#/components/schemas/ProofParamsKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - event_id
+                - event_data
+                - selector
+                - identity_counter
+                - timestamp_lower_bound
+                - timestamp_upper_bound
+                - identity_counter_lower_bound
+                - identity_counter_upper_bound
+                - expiration_date_lower_bound
+                - expiration_date_upper_bound
+                - birth_date_lower_bound
+                - birth_date_upper_bound
+                - citizenship_mask
+              properties:
+                event_id:
+                  type: string
+                  example: '134934934030489134341633902189494613533900917417361106374681011849132651019822199'
+                event_data:
+                  type: string
+                  example: '0x28906909b4f974d958f10cf00ff182f8942e75fb57caa1083a942350d6d7c930b'
+                selector:
+                  type: string
+                  example: '27065'
+                identity_counter:
+                  type: integer
+                  example: 0
+                timestamp_lower_bound:
+                  type: string
+                  example: '0'
+                timestamp_upper_bound:
+                  type: string
+                  example: '19000000000'
+                identity_counter_lower_bound:
+                  type: integer
+                  example: 0
+                identity_counter_upper_bound:
+                  type: integer
+                  example: 1
+                expiration_date_lower_bound:
+                  type: string
+                  example: '52983525027888'
+                expiration_date_upper_bound:
+                  type: string
+                  example: '52983525027888'
+                birth_date_lower_bound:
+                  type: string
+                  example: '0x303030303030'
+                birth_date_upper_bound:
+                  type: string
+                  example: '0x303630393032'
+                citizenship_mask:
+                  type: string
+                  example: '0x554B52'
+    ProofParamsKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: user@example.com
+        type:
+          type: string
+          enum:
+            - get_proof_params
     Status:
       allOf:
         - $ref: '#/components/schemas/StatusKey'
@@ -268,6 +532,45 @@ components:
           type: string
           enum:
             - user_status
+    User:
+      allOf:
+        - $ref: '#/components/schemas/UserKey'
+        - type: object
+          x-go-is-request: true
+          required:
+            - attributes
+          properties:
+            attributes:
+              required:
+                - age_lower_bound
+                - uniqueness
+                - nationality
+              properties:
+                age_lower_bound:
+                  type: integer
+                  example: 18
+                uniqueness:
+                  type: boolean
+                  example: true
+                nationality:
+                  type: string
+                  example: UKR
+                event_id:
+                  type: string
+                  example: '2234556494903931186902189494613533900917417361106374681011849132651019822199'
+    UserKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: example@example.com
+        type:
+          type: string
+          enum:
+            - user
   responses:
     internalError:
       description: Internal server error
@@ -288,6 +591,15 @@ components:
           schema:
             $ref: '#/components/schemas/Errors'
   parameters:
+    eventIdParam:
+      in: query
+      name: event_id
+      required: false
+      description: Event ID
+      example: '2234556494903931186902189494613533900917417361106374681011849132651019822199'
+      schema:
+        type: string
+        format: string
     idParam:
       in: query
       name: user_id
@@ -345,7 +657,7 @@ components:
       in: path
       name: user_id_hash
       required: true
-      example: user@example.com
+      example: '0x384734934386483457309437583757364283'
       schema:
         type: string
         fomat: string
