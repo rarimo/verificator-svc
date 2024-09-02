@@ -1,0 +1,9 @@
+in: query
+name: 'event_id'
+required: false
+description: "Event ID"
+example: "2234556494903931186902189494613533900917417361106374681011849132651019822199"
+schema:
+  type: string
+  format: string
+

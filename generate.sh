@@ -3,8 +3,8 @@
 GENERATOR_IMAGE=tokend/openapi-generator:v0.1.0
 
 
-GENERATED="~/go/src/verificator-svc/resources"
-OPENAPI_DIR="~/go/src/verificator-svc/docs/web_deploy"
+GENERATED="./resources"
+OPENAPI_DIR="./docs/web_deploy"
 PACKAGE_NAME=resources
 
 function printHelp {

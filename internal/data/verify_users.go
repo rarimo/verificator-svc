@@ -12,6 +12,7 @@ type VerifyUsers struct {
 	CreatedAt     time.Time `db:"created_at"`
 	Uniqueness    bool      `db:"uniqueness"`
 	Status        string    `db:"status"`
+	Proof         []byte    `db:"proof"`
 }
 
 type VerifyUsersQ interface {
@@ -23,6 +24,7 @@ type VerifyUsersQ interface {
 	Insert(*VerifyUsers) error
 	Delete() error
 
+	DeleteByID(*VerifyUsers) error
 	WhereID(userId string) VerifyUsersQ
 	WhereHashID(userId string) VerifyUsersQ
 	WhereCreatedAtLt(createdAt time.Time) VerifyUsersQ

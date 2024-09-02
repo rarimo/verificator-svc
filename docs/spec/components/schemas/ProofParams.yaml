@@ -1,5 +1,5 @@
 allOf:
-  - $ref: '#/components/schemas/ParametersKey'
+  - $ref: '#/components/schemas/ProofParamsKey'
   - type: object
     required:
       - attributes
@@ -20,7 +20,6 @@ allOf:
           - birth_date_lower_bound
           - birth_date_upper_bound
           - citizenship_mask
-          - callback_url
         properties:
           event_id:
             type: string
@@ -61,6 +60,3 @@ allOf:
           citizenship_mask:
             type: string
             example: "0x554B52"
-          callback_url:
-            type: string
-            example: "https://example.com/integrations/verificator-svc/public/receive-proof/callback/c15ad8f88949"

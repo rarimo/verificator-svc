@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/log"
@@ -28,6 +29,13 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		proof  = req.Data.Attributes.Proof
 		getter = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
 	)
+
+	proofJSON, err := json.Marshal(proof)
+	if err != nil {
+		Log(r).WithError(err).Errorf("failed to convert proof to json")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
 
 	userIDHash, err := ExtractEventData(getter)
 	if err != nil {
@@ -108,6 +116,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	verifiedUser.Status = "verified"
+	verifiedUser.Proof = proofJSON
 	err = VerifyUsersQ(r).Update(verifiedUser)
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
@@ -124,7 +133,7 @@ func NewVerificationCallbackResponse(user data.VerifyUsers) resources.StatusResp
 		Data: resources.Status{
 			Key: resources.Key{
 				ID:   user.UserID,
-				Type: resources.RECEIVE_PROOF,
+				Type: resources.USER_STATUS,
 			},
 			Attributes: resources.StatusAttributes{
 				Status: user.Status,

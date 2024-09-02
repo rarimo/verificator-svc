@@ -1,15 +1,16 @@
 get:
     tags:
-      - Verification Parameters
-    summary: Request user verification parameters
+      - Proof
+    summary: Get Proof Parameters(internal)
     description: |
-      Sends a request for user verification with provided parameters.
+      Get proof parameters for user with provided query parameters(internal, better to use verification links to get proof-parameters).
     operationId: getVerificationParameters
     parameters:
       - $ref: '#/components/parameters/idParam'
       - $ref: '#/components/parameters/typeOfVerificationAgeParam'
       - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
       - $ref: '#/components/parameters/nationalityParam'
+      - $ref: '#/components/parameters/eventIdParam'
     responses:
       200:
         description: Success

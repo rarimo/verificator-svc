@@ -1,12 +1,10 @@
 post:
   tags:
-    - Receive Proof
-  summary: Receive Proof by callback
-  description: >-
-    It receives the proof by callback url
-  operationId: receiveProofByCallback
-  parameters:
-    - $ref: '#/components/parameters/pathIDHash'
+    - User verification
+  summary: Request verification links for qr-code generation
+  description: |
+    Requests verification links for user to generate qr-code, returns: callback_url and get_proof_params.
+  operationId: getVerificationLink
   requestBody:
     required: true
     content:
@@ -17,7 +15,7 @@ post:
             - data
           properties:
             data:
-              $ref: '#/components/schemas/Proof'
+              $ref: '#/components/schemas/User'
   responses:
     200:
       description: Success
@@ -29,7 +27,7 @@ post:
               - data
             properties:
               data:
-                $ref: '#/components/schemas/Status'
+                $ref: '#/components/schemas/Links'
     400:
       $ref: '#/components/responses/invalidParameter'
     404:
