@@ -3,7 +3,7 @@ post:
     - User verification
   summary: Request verification links for qr-code generation
   description: |
-    Request verification links for user to generate qr-code, return: callback_url and get_proof_params.
+    Requests verification links for user to generate qr-code, returns: callback_url and get_proof_params.
   operationId: getVerificationLink
   requestBody:
     required: true

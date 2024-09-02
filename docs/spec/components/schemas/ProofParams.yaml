@@ -7,43 +7,43 @@ allOf:
       attributes:
         type: object
         required:
-          - eventID
-          - eventData
+          - event_id
+          - event_data
           - selector
-          - identityCounter
-          - timestampLowerBound
-          - timestampUpperBound
-          - identityCounterLowerBound
-          - identityCounterUpperBound
-          - expirationDateLowerBound
-          - expirationDateUpperBound
-          - birthDateLowerBound
-          - birthDateUpperBound
-          - citizenshipMask
+          - identity_counter
+          - timestamp_lower_bound
+          - timestamp_upper_bound
+          - identity_counter_lower_bound
+          - identity_counter_upper_bound
+          - expiration_date_lower_bound
+          - expiration_date_upper_bound
+          - birth_date_lower_bound
+          - birth_date_upper_bound
+          - citizenship_mask
         properties:
-          eventId:
+          event_id:
             type: string
-          eventData:
+          event_data:
             type: string
           selector:
             type: string
-          identityCounter:
+          identity_counter:
             type: integer
-          timestampLowerBound:
+          timestamp_lower_bound:
             type: string
-          timestampUpperBound:
+          timestamp_upper_bound:
             type: string
-          identityCounterLowerBound:
+          identity_counter_lower_bound:
             type: integer
-          identityCounterUpperBound:
+          identity_counter_upper_bound:
             type: integer
-          expirationDateLowerBound:
+          expiration_date_lower_bound:
             type: string
-          expirationDateUpperBound:
+          expiration_date_upper_bound:
             type: string
-          birthDateLowerBound:
+          birth_date_lower_bound:
             type: string
-          birthDateUpperBound:
+          birth_date_upper_bound:
             type: string
-          citizenshipMask:
+          citizenship_mask:
             type: string

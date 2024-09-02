@@ -7,11 +7,11 @@ allOf:
     properties:
       attributes:
         required:
-          - ageLowerBound
+          - age_lower_bound
           - uniqueness
           - nationality
         properties:
-          ageLowerBound:
+          age_lower_bound:
             type: integer
             example: 18
           uniqueness:

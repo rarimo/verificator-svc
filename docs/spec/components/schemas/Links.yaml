@@ -7,12 +7,12 @@ allOf:
     properties:
       attributes:
         required:
-          - callbackUrl
-          - getProofParams
+          - callback_url
+          - get_proof_params
         properties:
-          callbackUrl:
+          callback_url:
             type: string
             example: "https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949"
-          getProofParams:
+          get_proof_params:
             type: string
             example: "https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949"
