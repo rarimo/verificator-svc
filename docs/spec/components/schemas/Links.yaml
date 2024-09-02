@@ -12,7 +12,7 @@ allOf:
         properties:
           callbackUrl:
             type: string
-            example: "https://example.com/integrations/verificator-svc/v2/private/proof-params/c15ad8f88949"
+            example: "https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949"
           getProofParams:
             type: string
-            example: "https://example.com/integrations/verificator-svc/v1/public/callback/c15ad8f88949"
+            example: "https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949"

@@ -1,6 +1,6 @@
 delete:
   tags:
-    - Delete user
+    - User verification
   summary: Delete user
   description: |
     Delete user by UserID.

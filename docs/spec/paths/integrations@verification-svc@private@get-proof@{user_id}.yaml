@@ -1,12 +1,12 @@
 get:
   tags:
-    - Verification Status
-  summary: Get user verification status
+    - User verification
+  summary: Get verified proof
   description: |
-    Get user verification status by UserID.
-  operationId: getUserStatus
+    Get verified proof by userID.
+  operationId: getProof
   parameters:
-    - $ref: '#/components/parameters/pathID'
+    - $ref: '#/components/parameters/idParam'
   responses:
     200:
       description: Success
@@ -18,7 +18,7 @@ get:
               - data
             properties:
               data:
-                $ref: '#/components/schemas/Status'
+                $ref: '#/components/schemas/GetProof'
     400:
       $ref: '#/components/responses/invalidParameter'
     404:
