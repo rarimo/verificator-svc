@@ -41,7 +41,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"pub_signals/event_data": validation.Validate(getter.Get(zk.EventData), validation.When(userIDHash == getter.Get(zk.EventData), validation.Required)),
+			"pub_signals/event_data": err,
 		})...)
 		return
 	}
