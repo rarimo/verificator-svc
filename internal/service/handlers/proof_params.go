@@ -48,7 +48,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	birthDateUpperBound := CalculateBirthDateHex(existingUser.AgeLowerBound)
-	if existingUser.AgeLowerBound == 0 {
+	if existingUser.AgeLowerBound == -1 {
 		birthDateUpperBound = "0x303030303030"
 	}
 

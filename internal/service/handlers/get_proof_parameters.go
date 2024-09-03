@@ -174,7 +174,7 @@ func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality stri
 	if nationality != "" {
 		bitLine |= 1 << citizenshipBit
 	}
-	if ageLowerBound != 0 {
+	if ageLowerBound != -1 {
 		bitLine |= 1 << birthDateUpperboundBit
 	}
 	if uniqueness {
