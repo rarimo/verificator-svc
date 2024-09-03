@@ -30,10 +30,10 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		UserIDHash:    userIdHash,
 		CreatedAt:     time.Now().UTC(),
 		Status:        "not_verified",
-		Nationality:   req.Data.Attributes.Nationality,
-		EventId:       req.Data.Attributes.EventId,
-		AgeLowerBound: int(req.Data.Attributes.AgeLowerBound),
-		Uniqueness:    req.Data.Attributes.Uniqueness,
+		Nationality:   *req.Data.Attributes.Nationality,
+		EventId:       *req.Data.Attributes.EventId,
+		AgeLowerBound: int(*req.Data.Attributes.AgeLowerBound),
+		Uniqueness:    *req.Data.Attributes.Uniqueness,
 		Proof:         []byte{},
 	}
 

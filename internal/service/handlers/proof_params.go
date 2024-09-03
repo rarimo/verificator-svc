@@ -53,6 +53,10 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		TimestampUpperBound = ProofParameters(r).TimestampUpperBound
 		IdentityCounterUpperBound = 1
 	}
+	birthDateUpperBound := CalculateBirthDateHex(existingUser.AgeLowerBound)
+	if existingUser.AgeLowerBound == 0 {
+		birthDateUpperBound = "0x303030303030"
+	}
 
 	proofParams := GetProofParam{
 		eventID:                   eventID,
@@ -62,7 +66,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		citizenshipMask:           Utf8ToHex(existingUser.Nationality),
 		timestampLowerBound:       "0",
 		birthDateLowerBound:       "0x303030303030",
-		birthDateUpperBound:       CalculateBirthDateHex(existingUser.AgeLowerBound),
+		birthDateUpperBound:       birthDateUpperBound,
 		expirationDateUpperBound:  "52983525027888",
 		expirationDateLowerBound:  "52983525027888",
 	}

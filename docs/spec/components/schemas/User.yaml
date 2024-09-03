@@ -6,10 +6,6 @@ allOf:
       - attributes
     properties:
       attributes:
-        required:
-          - age_lower_bound
-          - uniqueness
-          - nationality
         properties:
           age_lower_bound:
             type: integer

@@ -58,6 +58,11 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	eventID := ProofParameters(r).EventID
+	if verifiedUser.EventId != "" {
+		eventID = verifiedUser.EventId
+	}
+
 	selectorInt, err := strconv.Atoi(getter.Get(zk.Selector))
 	if err != nil {
 		Log(r).WithError(err).Errorf("cannot extract selector from public signals")
@@ -97,8 +102,9 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
 		zk.WithIdentitiesCounter(identityCounterUpperBound),
 		zk.WithAgeAbove(verifiedUser.AgeLowerBound),
+		zk.WithEventID(eventID),
 	}
-	err = Verifiers(r).Passport.VerifyProof(*proof, verifyOpts...)
+	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
 	if err != nil {
 		var vErr validation.Errors
 		if errors.As(err, &vErr) {
