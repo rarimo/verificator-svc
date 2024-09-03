@@ -47,8 +47,6 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 
 	if req.Data.Attributes.Uniqueness != nil {
 		user.Uniqueness = *req.Data.Attributes.Uniqueness
-	} else {
-		user.Uniqueness = false
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
