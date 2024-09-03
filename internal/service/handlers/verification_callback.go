@@ -92,6 +92,9 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	if verifiedUser.Nationality != "" {
 		verifyOpts = append(verifyOpts, zk.WithCitizenships(verifiedUser.Nationality))
 	}
+	if verifiedUser.Uniqueness {
+		verifyOpts = append(verifyOpts, zk.WithIdentitiesCreationTimestampLimit(Verifiers(r).ServiceStartTimestamp), zk.WithIdentitiesCounter(1))
+	}
 
 	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
 	if err != nil {
