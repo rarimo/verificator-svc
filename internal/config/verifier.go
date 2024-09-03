@@ -32,7 +32,6 @@ func (c *config) Verifiers() Verifiers {
 			zk.WithVerificationKeyFile(cfg.VerificationKeyPath),
 			zk.WithPassportRootVerifier(c.passport.ProvideVerifier()),
 			zk.WithIdentitiesCreationTimestampLimit(cfg.AllowedIdentityTimestamp),
-			zk.WithEventID(c.ProofParametersConfig().EventID),
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to initialize passport verifier: %w", err))

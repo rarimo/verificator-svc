@@ -44,7 +44,7 @@ func NewProofByUserIDResponse(user data.VerifyUsers) resources.GetProofRequest {
 				Type: resources.GET_PROOF,
 			},
 			Attributes: resources.GetProofAttributes{
-				Proof: &proof,
+				Proof: proof,
 			},
 		},
 	}
