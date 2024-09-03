@@ -9,8 +9,8 @@ import (
 )
 
 type Verifiers struct {
-	Passport *zk.Verifier
-	Age      int64
+	Passport              *zk.Verifier
+	ServiceStartTimestamp int64
 }
 
 func (c *config) Verifiers() Verifiers {
@@ -32,15 +32,14 @@ func (c *config) Verifiers() Verifiers {
 			zk.WithProofType(zk.GlobalPassport),
 			zk.WithVerificationKeyFile(cfg.VerificationKeyPath),
 			zk.WithPassportRootVerifier(c.passport.ProvideVerifier()),
-			//zk.WithIdentitiesCreationTimestampLimit(cfg.AllowedIdentityTimestamp),
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to initialize passport verifier: %w", err))
 		}
 
 		return Verifiers{
-			Passport: pass,
-			Age:      cfg.AllowedIdentityTimestamp,
+			Passport:              pass,
+			ServiceStartTimestamp: cfg.AllowedIdentityTimestamp,
 		}
 	}).(Verifiers)
 }

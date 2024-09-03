@@ -49,7 +49,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	if verifiedUser == nil {
@@ -63,17 +63,24 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		eventID = verifiedUser.EventId
 	}
 
-	selectorInt, err := strconv.Atoi(getter.Get(zk.Selector))
-	if err != nil {
-		Log(r).WithError(err).Errorf("cannot extract selector from public signals")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
 	identityCounterUpperBound, err := strconv.ParseInt(getter.Get(zk.IdentityCounterUpperBound), 10, 64)
 	if err != nil {
 		Log(r).WithError(err).Errorf("cannot extract identityUpperBound from public signals")
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	identityTimestampUpperBound, err := strconv.ParseInt(getter.Get(zk.TimestampUpperBound), 10, 64)
+	if err != nil {
+		Log(r).WithError(err).Errorf("cannot extract identityUpperBound from public signals")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	selectorInt, err := strconv.Atoi(getter.Get(zk.Selector))
+	if err != nil {
+		Log(r).WithError(err).Errorf("cannot extract selector from public signals")
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
@@ -84,28 +91,6 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if verifiedUser.Nationality != "" {
 		verifyOpts = append(verifyOpts, zk.WithCitizenships(verifiedUser.Nationality))
-	}
-
-	// uniqueness check
-	timestampUpperBoundMatches := getter.Get(zk.TimestampUpperBound) == ProofParameters(r).TimestampUpperBound
-	timestampUpperBoundCheckRequired := selectorInt&(1<<timestampUpperBoundBit) == 0
-	if verifiedUser.Uniqueness && timestampUpperBoundMatches {
-		if timestampUpperBoundCheckRequired {
-			Log(r).Error("uniqueness check failed: pub-signals.TimestampUpperBound != config.TimestampUpperBound and timestampUpperBoundBit == 0")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
-		verifyOpts = append(verifyOpts, zk.WithIdentitiesCreationTimestampLimit(Verifiers(r).Age))
-	}
-	identityCounterUpperBoundMatches := getter.Get(zk.IdentityCounterUpperBound) == "1"
-	identityCounterUpperBoundCheckRequired := selectorInt&(1<<identityCounterUpperBoundBit) == 0
-	if verifiedUser.Uniqueness && identityCounterUpperBoundMatches {
-		if identityCounterUpperBoundCheckRequired {
-			Log(r).Error("uniqueness check failed: pub-signals.IdentityCounterUpperBound != 1 and identityCounterUpperBoundBit == 0")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
-		verifyOpts = append(verifyOpts, zk.WithIdentitiesCounter(identityCounterUpperBound))
 	}
 
 	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
@@ -128,6 +113,17 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	verifiedUser.Status = "verified"
+
+	if verifiedUser.Uniqueness {
+		status, uniquenessErr := CheckUniqueness(r, selectorInt, identityTimestampUpperBound, identityCounterUpperBound)
+		if uniquenessErr != nil {
+			Log(r).WithError(err).Errorf("failed to check uniqueness")
+			ape.RenderErr(w, problems.BadRequest(err)...)
+			return
+		}
+		verifiedUser.Status = status
+	}
+
 	verifiedUser.Proof = proofJSON
 	err = VerifyUsersQ(r).Update(verifiedUser)
 	if err != nil {
@@ -163,4 +159,30 @@ func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
 	userIDHashDecimal.FillBytes(userIDHash[:])
 
 	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
+}
+
+func CheckUniqueness(r *http.Request, selectorInt int, identityTimestampUpperBound int64, identityCounterUpperBound int64) (string, error) {
+	status := "uniqueness_check_failed"
+	if selectorInt&(1<<timestampUpperBoundBit) == 0 && selectorInt&(1<<identityCounterUpperBoundBit) == 0 {
+		return "", fmt.Errorf("both timestampUpperBoundBit and identityCounterUpperBoundBit are not set in selector")
+	}
+
+	timestampSuccess := false
+	counterSuccess := false
+
+	if selectorInt&(1<<timestampUpperBoundBit) == 1<<timestampUpperBoundBit {
+		if identityTimestampUpperBound <= Verifiers(r).ServiceStartTimestamp {
+			timestampSuccess = true
+		}
+	}
+	if selectorInt&(1<<identityCounterUpperBoundBit) == 1<<identityCounterUpperBoundBit {
+		if identityCounterUpperBound <= 1 {
+			counterSuccess = true
+		}
+	}
+
+	if timestampSuccess || counterSuccess {
+		return "verified", nil
+	}
+	return status, nil
 }

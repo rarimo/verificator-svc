@@ -33,7 +33,12 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	existingUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIDHash)
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	if existingUser == nil {
+		Log(r).WithError(err).Errorf("user with userID [%s] not found", userIDHash)
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
