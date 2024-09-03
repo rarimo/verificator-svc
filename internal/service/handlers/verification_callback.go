@@ -77,6 +77,15 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var verifyOpts = []zk.VerifyOption{
+		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
+		zk.WithAgeAbove(verifiedUser.AgeLowerBound), // if not required -1
+		zk.WithEventID(eventID),
+	}
+	if verifiedUser.Nationality != "" {
+		verifyOpts = append(verifyOpts, zk.WithCitizenships(verifiedUser.Nationality))
+	}
+
 	// uniqueness check
 	timestampUpperBoundMatches := getter.Get(zk.TimestampUpperBound) == ProofParameters(r).TimestampUpperBound
 	timestampUpperBoundCheckRequired := selectorInt&(1<<timestampUpperBoundBit) == 0
@@ -86,6 +95,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
+		verifyOpts = append(verifyOpts, zk.WithIdentitiesCreationTimestampLimit(Verifiers(r).Age))
 	}
 	identityCounterUpperBoundMatches := getter.Get(zk.IdentityCounterUpperBound) == "1"
 	identityCounterUpperBoundCheckRequired := selectorInt&(1<<identityCounterUpperBoundBit) == 0
@@ -95,15 +105,9 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
+		verifyOpts = append(verifyOpts, zk.WithIdentitiesCounter(identityCounterUpperBound))
 	}
 
-	var verifyOpts = []zk.VerifyOption{
-		zk.WithCitizenships(verifiedUser.Nationality),
-		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
-		zk.WithIdentitiesCounter(identityCounterUpperBound),
-		zk.WithAgeAbove(verifiedUser.AgeLowerBound),
-		zk.WithEventID(eventID),
-	}
 	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
 	if err != nil {
 		var vErr validation.Errors

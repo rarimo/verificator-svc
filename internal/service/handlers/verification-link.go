@@ -26,11 +26,12 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &data.VerifyUsers{
-		UserID:     req.Data.ID,
-		UserIDHash: userIdHash,
-		CreatedAt:  time.Now().UTC(),
-		Status:     "not_verified",
-		Proof:      []byte{},
+		UserID:        req.Data.ID,
+		UserIDHash:    userIdHash,
+		CreatedAt:     time.Now().UTC(),
+		Status:        "not_verified",
+		Proof:         []byte{},
+		AgeLowerBound: -1,
 	}
 
 	if req.Data.Attributes.Nationality != nil && *req.Data.Attributes.Nationality != "" {
