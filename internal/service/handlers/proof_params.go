@@ -52,7 +52,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		birthDateUpperBound = "0x303030303030"
 	}
 
-	proofSelector := CalculateProofSelector(existingUser.Uniqueness)
+	proofSelector := CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality)
 	if proofSelector&(1<<timestampUpperBoundBit) != 0 &&
 		proofSelector&(1<<identityCounterUpperBoundBit) != 0 {
 		TimestampUpperBound = ProofParameters(r).TimestampUpperBound

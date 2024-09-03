@@ -58,7 +58,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		eventID = userInputs.EventID
 	}
 
-	proofSelector := CalculateProofSelector(userInputs.Uniqueness)
+	proofSelector := CalculateProofSelector(userInputs.Uniqueness, userInputs.AgeLowerBound, userInputs.Nationality)
 	if proofSelector&(1<<timestampUpperBoundBit) != 0 &&
 		proofSelector&(1<<identityCounterUpperBoundBit) != 0 {
 		TimestampUpperBound = ProofParameters(r).TimestampUpperBound
@@ -168,11 +168,15 @@ func CalculateBirthDateHex(ageLowerBound int) string {
 	return fmt.Sprintf("0x%s", hexBirthDateLoweBound)
 }
 
-func CalculateProofSelector(uniqueness bool) int {
+func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality string) int {
 	var bitLine uint32
 	bitLine |= 1 << nullifierBit
-	bitLine |= 1 << citizenshipBit
-	bitLine |= 1 << birthDateUpperboundBit
+	if nationality != "" {
+		bitLine |= 1 << citizenshipBit
+	}
+	if ageLowerBound != 0 {
+		bitLine |= 1 << birthDateUpperboundBit
+	}
 	if uniqueness {
 		bitLine |= 1 << timestampUpperBoundBit
 		bitLine |= 1 << identityCounterUpperBoundBit
