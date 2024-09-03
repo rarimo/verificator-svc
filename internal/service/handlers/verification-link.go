@@ -26,15 +26,29 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &data.VerifyUsers{
-		UserID:        req.Data.ID,
-		UserIDHash:    userIdHash,
-		CreatedAt:     time.Now().UTC(),
-		Status:        "not_verified",
-		Nationality:   req.Data.Attributes.Nationality,
-		EventId:       req.Data.Attributes.EventId,
-		AgeLowerBound: int(req.Data.Attributes.AgeLowerBound),
-		Uniqueness:    req.Data.Attributes.Uniqueness,
-		Proof:         []byte{},
+		UserID:     req.Data.ID,
+		UserIDHash: userIdHash,
+		CreatedAt:  time.Now().UTC(),
+		Status:     "not_verified",
+		Proof:      []byte{},
+	}
+
+	if req.Data.Attributes.Nationality != nil && *req.Data.Attributes.Nationality != "" {
+		user.Nationality = *req.Data.Attributes.Nationality
+	}
+
+	if req.Data.Attributes.EventId != nil && *req.Data.Attributes.EventId != "" {
+		user.EventId = *req.Data.Attributes.EventId
+	}
+
+	if req.Data.Attributes.AgeLowerBound != nil {
+		user.AgeLowerBound = int(*req.Data.Attributes.AgeLowerBound)
+	}
+
+	if req.Data.Attributes.Uniqueness != nil {
+		user.Uniqueness = *req.Data.Attributes.Uniqueness
+	} else {
+		user.Uniqueness = false
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
