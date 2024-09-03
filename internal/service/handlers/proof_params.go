@@ -43,10 +43,9 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		IdentityCounterUpperBound int32
 	)
 
-	// todo: eventID: optional, write to db
-	//if userIDHash.EventID != "" {
-	//	eventID = existingUser.EventID
-	//}
+	if existingUser.EventId != "" {
+		eventID = existingUser.EventId
+	}
 
 	proofSelector := CalculateProofSelector(existingUser.Uniqueness)
 	if proofSelector&(1<<timestampUpperBoundBit) != 0 &&

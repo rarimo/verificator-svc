@@ -39,8 +39,10 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	userIDHash, err := ExtractEventData(getter)
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to extract user hash from event data", userIDHash)
-		ape.RenderErr(w, problems.BadRequest(err)...)
+		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"pub_signals/event_data": err,
+		})...)
 		return
 	}
 
@@ -102,9 +104,9 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		if errors.As(err, &vErr) {
 			verifiedUser.Status = "failed_verification"
 			Log(r).WithError(err).Error("failed to verify proof, updating user status")
-			err = VerifyUsersQ(r).Update(verifiedUser)
-			if err != nil {
-				Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
+			dbErr := VerifyUsersQ(r).Update(verifiedUser)
+			if dbErr != nil {
+				Log(r).WithError(dbErr).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
 				ape.RenderErr(w, problems.InternalError())
 				return
 			}

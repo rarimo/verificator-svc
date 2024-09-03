@@ -8,6 +8,7 @@ CREATE TABLE verify_users
     nationality     TEXT             NOT NULL,
     created_at      TIMESTAMP        NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     uniqueness      BOOLEAN          NOT NULL,
+    event_id        TEXT             NOT NULL,
     status          TEXT             NOT NULL,
     proof           JSON             NOT NULL
 );
