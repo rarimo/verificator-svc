@@ -7,7 +7,6 @@ allOf:
     properties:
       attributes:
         required:
-          - callback_url
           - get_proof_params
         properties:
           callback_url:

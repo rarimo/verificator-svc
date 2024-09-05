@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
@@ -36,6 +37,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		eventID                   = Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
 		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality)
+		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
 	)
 
 	if existingUser.EventId != "" {
@@ -66,6 +68,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		Selector:                  strconv.Itoa(proofSelector),
 		TimestampLowerBound:       "0",
 		TimestampUpperBound:       TimestampUpperBound,
+		CallbackUrl:               &callbackURL,
 	}
 
 	ape.Render(w, responses.NewProofParamsByIdResponse(*existingUser, proofParameters))

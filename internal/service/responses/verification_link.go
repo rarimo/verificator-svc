@@ -14,7 +14,6 @@ func NewVerificationLinkResponse(user data.VerifyUsers, host string) resources.L
 				Type: resources.VERIFICATION_LINK,
 			},
 			Attributes: resources.LinksAttributes{
-				CallbackUrl:    fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", host, user.UserIDHash),
 				GetProofParams: fmt.Sprintf("%s/integrations/verificator-svc/public/proof-params/%s", host, user.UserIDHash),
 			},
 		},
