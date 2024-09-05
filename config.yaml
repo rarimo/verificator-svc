@@ -20,7 +20,6 @@ callback:
 
 proof_parameters:
   event_id: "event_id"
-  timestamp_upper_bound: "19000000000"
 
 verifier:
   verification_key_path: "./proof_keys/passport.json"

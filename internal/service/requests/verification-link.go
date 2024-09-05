@@ -14,15 +14,9 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 	}
 
 	req.Data.ID = strings.ToLower(req.Data.ID)
-	var (
-		attr = req.Data.Attributes
-	)
 
 	return req, val.Errors{
-		"data/id":                         val.Validate(req.Data.ID, val.Required),
-		"data/type":                       val.Validate(req.Data.Type, val.Required, val.In(resources.USER)),
-		"data/attributes/age_lower_bound": val.Validate(attr.AgeLowerBound),
-		"data/attributes/nationality":     val.Validate(attr.Nationality),
-		"data/attributes/event_id":        val.Validate(attr.EventId),
+		"data/id":   val.Validate(req.Data.ID, val.Required),
+		"data/type": val.Validate(req.Data.Type, val.Required, val.In(resources.USER)),
 	}.Filter()
 }

@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
-	"github.com/rarimo/verificator-svc/resources"
+	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"net/http"
@@ -18,7 +18,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdHash, err := StringToPoseidonHash(req.Data.ID)
+	userIdHash, err := helpers.StringToPoseidonHash(req.Data.ID)
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to convert user with userID [%s] to poseidon hash", req.Data.ID)
 		ape.RenderErr(w, problems.InternalError())
@@ -57,7 +57,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if existingUser != nil {
-		ape.Render(w, NewVerificationLinkResponse(*existingUser, Callback(r).URL))
+		ape.Render(w, responses.NewVerificationLinkResponse(*existingUser, Callback(r).URL))
 		return
 	}
 
@@ -67,21 +67,6 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, NewVerificationLinkResponse(*user, Callback(r).URL))
+	ape.Render(w, responses.NewVerificationLinkResponse(*user, Callback(r).URL))
 
-}
-
-func NewVerificationLinkResponse(user data.VerifyUsers, host string) resources.LinksRequest {
-	return resources.LinksRequest{
-		Data: resources.Links{
-			Key: resources.Key{
-				ID:   user.UserID,
-				Type: resources.VERIFICATION_LINK,
-			},
-			Attributes: resources.LinksAttributes{
-				CallbackUrl:    fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", host, user.UserIDHash),
-				GetProofParams: fmt.Sprintf("%s/integrations/verificator-svc/public/proof-params/%s", host, user.UserIDHash),
-			},
-		},
-	}
 }

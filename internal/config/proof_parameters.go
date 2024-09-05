@@ -12,8 +12,7 @@ type ProofParametersConfiger interface {
 }
 
 type ProofParametersConfig struct {
-	EventID             string `fig:"event_id,required"`
-	TimestampUpperBound string `fig:"timestamp_upper_bound,required"`
+	EventID string `fig:"event_id,required"`
 }
 
 type ProofParameters struct {

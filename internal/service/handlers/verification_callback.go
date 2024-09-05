@@ -1,19 +1,16 @@
 package handlers
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/log"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
-	"github.com/rarimo/verificator-svc/resources"
+	"github.com/rarimo/verificator-svc/internal/service/responses"
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"math/big"
 	"net/http"
 	"strconv"
 )
@@ -26,8 +23,9 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		proof  = req.Data.Attributes.Proof
-		getter = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
+		proof   = req.Data.Attributes.Proof
+		getter  = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
+		eventID = ProofParameters(r).EventID
 	)
 
 	proofJSON, err := json.Marshal(proof)
@@ -35,32 +33,6 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		Log(r).WithError(err).Errorf("failed to convert proof to json")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
-	}
-
-	userIDHash, err := ExtractEventData(getter)
-	if err != nil {
-		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"pub_signals/event_data": err,
-		})...)
-		return
-	}
-
-	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
-	if err != nil {
-		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-	if verifiedUser == nil {
-		Log(r).Error("user not found or eventData != userHashID")
-		ape.RenderErr(w, problems.NotFound())
-		return
-	}
-
-	eventID := ProofParameters(r).EventID
-	if verifiedUser.EventId != "" {
-		eventID = verifiedUser.EventId
 	}
 
 	identityCounterUpperBound, err := strconv.ParseInt(getter.Get(zk.IdentityCounterUpperBound), 10, 64)
@@ -84,6 +56,31 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userIDHash, err := helpers.ExtractEventData(getter)
+	if err != nil {
+		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"pub_signals/event_data": err,
+		})...)
+		return
+	}
+
+	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
+	if err != nil {
+		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	if verifiedUser == nil {
+		Log(r).Error("user not found or eventData != userHashID")
+		ape.RenderErr(w, problems.NotFound())
+		return
+	}
+
+	if verifiedUser.EventId != "" {
+		eventID = verifiedUser.EventId
+	}
+
 	var verifyOpts = []zk.VerifyOption{
 		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
 		zk.WithAgeAbove(verifiedUser.AgeLowerBound), // if not required -1
@@ -91,9 +88,6 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if verifiedUser.Nationality != "" {
 		verifyOpts = append(verifyOpts, zk.WithCitizenships(verifiedUser.Nationality))
-	}
-	if verifiedUser.Uniqueness {
-		verifyOpts = append(verifyOpts, zk.WithIdentitiesCreationTimestampLimit(Verifiers(r).ServiceStartTimestamp), zk.WithIdentitiesCounter(1))
 	}
 
 	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
@@ -118,10 +112,10 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	verifiedUser.Status = "verified"
 
 	if verifiedUser.Uniqueness {
-		status, uniquenessErr := CheckUniqueness(r, selectorInt, identityTimestampUpperBound, identityCounterUpperBound)
+		status, uniquenessErr := helpers.CheckUniqueness(selectorInt, Verifiers(r).ServiceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound)
 		if uniquenessErr != nil {
 			Log(r).WithError(err).Errorf("failed to check uniqueness")
-			ape.RenderErr(w, problems.BadRequest(err)...)
+			ape.RenderErr(w, problems.BadRequest(uniquenessErr)...)
 			return
 		}
 		verifiedUser.Status = status
@@ -136,56 +130,5 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debug("Proof successfully verified")
-	ape.Render(w, NewVerificationCallbackResponse(*verifiedUser))
-}
-
-func NewVerificationCallbackResponse(user data.VerifyUsers) resources.StatusResponse {
-	return resources.StatusResponse{
-		Data: resources.Status{
-			Key: resources.Key{
-				ID:   user.UserID,
-				Type: resources.USER_STATUS,
-			},
-			Attributes: resources.StatusAttributes{
-				Status: user.Status,
-			},
-		},
-	}
-}
-
-func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
-	userIDHashDecimal, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
-	if !ok {
-		return "", fmt.Errorf("failed to parse event data")
-	}
-	var userIDHash [32]byte
-	userIDHashDecimal.FillBytes(userIDHash[:])
-
-	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
-}
-
-func CheckUniqueness(r *http.Request, selectorInt int, identityTimestampUpperBound int64, identityCounterUpperBound int64) (string, error) {
-	status := "uniqueness_check_failed"
-	if selectorInt&(1<<timestampUpperBoundBit) == 0 && selectorInt&(1<<identityCounterUpperBoundBit) == 0 {
-		return "", fmt.Errorf("both timestampUpperBoundBit and identityCounterUpperBoundBit are not set in selector")
-	}
-
-	timestampSuccess := false
-	counterSuccess := false
-
-	if selectorInt&(1<<timestampUpperBoundBit) == 1<<timestampUpperBoundBit {
-		if identityTimestampUpperBound <= Verifiers(r).ServiceStartTimestamp {
-			timestampSuccess = true
-		}
-	}
-	if selectorInt&(1<<identityCounterUpperBoundBit) == 1<<identityCounterUpperBoundBit {
-		if identityCounterUpperBound <= 1 {
-			counterSuccess = true
-		}
-	}
-
-	if timestampSuccess || counterSuccess {
-		return "verified", nil
-	}
-	return status, nil
+	ape.Render(w, responses.NewVerificationCallbackResponse(*verifiedUser))
 }
