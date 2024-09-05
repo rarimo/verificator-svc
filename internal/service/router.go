@@ -19,7 +19,6 @@ func (s *service) router(cfg config.Config) chi.Router {
 			handlers.CtxVerifyUsersQ(pg.NewVerifyUsersQ(cfg.DB().Clone())),
 			handlers.CtxVerifiers(cfg.Verifiers()),
 			handlers.CtxCallback(cfg.CallbackConfig()),
-			handlers.CtxProofParameters(cfg.ProofParametersConfig()),
 		),
 	)
 	r.Route("/integrations/verificator-svc", func(r chi.Router) {

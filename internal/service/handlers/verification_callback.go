@@ -1,19 +1,16 @@
 package handlers
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/log"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
-	"github.com/rarimo/verificator-svc/resources"
+	"github.com/rarimo/verificator-svc/internal/service/responses"
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"math/big"
 	"net/http"
 	"strconv"
 )
@@ -26,8 +23,9 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		proof  = req.Data.Attributes.Proof
-		getter = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
+		proof   = req.Data.Attributes.Proof
+		getter  = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
+		eventID = Verifiers(r).EventID
 	)
 
 	proofJSON, err := json.Marshal(proof)
@@ -37,7 +35,28 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIDHash, err := ExtractEventData(getter)
+	identityCounterUpperBound, err := strconv.ParseInt(getter.Get(zk.IdentityCounterUpperBound), 10, 64)
+	if err != nil {
+		Log(r).WithError(err).Errorf("cannot extract identityUpperBound from public signals")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	identityTimestampUpperBound, err := strconv.ParseInt(getter.Get(zk.TimestampUpperBound), 10, 64)
+	if err != nil {
+		Log(r).WithError(err).Errorf("cannot extract identityUpperBound from public signals")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	selectorInt, err := strconv.Atoi(getter.Get(zk.Selector))
+	if err != nil {
+		Log(r).WithError(err).Errorf("cannot extract selector from public signals")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	userIDHash, err := helpers.ExtractEventData(getter)
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
@@ -49,7 +68,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	if verifiedUser == nil {
@@ -58,52 +77,19 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	eventID := ProofParameters(r).EventID
 	if verifiedUser.EventId != "" {
 		eventID = verifiedUser.EventId
 	}
 
-	selectorInt, err := strconv.Atoi(getter.Get(zk.Selector))
-	if err != nil {
-		Log(r).WithError(err).Errorf("cannot extract selector from public signals")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	identityCounterUpperBound, err := strconv.ParseInt(getter.Get(zk.IdentityCounterUpperBound), 10, 64)
-	if err != nil {
-		Log(r).WithError(err).Errorf("cannot extract identityUpperBound from public signals")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	// uniqueness check
-	timestampUpperBoundMatches := getter.Get(zk.TimestampUpperBound) == ProofParameters(r).TimestampUpperBound
-	timestampUpperBoundCheckRequired := selectorInt&(1<<timestampUpperBoundBit) == 0
-	if verifiedUser.Uniqueness && timestampUpperBoundMatches {
-		if timestampUpperBoundCheckRequired {
-			Log(r).Error("uniqueness check failed: pub-signals.TimestampUpperBound != config.TimestampUpperBound and timestampUpperBoundBit == 0")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
-	}
-	identityCounterUpperBoundMatches := getter.Get(zk.IdentityCounterUpperBound) == "1"
-	identityCounterUpperBoundCheckRequired := selectorInt&(1<<identityCounterUpperBoundBit) == 0
-	if verifiedUser.Uniqueness && identityCounterUpperBoundMatches {
-		if identityCounterUpperBoundCheckRequired {
-			Log(r).Error("uniqueness check failed: pub-signals.IdentityCounterUpperBound != 1 and identityCounterUpperBoundBit == 0")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
-	}
-
 	var verifyOpts = []zk.VerifyOption{
-		zk.WithCitizenships(verifiedUser.Nationality),
 		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
-		zk.WithIdentitiesCounter(identityCounterUpperBound),
-		zk.WithAgeAbove(verifiedUser.AgeLowerBound),
+		zk.WithAgeAbove(verifiedUser.AgeLowerBound), // if not required -1
 		zk.WithEventID(eventID),
 	}
+	if verifiedUser.Nationality != "" {
+		verifyOpts = append(verifyOpts, zk.WithCitizenships(verifiedUser.Nationality))
+	}
+
 	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
 	if err != nil {
 		var vErr validation.Errors
@@ -124,6 +110,17 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	verifiedUser.Status = "verified"
+
+	if verifiedUser.Uniqueness {
+		status, uniquenessErr := helpers.CheckUniqueness(selectorInt, Verifiers(r).ServiceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound)
+		if uniquenessErr != nil {
+			Log(r).WithError(err).Errorf("failed to check uniqueness")
+			ape.RenderErr(w, problems.BadRequest(uniquenessErr)...)
+			return
+		}
+		verifiedUser.Status = status
+	}
+
 	verifiedUser.Proof = proofJSON
 	err = VerifyUsersQ(r).Update(verifiedUser)
 	if err != nil {
@@ -133,30 +130,5 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debug("Proof successfully verified")
-	ape.Render(w, NewVerificationCallbackResponse(*verifiedUser))
-}
-
-func NewVerificationCallbackResponse(user data.VerifyUsers) resources.StatusResponse {
-	return resources.StatusResponse{
-		Data: resources.Status{
-			Key: resources.Key{
-				ID:   user.UserID,
-				Type: resources.USER_STATUS,
-			},
-			Attributes: resources.StatusAttributes{
-				Status: user.Status,
-			},
-		},
-	}
-}
-
-func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
-	userIDHashDecimal, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
-	if !ok {
-		return "", fmt.Errorf("failed to parse event data")
-	}
-	var userIDHash [32]byte
-	userIDHashDecimal.FillBytes(userIDHash[:])
-
-	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
+	ape.Render(w, responses.NewVerificationCallbackResponse(*verifiedUser))
 }

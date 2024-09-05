@@ -1,27 +1,15 @@
 package handlers
 
 import (
-	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
+	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"github.com/rarimo/verificator-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"net/http"
 	"strconv"
 )
-
-type GetProofParam struct {
-	eventID                   string
-	proofSelector             string
-	citizenshipMask           string
-	birthDateLowerBound       string
-	birthDateUpperBound       string
-	timestampUpperBound       string
-	timestampLowerBound       string
-	identityCounterUpperBound int32
-	expirationDateUpperBound  string
-	expirationDateLowerBound  string
-}
 
 func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	userIDHash, err := requests.GetProofParamsByID(r)
@@ -33,71 +21,53 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	existingUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIDHash)
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	if existingUser == nil {
+		Log(r).WithError(err).Errorf("user with userID [%s] not found", userIDHash)
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
 	var (
-		eventID                   = ProofParameters(r).EventID
-		TimestampUpperBound       = "0"
 		IdentityCounterUpperBound int32
+		TimestampUpperBound       = "0"
+		eventID                   = Verifiers(r).EventID
+		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
+		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality)
 	)
 
 	if existingUser.EventId != "" {
 		eventID = existingUser.EventId
 	}
 
-	birthDateUpperBound := CalculateBirthDateHex(existingUser.AgeLowerBound)
-	if existingUser.AgeLowerBound == 0 {
+	if existingUser.AgeLowerBound == -1 {
 		birthDateUpperBound = "0x303030303030"
 	}
 
-	proofSelector := CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality)
-	if proofSelector&(1<<timestampUpperBoundBit) != 0 &&
-		proofSelector&(1<<identityCounterUpperBoundBit) != 0 {
-		TimestampUpperBound = ProofParameters(r).TimestampUpperBound
+	if proofSelector&(1<<helpers.TimestampUpperBoundBit) != 0 &&
+		proofSelector&(1<<helpers.IdentityCounterUpperBoundBit) != 0 {
+		TimestampUpperBound = strconv.FormatInt(Verifiers(r).ServiceStartTimestamp, 10)
 		IdentityCounterUpperBound = 1
 	}
 
-	proofParams := GetProofParam{
-		eventID:                   eventID,
-		proofSelector:             strconv.Itoa(proofSelector),
-		identityCounterUpperBound: IdentityCounterUpperBound,
-		timestampUpperBound:       TimestampUpperBound,
-		citizenshipMask:           Utf8ToHex(existingUser.Nationality),
-		timestampLowerBound:       "0",
-		birthDateLowerBound:       "0x303030303030",
-		birthDateUpperBound:       birthDateUpperBound,
-		expirationDateUpperBound:  "52983525027888",
-		expirationDateLowerBound:  "52983525027888",
+	proofParameters := resources.ProofParamsAttributes{
+		BirthDateLowerBound:       "0x303030303030",
+		BirthDateUpperBound:       birthDateUpperBound,
+		CitizenshipMask:           helpers.Utf8ToHex(existingUser.Nationality),
+		EventData:                 existingUser.UserIDHash,
+		EventId:                   eventID,
+		ExpirationDateLowerBound:  "52983525027888",
+		ExpirationDateUpperBound:  "52983525027888",
+		IdentityCounter:           0,
+		IdentityCounterLowerBound: 0,
+		IdentityCounterUpperBound: IdentityCounterUpperBound,
+		Selector:                  strconv.Itoa(proofSelector),
+		TimestampLowerBound:       "0",
+		TimestampUpperBound:       TimestampUpperBound,
 	}
 
-	ape.Render(w, NewProofParamsByIdResponse(*existingUser, proofParams))
+	ape.Render(w, responses.NewProofParamsByIdResponse(*existingUser, proofParameters))
 
-}
-
-func NewProofParamsByIdResponse(user data.VerifyUsers, params GetProofParam) resources.ProofParamsResponse {
-	return resources.ProofParamsResponse{
-		Data: resources.ProofParams{
-			Key: resources.Key{
-				ID:   user.UserIDHash,
-				Type: resources.GET_PROOF_PARAMS,
-			},
-			Attributes: resources.ProofParamsAttributes{
-				BirthDateLowerBound:       params.birthDateLowerBound,
-				BirthDateUpperBound:       params.birthDateUpperBound,
-				CitizenshipMask:           params.citizenshipMask,
-				EventData:                 user.UserIDHash,
-				EventId:                   params.eventID,
-				ExpirationDateLowerBound:  params.expirationDateLowerBound,
-				ExpirationDateUpperBound:  params.expirationDateUpperBound,
-				IdentityCounter:           0,
-				IdentityCounterLowerBound: 0,
-				IdentityCounterUpperBound: params.identityCounterUpperBound,
-				Selector:                  params.proofSelector,
-				TimestampLowerBound:       params.timestampLowerBound,
-				TimestampUpperBound:       params.timestampUpperBound,
-			},
-		},
-	}
 }
