@@ -11,6 +11,7 @@ import (
 type Verifiers struct {
 	Passport              *zk.Verifier
 	ServiceStartTimestamp int64
+	EventID               string
 }
 
 func (c *config) Verifiers() Verifiers {
@@ -18,6 +19,7 @@ func (c *config) Verifiers() Verifiers {
 		var cfg struct {
 			VerificationKeyPath      string `fig:"verification_key_path,required"`
 			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
+			EventID                  string `fig:"event_id,required"`
 		}
 
 		err := figure.
@@ -40,6 +42,7 @@ func (c *config) Verifiers() Verifiers {
 		return Verifiers{
 			Passport:              pass,
 			ServiceStartTimestamp: cfg.AllowedIdentityTimestamp,
+			EventID:               cfg.EventID,
 		}
 	}).(Verifiers)
 }

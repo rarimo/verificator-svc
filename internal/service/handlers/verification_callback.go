@@ -25,7 +25,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	var (
 		proof   = req.Data.Attributes.Proof
 		getter  = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
-		eventID = ProofParameters(r).EventID
+		eventID = Verifiers(r).EventID
 	)
 
 	proofJSON, err := json.Marshal(proof)

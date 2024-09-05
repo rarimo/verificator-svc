@@ -58,13 +58,3 @@ func CtxCallback(c config.CallbackConfig) func(context.Context) context.Context 
 func Callback(r *http.Request) config.CallbackConfig {
 	return r.Context().Value(callbackCtxKey).(config.CallbackConfig)
 }
-
-func CtxProofParameters(c config.ProofParametersConfig) func(context.Context) context.Context {
-	return func(ctx context.Context) context.Context {
-		return context.WithValue(ctx, proofParametersCtxKey, c)
-	}
-}
-
-func ProofParameters(r *http.Request) config.ProofParametersConfig {
-	return r.Context().Value(proofParametersCtxKey).(config.ProofParametersConfig)
-}

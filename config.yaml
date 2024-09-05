@@ -18,12 +18,10 @@ cop:
 callback:
   url: "http://localhost:8000"
 
-proof_parameters:
-  event_id: "event_id"
-
 verifier:
   verification_key_path: "./proof_keys/passport.json"
   allowed_identity_timestamp: 1715698750
+  event_id: "event_id"
 
 poseidonsmt_root_verifier:
   rpc: rpc_url

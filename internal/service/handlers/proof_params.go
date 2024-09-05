@@ -33,7 +33,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	var (
 		IdentityCounterUpperBound int32
 		TimestampUpperBound       = "0"
-		eventID                   = ProofParameters(r).EventID
+		eventID                   = Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
 		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality)
 	)
