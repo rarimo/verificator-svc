@@ -75,7 +75,7 @@ func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality stri
 	return int(bitLine)
 }
 
-func CheckUniqueness(selectorInt int, serviceStartTimestamp, identityTimestampUpperBound int64, identityCounterUpperBound int64) (string, error) {
+func CheckUniqueness(selectorInt int, serviceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound int64) (string, error) {
 	var (
 		status           = "uniqueness_check_failed"
 		timestampSuccess = false
