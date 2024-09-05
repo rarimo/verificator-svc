@@ -457,7 +457,6 @@
             "properties": {
               "attributes": {
                 "required": [
-                  "callback_url",
                   "get_proof_params"
                 ],
                 "properties": {
@@ -732,6 +731,10 @@
                   "citizenship_mask": {
                     "type": "string",
                     "example": "0x554B52"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "example": "https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949"
                   }
                 }
               }
