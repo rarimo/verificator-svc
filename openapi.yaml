@@ -519,6 +519,7 @@ components:
                     - not_verified
                     - verified
                     - failed_verification
+                    - uniqueness_check_failed
     StatusKey:
       type: object
       required:

@@ -780,7 +780,8 @@
                     "enum": [
                       "not_verified",
                       "verified",
-                      "failed_verification"
+                      "failed_verification",
+                      "uniqueness_check_failed"
                     ]
                   }
                 }
