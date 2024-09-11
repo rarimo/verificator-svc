@@ -29,7 +29,7 @@ func GetVerificationCallbackByID(r *http.Request) (req resources.ProofRequest, e
 
 	return req, val.Errors{
 		"data/attributes/proof/proof":       val.Validate(attr.Proof.Proof, val.Required),
-		"data/attributes/proof/pub_signals": val.Validate(attr.Proof.PubSignals, val.Required, val.Length(22, 22)),
+		"data/attributes/proof/pub_signals": val.Validate(attr.Proof.PubSignals, val.Required, val.Length(23, 23)),
 	}.Filter()
 
 }
