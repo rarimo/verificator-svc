@@ -1907,6 +1907,8 @@ github.com/rarimo/zkverifier-kit v1.2.1 h1:sO6qgm6OBm+sBD53g3/xxo9WSvQoz1RiXsH+/
 github.com/rarimo/zkverifier-kit v1.2.1/go.mod h1:3YDg5dTkDRr4IdfaDHGYetopd6gS/2SuwSeseYTWwNw=
 github.com/rarimo/zkverifier-kit v1.2.3 h1:4UQWGSWA4klDoS5MNYA6R4PNC4QRak6kauH/cDncZwc=
 github.com/rarimo/zkverifier-kit v1.2.3/go.mod h1:3YDg5dTkDRr4IdfaDHGYetopd6gS/2SuwSeseYTWwNw=
+github.com/rarimo/zkverifier-kit v1.2.4 h1:AJ5ZAyOYOGR2QiDlOA2ul/QMZnjBZ/VzPqLjSIUbZgw=
+github.com/rarimo/zkverifier-kit v1.2.4/go.mod h1:3YDg5dTkDRr4IdfaDHGYetopd6gS/2SuwSeseYTWwNw=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/retailnext/hllpp v1.0.1-0.20180308014038-101a6d2f8b52/go.mod h1:RDpi1RftBQPUCDRw6SmxeaREsAaRKnOclghuzp/WRzc=
