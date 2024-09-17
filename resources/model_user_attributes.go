@@ -5,8 +5,14 @@
 package resources
 
 type UserAttributes struct {
-	AgeLowerBound *int32  `json:"age_lower_bound,omitempty"`
-	EventId       *string `json:"event_id,omitempty"`
-	Nationality   *string `json:"nationality,omitempty"`
-	Uniqueness    *bool   `json:"uniqueness,omitempty"`
+	// Lower user age limit
+	AgeLowerBound *int32 `json:"age_lower_bound,omitempty"`
+	// Event ID of event
+	EventId *string `json:"event_id,omitempty"`
+	// User nationality
+	Nationality *string `json:"nationality,omitempty"`
+	// Enable verification of sex param
+	Sex *bool `json:"sex,omitempty"`
+	// Parameters for checking user uniqueness
+	Uniqueness *bool `json:"uniqueness,omitempty"`
 }

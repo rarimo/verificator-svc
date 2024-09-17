@@ -10,12 +10,20 @@ allOf:
           age_lower_bound:
             type: integer
             example: 18
+            description: "Lower user age limit"
           uniqueness:
             type: boolean
             example: true
+            description: "Parameters for checking user uniqueness"
           nationality:
             type: string
             example: "UKR"
+            description: "User nationality"
           event_id:
             type: string
             example: "2234556494903931186902189494613533900917417361106374681011849132651019822199"
+            description: "Event ID of event"
+          sex:
+            type: boolean
+            example: true
+            description: "Enable verification of sex param"

@@ -5,6 +5,8 @@
 package resources
 
 type LinksAttributes struct {
-	CallbackUrl    *string `json:"callback_url,omitempty"`
-	GetProofParams string  `json:"get_proof_params"`
+	// It is not returned by default, this link are in get_proof_params
+	CallbackUrl *string `json:"callback_url,omitempty"`
+	// Returns proof-parameters and callback_url
+	GetProofParams string `json:"get_proof_params"`
 }

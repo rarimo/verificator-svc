@@ -6,6 +6,7 @@ properties:
   id:
     type: string
     example: "user@example.com"
+    description: "User identifier (e.g., email, address)."
   type:
     type: string
     enum:

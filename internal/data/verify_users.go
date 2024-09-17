@@ -14,6 +14,7 @@ type VerifyUsers struct {
 	EventId       string    `db:"event_id"`
 	Status        string    `db:"status"`
 	Proof         []byte    `db:"proof"`
+	Sex           bool      `db:"sex"`
 }
 
 type VerifyUsersQ interface {
