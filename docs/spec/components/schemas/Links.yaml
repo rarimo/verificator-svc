@@ -9,10 +9,6 @@ allOf:
         required:
           - get_proof_params
         properties:
-          callback_url:
-            type: string
-            example: "https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949"
-            description: "It is not returned by default, this link are in get_proof_params"
           get_proof_params:
             type: string
             example: "https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949"
