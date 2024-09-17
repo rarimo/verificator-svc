@@ -3,7 +3,7 @@ get:
     - Proof
   summary: Get Proof Parameters(mobile)
   description: |
-    Get proof parameters by userIDHash.
+    Get proof parameters by userIDHash, returns: proof-params and callback_url.
   operationId: getProofParameters
   parameters:
     - $ref: '#/components/parameters/pathIDHash'

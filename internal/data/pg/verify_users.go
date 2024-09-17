@@ -77,6 +77,7 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 		"event_id":        VerifyUsers.EventId,
 		"status":          VerifyUsers.Status,
 		"proof":           proofJSON,
+		"sex":             VerifyUsers.Sex,
 	})
 
 	if err = q.db.Exec(stmt); err != nil {

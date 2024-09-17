@@ -25,7 +25,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		IdentityCounterUpperBound int32
 		TimestampUpperBound       = "0"
 		eventID                   = Verifiers(r).EventID
-		proofSelector             = helpers.CalculateProofSelector(userInputs.Uniqueness, userInputs.AgeLowerBound, userInputs.Nationality)
+		proofSelector             = helpers.CalculateProofSelector(userInputs.Uniqueness, userInputs.AgeLowerBound, userInputs.Nationality, true)
 	)
 
 	if userInputs.EventID != "" {

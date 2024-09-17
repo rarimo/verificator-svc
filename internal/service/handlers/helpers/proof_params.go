@@ -13,6 +13,7 @@ import (
 const (
 	NullifierBit                 = 0
 	CitizenshipBit               = 5
+	SexBit                       = 6
 	TimestampUpperBoundBit       = 9
 	IdentityCounterUpperBoundBit = 11
 	ExpirationDateLowerboundBit  = 12
@@ -58,11 +59,14 @@ func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
 	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
 }
 
-func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality string) int {
+func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality string, sexEnable bool) int {
 	var bitLine uint32
 	bitLine |= 1 << NullifierBit
 	if nationality != "" {
 		bitLine |= 1 << CitizenshipBit
+	}
+	if sexEnable {
+		bitLine |= 1 << SexBit
 	}
 	if ageLowerBound != -1 {
 		bitLine |= 1 << BirthDateUpperboundBit
