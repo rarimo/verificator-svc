@@ -158,7 +158,7 @@ paths:
         - User verification
       summary: Request verification links for qr-code generation
       description: |
-        Requests verification links for user to generate qr-code, returns: callback_url and get_proof_params.
+        Requests verification links for user to generate qr-code, returns: get_proof_params.
       operationId: getVerificationLink
       requestBody:
         required: true
@@ -195,7 +195,7 @@ paths:
         - Proof
       summary: Get Proof Parameters(mobile)
       description: |
-        Get proof parameters by userIDHash.
+        Get proof parameters by userIDHash, returns: proof-params and callback_url.
       operationId: getProofParameters
       parameters:
         - $ref: '#/components/parameters/pathIDHash'
@@ -279,6 +279,7 @@ components:
         id:
           type: string
           example: 18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff
+          description: User hash identifier
         type:
           type: string
           enum:
@@ -295,12 +296,10 @@ components:
               required:
                 - get_proof_params
               properties:
-                callback_url:
-                  type: string
-                  example: 'https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949'
                 get_proof_params:
                   type: string
                   example: 'https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949'
+                  description: Returns proof-parameters and callback_url
     LinksKey:
       type: object
       required:
@@ -310,6 +309,7 @@ components:
         id:
           type: string
           example: 18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff
+          description: User hash identifier
         type:
           type: string
           enum:
@@ -390,6 +390,7 @@ components:
         id:
           type: string
           example: user@example.com
+          description: 'User identifier (e.g., email, address).'
         type:
           type: string
           enum:
@@ -420,6 +421,7 @@ components:
         id:
           type: string
           example: 18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff
+          description: User hash identifier
         type:
           type: string
           enum:
@@ -499,6 +501,7 @@ components:
         id:
           type: string
           example: user@example.com
+          description: 'User identifier (e.g., email, address).'
         type:
           type: string
           enum:
@@ -531,6 +534,7 @@ components:
         id:
           type: string
           example: user@example.com
+          description: 'User identifier (e.g., email, address).'
         type:
           type: string
           enum:
@@ -548,15 +552,23 @@ components:
                 age_lower_bound:
                   type: integer
                   example: 18
+                  description: Lower user age limit
                 uniqueness:
                   type: boolean
                   example: true
+                  description: Parameters for checking user uniqueness
                 nationality:
                   type: string
                   example: UKR
+                  description: User nationality
                 event_id:
                   type: string
                   example: '2234556494903931186902189494613533900917417361106374681011849132651019822199'
+                  description: Event ID of event
+                sex:
+                  type: boolean
+                  example: true
+                  description: Enable verification of sex param
     UserKey:
       type: object
       required:
@@ -566,6 +578,7 @@ components:
         id:
           type: string
           example: example@example.com
+          description: 'User identifier (e.g., email, address).'
         type:
           type: string
           enum:
@@ -648,6 +661,7 @@ components:
       in: path
       name: user_id
       required: true
+      description: 'User identifier (e.g., email, address).'
       example: user@example.com
       schema:
         type: string

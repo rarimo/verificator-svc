@@ -253,7 +253,7 @@
           "User verification"
         ],
         "summary": "Request verification links for qr-code generation",
-        "description": "Requests verification links for user to generate qr-code, returns: callback_url and get_proof_params.\n",
+        "description": "Requests verification links for user to generate qr-code, returns: get_proof_params.\n",
         "operationId": "getVerificationLink",
         "requestBody": {
           "required": true,
@@ -310,7 +310,7 @@
           "Proof"
         ],
         "summary": "Get Proof Parameters(mobile)",
-        "description": "Get proof parameters by userIDHash.\n",
+        "description": "Get proof parameters by userIDHash, returns: proof-params and callback_url.\n",
         "operationId": "getProofParameters",
         "parameters": [
           {
@@ -433,7 +433,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff"
+            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff",
+            "description": "User hash identifier"
           },
           "type": {
             "type": "string",
@@ -460,13 +461,10 @@
                   "get_proof_params"
                 ],
                 "properties": {
-                  "callback_url": {
-                    "type": "string",
-                    "example": "https://example.com/integrations/verificator-svc/public/callback/c15ad8f88949"
-                  },
                   "get_proof_params": {
                     "type": "string",
-                    "example": "https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949"
+                    "example": "https://example.com/integrations/verificator-svc/public/proof-params/c15ad8f88949",
+                    "description": "Returns proof-parameters and callback_url"
                   }
                 }
               }
@@ -483,7 +481,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff"
+            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff",
+            "description": "User hash identifier"
           },
           "type": {
             "type": "string",
@@ -594,7 +593,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "user@example.com"
+            "example": "user@example.com",
+            "description": "User identifier (e.g., email, address)."
           },
           "type": {
             "type": "string",
@@ -641,7 +641,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff"
+            "example": "18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff",
+            "description": "User hash identifier"
           },
           "type": {
             "type": "string",
@@ -751,7 +752,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "user@example.com"
+            "example": "user@example.com",
+            "description": "User identifier (e.g., email, address)."
           },
           "type": {
             "type": "string",
@@ -802,7 +804,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "user@example.com"
+            "example": "user@example.com",
+            "description": "User identifier (e.g., email, address)."
           },
           "type": {
             "type": "string",
@@ -828,19 +831,28 @@
                 "properties": {
                   "age_lower_bound": {
                     "type": "integer",
-                    "example": 18
+                    "example": 18,
+                    "description": "Lower user age limit"
                   },
                   "uniqueness": {
                     "type": "boolean",
-                    "example": true
+                    "example": true,
+                    "description": "Parameters for checking user uniqueness"
                   },
                   "nationality": {
                     "type": "string",
-                    "example": "UKR"
+                    "example": "UKR",
+                    "description": "User nationality"
                   },
                   "event_id": {
                     "type": "string",
-                    "example": "2234556494903931186902189494613533900917417361106374681011849132651019822199"
+                    "example": "2234556494903931186902189494613533900917417361106374681011849132651019822199",
+                    "description": "Event ID of event"
+                  },
+                  "sex": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Enable verification of sex param"
                   }
                 }
               }
@@ -857,7 +869,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "example@example.com"
+            "example": "example@example.com",
+            "description": "User identifier (e.g., email, address)."
           },
           "type": {
             "type": "string",
@@ -972,6 +985,7 @@
         "in": "path",
         "name": "user_id",
         "required": true,
+        "description": "User identifier (e.g., email, address).",
         "example": "user@example.com",
         "schema": {
           "type": "string",
