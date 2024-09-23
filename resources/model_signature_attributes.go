@@ -5,6 +5,8 @@
 package resources
 
 type SignatureAttributes struct {
-	Message   string `json:"message"`
+	// Signed message, must be len(message) == 32
+	Message string `json:"message"`
+	// Signature, must be len(signature) == 64
 	Signature string `json:"signature"`
 }

@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
+func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 	userIDHash, err := requests.GetProofParamsByID(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
@@ -37,7 +37,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		eventID                   = Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
 		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality, existingUser.Sex)
-		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
+		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", Callback(r).URL, userIDHash)
 	)
 
 	if existingUser.EventId != "" {

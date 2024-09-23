@@ -4,7 +4,7 @@
 
 package resources
 
-type ProofParamsAttributes struct {
+type ProofParamsLightAttributes struct {
 	BirthDateLowerBound       string  `json:"birth_date_lower_bound"`
 	BirthDateUpperBound       string  `json:"birth_date_upper_bound"`
 	CallbackUrl               *string `json:"callback_url,omitempty"`

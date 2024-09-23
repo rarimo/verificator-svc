@@ -1,0 +1,27 @@
+get:
+  tags:
+    - Light Signature
+  summary: Get Proof Parameters(mobile)
+  description: |
+    Get proof parameters by userIDHash, returns: proof-params and callback_url.
+  operationId: getProofParameters
+  parameters:
+    - $ref: '#/components/parameters/pathIDHash'
+  responses:
+    200:
+      description: Success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/ProofParamsLight'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'

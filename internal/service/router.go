@@ -38,6 +38,12 @@ func (s *service) router(cfg config.Config) chi.Router {
 		r.Route("/light", func(r chi.Router) {
 			r.Route("/public", func(r chi.Router) {
 				r.Post("/callback-sign/{user_id_hash}", handlers.VerificationSignatureCallback)
+				r.Get("/proof-params/{user_id_hash}", handlers.GetProofParamsLightById)
+			})
+			r.Route("/private", func(r chi.Router) {
+				r.Post("/verification-link", handlers.VerificationLinkLight)
+				r.Delete("/user/{user_id}", handlers.DeleteUser)
+				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
 			})
 		})
 

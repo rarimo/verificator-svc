@@ -6,7 +6,7 @@ import (
 	"github.com/rarimo/verificator-svc/resources"
 )
 
-func NewVerificationLinkResponse(user data.VerifyUsers, host string) resources.LinksRequest {
+func NewVerificationLinkLightResponse(user data.VerifyUsers, host string) resources.LinksRequest {
 	return resources.LinksRequest{
 		Data: resources.Links{
 			Key: resources.Key{
@@ -14,9 +14,8 @@ func NewVerificationLinkResponse(user data.VerifyUsers, host string) resources.L
 				Type: resources.VERIFICATION_LINK,
 			},
 			Attributes: resources.LinksAttributes{
-				GetProofParams: fmt.Sprintf("%s/integrations/verificator-svc/public/proof-params/%s", host, user.UserIDHash),
+				GetProofParams: fmt.Sprintf("%s/integrations/verificator-svc/light/public/proof-params/%s", host, user.UserIDHash),
 			},
 		},
 	}
 }
-`
