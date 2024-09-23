@@ -1,0 +1,38 @@
+post:
+  tags:
+    - Proof
+  summary: Receive signature and message by callback(mobile)
+  description: >-
+    It receives the signature and message for verification by callback url
+  operationId: receiveSignatureByCallback
+  parameters:
+    - $ref: '#/components/parameters/pathIDHash'
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/Signature'
+  responses:
+    200:
+      description: Success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Status'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'

@@ -8,6 +8,7 @@ type ProofParamsAttributes struct {
 	BirthDateLowerBound       string  `json:"birth_date_lower_bound"`
 	BirthDateUpperBound       string  `json:"birth_date_upper_bound"`
 	CallbackUrl               *string `json:"callback_url,omitempty"`
+	CallbackUrlLight          *string `json:"callback_url_light,omitempty"`
 	CitizenshipMask           string  `json:"citizenship_mask"`
 	EventData                 string  `json:"event_data"`
 	EventId                   string  `json:"event_id"`

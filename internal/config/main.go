@@ -16,6 +16,7 @@ type Config interface {
 	comfig.Listenerer
 	CallbackConfiger
 	Verifiers() Verifiers
+	SignatureVerificationConfiger
 }
 
 type config struct {
@@ -25,6 +26,7 @@ type config struct {
 	comfig.Listenerer
 	getter kv.Getter
 	CallbackConfiger
+	SignatureVerificationConfiger
 
 	verifier comfig.Once
 	passport root.VerifierProvider
@@ -32,12 +34,13 @@ type config struct {
 
 func New(getter kv.Getter) Config {
 	return &config{
-		getter:           getter,
-		Databaser:        pgdb.NewDatabaser(getter),
-		Copuser:          copus.NewCopuser(getter),
-		Listenerer:       comfig.NewListenerer(getter),
-		Logger:           comfig.NewLogger(getter, comfig.LoggerOpts{}),
-		CallbackConfiger: NewCallbackConfiger(getter),
-		passport:         root.NewVerifierProvider(getter, root.PoseidonSMT),
+		getter:                        getter,
+		Databaser:                     pgdb.NewDatabaser(getter),
+		Copuser:                       copus.NewCopuser(getter),
+		Listenerer:                    comfig.NewListenerer(getter),
+		Logger:                        comfig.NewLogger(getter, comfig.LoggerOpts{}),
+		CallbackConfiger:              NewCallbackConfiger(getter),
+		SignatureVerificationConfiger: NewSignatureVerificationConfiger(getter),
+		passport:                      root.NewVerifierProvider(getter, root.PoseidonSMT),
 	}
 }

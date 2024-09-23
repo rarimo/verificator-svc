@@ -38,6 +38,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
 		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality, existingUser.Sex)
 		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
+		callbackURLLight          = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", Callback(r).URL, userIDHash)
 	)
 
 	if existingUser.EventId != "" {
@@ -69,6 +70,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		TimestampLowerBound:       "0",
 		TimestampUpperBound:       TimestampUpperBound,
 		CallbackUrl:               &callbackURL,
+		CallbackUrlLight:          &callbackURLLight,
 	}
 
 	ape.Render(w, responses.NewProofParamsByIdResponse(*existingUser, proofParameters))

@@ -1,0 +1,13 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    example: "0x18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff"
+    description: "User hash identifier"
+  type:
+    type: string
+    enum:
+      - receive_signature

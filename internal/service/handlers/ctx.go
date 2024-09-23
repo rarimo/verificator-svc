@@ -17,6 +17,7 @@ const (
 	verifiersCtxKey
 	callbackCtxKey
 	proofParametersCtxKey
+	signatureVerificationCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -57,4 +58,14 @@ func CtxCallback(c config.CallbackConfig) func(context.Context) context.Context 
 
 func Callback(r *http.Request) config.CallbackConfig {
 	return r.Context().Value(callbackCtxKey).(config.CallbackConfig)
+}
+
+func CtxSignatureVerification(c config.SignatureVerificationConfig) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, signatureVerificationCtxKey, c)
+	}
+}
+
+func SignatureVerification(r *http.Request) config.SignatureVerificationConfig {
+	return r.Context().Value(signatureVerificationCtxKey).(config.SignatureVerificationConfig)
 }
