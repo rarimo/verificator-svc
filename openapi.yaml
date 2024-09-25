@@ -7,6 +7,34 @@ servers:
   - url: 'https://api.stage.rarime.com'
     description: Rarimo Developer Environment
 paths:
+  '/integrations/verification-svc/light/private/verification-status/{user_id}':
+    get:
+      tags:
+        - Light User verification
+      summary: Get user verification status
+      description: |
+        Get user verification status by UserID.
+      operationId: getUserStatus
+      parameters:
+        - $ref: '#/components/parameters/pathID'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Status'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
   '/integrations/verification-svc/private/proof/{user_id}':
     get:
       tags:
@@ -127,6 +155,128 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Parameters'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verificator-svc/light/private/user/{user_id}':
+    delete:
+      tags:
+        - Light User verification
+      summary: Delete user
+      description: |
+        Delete user by UserID.
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/pathID'
+      responses:
+        '204':
+          description: User deleted
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  /integrations/verificator-svc/light/private/verification-link:
+    post:
+      tags:
+        - Light User verification
+      summary: Request verification links for qr-code generation
+      description: |
+        Requests verification links for user to generate qr-code, returns: get_proof_params.
+      operationId: getVerificationLink
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LinksLight'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verificator-svc/light/public/callback-sign/{user_id_hash}':
+    post:
+      tags:
+        - Light Signature
+      summary: Receive signature and message by callback(mobile)
+      description: It receives the signature and message for verification by callback url
+      operationId: receiveSignatureByCallback
+      parameters:
+        - $ref: '#/components/parameters/pathIDHash'
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Signature'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Status'
+        '400':
+          $ref: '#/components/responses/invalidParameter'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalError'
+  '/integrations/verificator-svc/light/public/proof-params/{user_id_hash}':
+    get:
+      tags:
+        - Light Signature
+      summary: Get Proof Parameters(mobile)
+      description: |
+        Get proof parameters by userIDHash, returns: proof-params and callback_url.
+      operationId: getProofParameters
+      parameters:
+        - $ref: '#/components/parameters/pathIDHash'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProofParamsLight'
         '400':
           $ref: '#/components/responses/invalidParameter'
         '404':
@@ -314,6 +464,22 @@ components:
           type: string
           enum:
             - verification_link
+    LinksLight:
+      allOf:
+        - $ref: '#/components/schemas/LinksKey'
+        - type: object
+          x-go-is-request: true
+          required:
+            - attributes
+          properties:
+            attributes:
+              required:
+                - get_proof_params
+              properties:
+                get_proof_params:
+                  type: string
+                  example: 'https://example.com/integrations/verificator-svc/light/public/proof-params/c15ad8f88949'
+                  description: Returns proof-parameters and callback_url
     Parameters:
       allOf:
         - $ref: '#/components/schemas/ParametersKey'
@@ -506,6 +672,102 @@ components:
           type: string
           enum:
             - get_proof_params
+    ProofParamsLight:
+      allOf:
+        - $ref: '#/components/schemas/ProofParamsKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - event_id
+                - event_data
+                - selector
+                - identity_counter
+                - timestamp_lower_bound
+                - timestamp_upper_bound
+                - identity_counter_lower_bound
+                - identity_counter_upper_bound
+                - expiration_date_lower_bound
+                - expiration_date_upper_bound
+                - birth_date_lower_bound
+                - birth_date_upper_bound
+                - citizenship_mask
+              properties:
+                event_id:
+                  type: string
+                  example: '134934934030489134341633902189494613533900917417361106374681011849132651019822199'
+                event_data:
+                  type: string
+                  example: '0x28906909b4f974d958f10cf00ff182f8942e75fb57caa1083a942350d6d7c930b'
+                selector:
+                  type: string
+                  example: '27065'
+                identity_counter:
+                  type: integer
+                  example: 0
+                timestamp_lower_bound:
+                  type: string
+                  example: '0'
+                timestamp_upper_bound:
+                  type: string
+                  example: '19000000000'
+                identity_counter_lower_bound:
+                  type: integer
+                  example: 0
+                identity_counter_upper_bound:
+                  type: integer
+                  example: 1
+                expiration_date_lower_bound:
+                  type: string
+                  example: '52983525027888'
+                expiration_date_upper_bound:
+                  type: string
+                  example: '52983525027888'
+                birth_date_lower_bound:
+                  type: string
+                  example: '0x303030303030'
+                birth_date_upper_bound:
+                  type: string
+                  example: '0x303630393032'
+                citizenship_mask:
+                  type: string
+                  example: '0x554B52'
+                callback_url:
+                  type: string
+                  example: 'https://example.com/integrations/verificator-svc/light/public/callback-sign/c15ad8f88949'
+    Signature:
+      allOf:
+        - $ref: '#/components/schemas/SignatureKey'
+        - type: object
+          x-go-is-request: true
+          required:
+            - attributes
+          properties:
+            attributes:
+              required:
+                - signature
+              properties:
+                signature:
+                  type: string
+                  example: a079d249635fd884371dab4065f65bc36668d79787f005c9c56a574bf08ee51450c3ce98dcfc490ad049db8683cc02d8edbe8281e95077d1393b51a7d283031a01
+                  description: 'Signature, must be len(signature) == 64'
+    SignatureKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: '0x18493889724322d9aba2d93238ae60c2638946737bbe8eaecd6e5efdc0b6f4ff'
+          description: User hash identifier
+        type:
+          type: string
+          enum:
+            - receive_signature
     Status:
       allOf:
         - $ref: '#/components/schemas/StatusKey'
