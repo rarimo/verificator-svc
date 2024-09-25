@@ -1,0 +1,65 @@
+allOf:
+  - $ref: '#/components/schemas/ProofParamsKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - event_id
+          - event_data
+          - selector
+          - identity_counter
+          - timestamp_lower_bound
+          - timestamp_upper_bound
+          - identity_counter_lower_bound
+          - identity_counter_upper_bound
+          - expiration_date_lower_bound
+          - expiration_date_upper_bound
+          - birth_date_lower_bound
+          - birth_date_upper_bound
+          - citizenship_mask
+        properties:
+          event_id:
+            type: string
+            example: "134934934030489134341633902189494613533900917417361106374681011849132651019822199"
+          event_data:
+            type: string
+            example: "0x28906909b4f974d958f10cf00ff182f8942e75fb57caa1083a942350d6d7c930b"
+          selector:
+            type: string
+            example: "27065"
+          identity_counter:
+            type: integer
+            example: 0
+          timestamp_lower_bound:
+            type: string
+            example: "0"
+          timestamp_upper_bound:
+            type: string
+            example: "19000000000"
+          identity_counter_lower_bound:
+            type: integer
+            example: 0
+          identity_counter_upper_bound:
+            type: integer
+            example: 1
+          expiration_date_lower_bound:
+            type: string
+            example: "52983525027888"
+          expiration_date_upper_bound:
+            type: string
+            example: "52983525027888"
+          birth_date_lower_bound:
+            type: string
+            example: "0x303030303030"
+          birth_date_upper_bound:
+            type: string
+            example: "0x303630393032"
+          citizenship_mask:
+            type: string
+            example: "0x554B52"
+          callback_url:
+            type: string
+            example: "https://example.com/integrations/verificator-svc/light/public/callback-sign/c15ad8f88949"

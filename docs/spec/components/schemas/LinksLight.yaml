@@ -1,0 +1,15 @@
+allOf:
+  - $ref: '#/components/schemas/LinksKey'
+  - type: object
+    x-go-is-request: true
+    required:
+      - attributes
+    properties:
+      attributes:
+        required:
+          - get_proof_params
+        properties:
+          get_proof_params:
+            type: string
+            example: "https://example.com/integrations/verificator-svc/light/public/proof-params/c15ad8f88949"
+            description: "Returns proof-parameters and callback_url"

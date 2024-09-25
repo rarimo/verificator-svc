@@ -1,0 +1,18 @@
+delete:
+  tags:
+    - Light User verification
+  summary: Delete user
+  description: |
+    Delete user by UserID.
+  operationId: deleteUser
+  parameters:
+    - $ref: '#/components/parameters/pathID'
+  responses:
+    '204':
+      description: User deleted
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'
