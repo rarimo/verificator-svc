@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/ethereum/go-ethereum/log"
@@ -27,19 +28,16 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	message, err := hex.DecodeString(req.Data.Attributes.Message)
-	if err != nil {
-		Log(r).Error("cannot decode message from string to bytes")
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-
 	pubKey, err := hex.DecodeString(SignatureVerification(r).PubKey)
 	if err != nil {
 		Log(r).Error("cannot decode public-key from string to bytes")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
+
+	hash := sha256.New()
+	hash.Write([]byte(userIDHash))
+	message := hash.Sum(nil)
 
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {

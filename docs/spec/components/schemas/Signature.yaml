@@ -7,13 +7,8 @@ allOf:
     properties:
       attributes:
         required:
-          - message
           - signature
         properties:
-          message:
-            type: string
-            example: "ca0677bb30baa8cf067c88db9811f4333d131bf8bcb12fe7065d211dce971008"
-            description: "Signed message, must be len(message) == 32"
           signature:
             type: string
             example: "a079d249635fd884371dab4065f65bc36668d79787f005c9c56a574bf08ee51450c3ce98dcfc490ad049db8683cc02d8edbe8281e95077d1393b51a7d283031a01"

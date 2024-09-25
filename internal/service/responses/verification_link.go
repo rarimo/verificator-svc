@@ -19,4 +19,3 @@ func NewVerificationLinkResponse(user data.VerifyUsers, host string) resources.L
 		},
 	}
 }
-`
