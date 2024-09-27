@@ -51,7 +51,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Data.Attributes.Sex != nil {
-		user.Sex = *req.Data.Attributes.Sex
+		user.SexEnable = *req.Data.Attributes.Sex
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()

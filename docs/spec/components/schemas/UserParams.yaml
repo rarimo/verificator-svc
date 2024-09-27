@@ -1,0 +1,25 @@
+allOf:
+  - $ref: '#/components/schemas/UserKey'
+  - type: object
+    x-go-is-request: true
+    required:
+      - attributes
+    properties:
+      attributes:
+        required:
+          - age_lower_bound
+          - nationality
+          - sex
+        properties:
+          age_lower_bound:
+            type: integer
+            example: 18
+            description: "Lower user age limit"
+          nationality:
+            type: string
+            example: "UKR"
+            description: "User nationality"
+          sex:
+            type: string
+            example: "F"
+            description: "User sex"

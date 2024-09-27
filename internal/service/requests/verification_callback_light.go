@@ -16,9 +16,10 @@ func GetVerificationCallbackSignatureByID(r *http.Request) (req resources.Signat
 	req.Data.ID = strings.ToLower(req.Data.ID)
 
 	return req, val.Errors{
-		"data/id":                   val.Validate(req.Data.ID, val.Required),
-		"data/type":                 val.Validate(req.Data.Type, val.Required, val.In(resources.RECEIVE_SIGNATURE)),
-		"data/attributes/signature": val.Validate(req.Data.Attributes.Signature, val.Required),
+		"data/id":                     val.Validate(req.Data.ID, val.Required),
+		"data/type":                   val.Validate(req.Data.Type, val.Required, val.In(resources.RECEIVE_SIGNATURE)),
+		"data/attributes/pub_signals": val.Validate(req.Data.Attributes.PubSignals, val.Required),
+		"data/attributes/signature":   val.Validate(req.Data.Attributes.Signature, val.Required),
 	}.Filter()
 
 }
