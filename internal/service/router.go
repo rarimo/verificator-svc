@@ -43,6 +43,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			r.Route("/private", func(r chi.Router) {
 				r.Post("/verification-link", handlers.VerificationLinkLight)
 				r.Delete("/user/{user_id}", handlers.DeleteUser)
+				r.Get("/user/{user_id}", handlers.GetUser)
 				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
 			})
 		})

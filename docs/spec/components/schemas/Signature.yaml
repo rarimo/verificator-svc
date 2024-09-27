@@ -7,8 +7,37 @@ allOf:
     properties:
       attributes:
         required:
+          - pub_signals
           - signature
         properties:
+          pub_signals:
+            type: array
+            items:
+              type: string
+            description: "Generated proof's public signals, see which element corresponds to a certain one pub-signal: https://github.com/rarimo/passport-zk-circuits#query-circuit-public-signals"
+            example: [
+                    "20925303098627062266630214635967906856225360340756326562498326001746719100911",
+                    "52992115355956",
+                    "55216908480563",
+                    "0",
+                    "0",
+                    "0",
+                    "5589842",
+                    "0",
+                    "0",
+                    "304358862882731539112827930982999386691702727710421481944329166126417129570",
+                    "1217571210886365587192326979343136122389414675532",
+                    "5904469035765435216409767735512782299719282306270684213646687525744667841608",
+                    "39",
+                    "0",
+                    "0",
+                    "1",
+                    "0",
+                    "52983525027888",
+                    "52983525027888",
+                    "52983525027888",
+                    "5298352502788",
+                    "0"]
           signature:
             type: string
             example: "a079d249635fd884371dab4065f65bc36668d79787f005c9c56a574bf08ee51450c3ce98dcfc490ad049db8683cc02d8edbe8281e95077d1393b51a7d283031a01"

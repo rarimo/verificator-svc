@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"github.com/iden3/go-iden3-crypto/poseidon"
@@ -22,6 +23,28 @@ const (
 	BirthDateUpperboundBit       = 15
 	BirthDateFormat              = "060102"
 )
+
+func PubSignalsToSha256(pubSignals []string) ([]byte, error) {
+	var hash = sha256.New()
+	for _, pubSignalByte := range pubSignals {
+		if len(pubSignalByte) > 1 && pubSignalByte[:2] == "0x" {
+			pubSignalBytes, convertErr := hex.DecodeString(pubSignalByte[2:])
+			if convertErr != nil {
+				return nil, fmt.Errorf("error in converting pubSignalHex: %v", pubSignalByte)
+			}
+			hash.Write(pubSignalBytes)
+		} else {
+			pubSignalDecimal, ok := new(big.Int).SetString(pubSignalByte, 10)
+			if !ok {
+				return nil, fmt.Errorf("error in converting pubSignal: %v", pubSignalByte)
+			}
+			hash.Write(pubSignalDecimal.Bytes())
+		}
+	}
+	messageHash := hash.Sum(nil)
+
+	return messageHash, nil
+}
 
 func StringToPoseidonHash(inputString string) (string, error) {
 	inputBytes := []byte(inputString)

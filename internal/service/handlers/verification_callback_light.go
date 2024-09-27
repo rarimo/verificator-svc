@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
@@ -19,7 +19,10 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userIDHash = req.Data.ID
+	var (
+		userIDHash = req.Data.ID
+		pubSignals = req.Data.Attributes.PubSignals
+	)
 
 	signature, err := hex.DecodeString(req.Data.Attributes.Signature)
 	if err != nil {
@@ -35,9 +38,12 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hash := sha256.New()
-	hash.Write([]byte(userIDHash))
-	message := hash.Sum(nil)
+	pubSignalsHash, err := helpers.PubSignalsToSha256(pubSignals)
+	if err != nil {
+		Log(r).Error("failed to convert pubSignal array to sha256")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
 
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
@@ -51,7 +57,23 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verificationStatus := secp256k1.VerifySignature(pubKey, message, signature[:64])
+	//if pubSignals[10] != userIDHash {
+	//	Log(r).Error("failed to verify eventData")
+	//	ape.RenderErr(w, problems.NotFound())
+	//	return
+	//}
+	//if pubSignals[22] == "0" && pubSignals[22] != verifiedUser.Nationality {
+	//	Log(r).Error("failed to verify citizenship")
+	//	ape.RenderErr(w, problems.NotFound())
+	//	return
+	//}
+	//if verifiedUser.SexEnable && pubSignals[7] == "0" {
+	//	Log(r).Error("failed to verify sex")
+	//	ape.RenderErr(w, problems.NotFound())
+	//	return
+	//}
+
+	verificationStatus := secp256k1.VerifySignature(pubKey, pubSignalsHash, signature[:64])
 	if verificationStatus {
 		verifiedUser.Status = "verified"
 	} else {
