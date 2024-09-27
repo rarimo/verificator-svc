@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/hex"
+	"fmt"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -9,6 +10,7 @@ import (
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
+	"math/big"
 	"net/http"
 )
 
@@ -57,21 +59,46 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//if pubSignals[10] != userIDHash {
-	//	Log(r).Error("failed to verify eventData")
-	//	ape.RenderErr(w, problems.NotFound())
-	//	return
-	//}
-	//if pubSignals[22] == "0" && pubSignals[22] != verifiedUser.Nationality {
-	//	Log(r).Error("failed to verify citizenship")
-	//	ape.RenderErr(w, problems.NotFound())
-	//	return
-	//}
-	//if verifiedUser.SexEnable && pubSignals[7] == "0" {
-	//	Log(r).Error("failed to verify sex")
-	//	ape.RenderErr(w, problems.NotFound())
-	//	return
-	//}
+	userIDHashDecimal, _ := new(big.Int).SetString(pubSignals[10], 10)
+	var eventDataBytes [32]byte
+	userIDHashDecimal.FillBytes(eventDataBytes[:])
+
+	eventData := fmt.Sprintf("0x%s", hex.EncodeToString(eventDataBytes[:]))
+	nationality, err := helpers.DecimalToHexToUtf8(pubSignals[5])
+	if err != nil {
+		Log(r).Error("failed to convert nationality from decimal to UTF8")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	sex, err := helpers.DecimalToHexToUtf8(pubSignals[7])
+	if err != nil {
+		Log(r).Error("failed to convert sex from decimal to UTF8")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	if verifiedUser.Nationality == "" && pubSignals[5] != "0" {
+		verifiedUser.Nationality = nationality
+	}
+	if verifiedUser.Sex == "" && pubSignals[7] != "0" {
+		verifiedUser.Sex = sex
+	}
+
+	if eventData != userIDHash {
+		Log(r).Error("failed to verify eventData")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	if verifiedUser.Nationality != nationality {
+		Log(r).Error("failed to verify citizenship")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	if verifiedUser.Sex != sex {
+		Log(r).Error("failed to verify sex")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
 
 	verificationStatus := secp256k1.VerifySignature(pubKey, pubSignalsHash, signature[:64])
 	if verificationStatus {
