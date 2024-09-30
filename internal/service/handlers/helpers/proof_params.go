@@ -8,7 +8,6 @@ import (
 	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
 	"math/big"
-	"strconv"
 	"time"
 )
 
@@ -65,12 +64,12 @@ func Utf8ToHex(input string) string {
 }
 
 func DecimalToHexToUtf8(input string) (string, error) {
-	inputDecimal, err := strconv.Atoi(input)
-	if err != nil {
-		return "", fmt.Errorf("failde to convert input string to decimal: %w", err)
-
+	inputBig, ok := new(big.Int).SetString(input, 10)
+	if !ok {
+		return "", fmt.Errorf("failed to parse big int when converting to UTF8")
 	}
-	inputUtf8 := string(hexutils.HexToBytes(strconv.FormatInt(int64(inputDecimal), 16)))
+
+	inputUtf8 := string(inputBig.Bytes())
 
 	return inputUtf8, nil
 }

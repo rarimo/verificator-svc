@@ -59,7 +59,12 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIDHashDecimal, _ := new(big.Int).SetString(pubSignals[10], 10)
+	userIDHashDecimal, ok := new(big.Int).SetString(pubSignals[10], 10)
+	if !ok {
+		Log(r).Error("failed to parse event data")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
 	var eventDataBytes [32]byte
 	userIDHashDecimal.FillBytes(eventDataBytes[:])
 
