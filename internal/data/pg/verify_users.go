@@ -92,8 +92,10 @@ func (q *VerifyUsersQ) Update(VerifyUsers *data.VerifyUsers) error {
 	err := q.db.Exec(
 		sq.Update(verifyUsersTableName).
 			SetMap(map[string]interface{}{
-				"status": VerifyUsers.Status,
-				"proof":  VerifyUsers.Proof,
+				"status":      VerifyUsers.Status,
+				"proof":       VerifyUsers.Proof,
+				"sex":         VerifyUsers.Sex,
+				"nationality": VerifyUsers.Nationality,
 			}).
 			Where(sq.Eq{userIdColumnName: VerifyUsers.UserID}),
 	)

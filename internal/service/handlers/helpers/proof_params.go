@@ -8,6 +8,7 @@ import (
 	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
 	"math/big"
+	"strconv"
 	"time"
 )
 
@@ -61,6 +62,17 @@ func Utf8ToHex(input string) string {
 	bytes := []byte(input)
 	hexString := hexutils.BytesToHex(bytes)
 	return fmt.Sprintf("0x%s", hexString)
+}
+
+func DecimalToHexToUtf8(input string) (string, error) {
+	inputDecimal, err := strconv.Atoi(input)
+	if err != nil {
+		return "", fmt.Errorf("failde to convert input string to decimal: %w", err)
+
+	}
+	inputUtf8 := string(hexutils.HexToBytes(strconv.FormatInt(int64(inputDecimal), 16)))
+
+	return inputUtf8, nil
 }
 
 func CalculateBirthDateHex(ageLowerBound int) string {
