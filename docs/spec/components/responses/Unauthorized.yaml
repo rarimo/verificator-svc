@@ -1,0 +1,5 @@
+description: You must provide a valid signature.
+content:
+  application/vnd.api+json:
+    schema:
+      $ref: '#/components/schemas/Errors'

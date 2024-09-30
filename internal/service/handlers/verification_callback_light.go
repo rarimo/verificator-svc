@@ -47,6 +47,13 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	validSignature := secp256k1.VerifySignature(pubKey, pubSignalsHash, signature[:64])
+	if !validSignature {
+		Log(r).Error("provided signature not valid")
+		ape.RenderErr(w, problems.Unauthorized())
+		return
+	}
+
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
@@ -89,27 +96,11 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		verifiedUser.Sex = sex
 	}
 
-	if eventData != userIDHash {
-		Log(r).Error("failed to verify eventData")
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-	if verifiedUser.Nationality != nationality {
-		Log(r).Error("failed to verify citizenship")
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-	if verifiedUser.Sex != sex {
-		Log(r).Error("failed to verify sex")
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-
-	verificationStatus := secp256k1.VerifySignature(pubKey, pubSignalsHash, signature[:64])
-	if verificationStatus {
-		verifiedUser.Status = "verified"
-	} else {
+	if eventData != userIDHash || verifiedUser.Nationality != nationality || verifiedUser.Sex != sex {
+		Log(r).WithError(err).Errorf("failed to verify user by: EventData, Citizenship and Sex with userHashID [%s]", userIDHash)
 		verifiedUser.Status = "failed_verification"
+	} else {
+		verifiedUser.Status = "verified"
 	}
 
 	err = VerifyUsersQ(r).Update(verifiedUser)

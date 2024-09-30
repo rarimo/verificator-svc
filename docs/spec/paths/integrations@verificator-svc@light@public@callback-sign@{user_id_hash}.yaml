@@ -32,6 +32,8 @@ post:
                 $ref: '#/components/schemas/Status'
     400:
       $ref: '#/components/responses/invalidParameter'
+    401:
+      $ref: '#/components/responses/Unauthorized'
     404:
       $ref: '#/components/responses/notFound'
     500:
