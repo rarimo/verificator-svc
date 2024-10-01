@@ -98,15 +98,15 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 
 	verifiedUser.Status = "verified"
 	if eventData != userIDHash {
-		Log(r).WithError(err).Errorf("failed to verify user by EventData for userHashID [%s]", userIDHash)
+		Log(r).WithError(err).Errorf("failed to verify user: EventData from pub-signals [%s] != userIdHash from db [%s]", eventData, userIDHash)
 		verifiedUser.Status = "failed_verification"
 	}
 	if verifiedUser.Nationality != nationality {
-		Log(r).WithError(err).Errorf("failed to verify user by Citizenship for userHashID [%s]", userIDHash)
+		Log(r).WithError(err).Errorf("failed to verify user with UserIdHash[%s]: Citizenship from pub-signals [%s] != User.Citizenship from db [%s]", userIDHash, nationality, verifiedUser.Nationality)
 		verifiedUser.Status = "failed_verification"
 	}
 	if verifiedUser.Sex != sex {
-		Log(r).WithError(err).Errorf("failed to verify user by Sex for userHashID [%s]", userIDHash)
+		Log(r).WithError(err).Errorf("failed to verify user with UserIdHash[%s]: Sex from pub-signals [%s] != User.Sex from db [%s]", userIDHash, sex, verifiedUser.Sex)
 		verifiedUser.Status = "failed_verification"
 	}
 
