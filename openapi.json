@@ -443,6 +443,9 @@
           "400": {
             "$ref": "#/components/responses/invalidParameter"
           },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
           "404": {
             "$ref": "#/components/responses/notFound"
           },
@@ -1421,6 +1424,16 @@
       },
       "notFound": {
         "description": "Requested resource does not exist.",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Errors"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "You must provide a valid signature.",
         "content": {
           "application/vnd.api+json": {
             "schema": {

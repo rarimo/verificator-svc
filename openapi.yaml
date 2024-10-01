@@ -278,6 +278,8 @@ paths:
                     $ref: '#/components/schemas/Status'
         '400':
           $ref: '#/components/responses/invalidParameter'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/notFound'
         '500':
@@ -942,6 +944,12 @@ components:
             $ref: '#/components/schemas/Errors'
     notFound:
       description: Requested resource does not exist.
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    Unauthorized:
+      description: You must provide a valid signature.
       content:
         application/vnd.api+json:
           schema:
