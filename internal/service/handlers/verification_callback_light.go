@@ -96,11 +96,18 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		verifiedUser.Sex = sex
 	}
 
-	if eventData != userIDHash || verifiedUser.Nationality != nationality || verifiedUser.Sex != sex {
-		Log(r).WithError(err).Errorf("failed to verify user by: EventData, Citizenship and Sex with userHashID [%s]", userIDHash)
+	verifiedUser.Status = "verified"
+	if eventData != userIDHash {
+		Log(r).WithError(err).Errorf("failed to verify user by EventData for userHashID [%s]", userIDHash)
 		verifiedUser.Status = "failed_verification"
-	} else {
-		verifiedUser.Status = "verified"
+	}
+	if verifiedUser.Nationality != nationality {
+		Log(r).WithError(err).Errorf("failed to verify user by Citizenship for userHashID [%s]", userIDHash)
+		verifiedUser.Status = "failed_verification"
+	}
+	if verifiedUser.Sex != sex {
+		Log(r).WithError(err).Errorf("failed to verify user by Sex for userHashID [%s]", userIDHash)
+		verifiedUser.Status = "failed_verification"
 	}
 
 	err = VerifyUsersQ(r).Update(verifiedUser)
