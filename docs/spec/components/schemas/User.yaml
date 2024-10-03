@@ -19,6 +19,10 @@ allOf:
             type: string
             example: "UKR"
             description: "User nationality"
+          nationality_check:
+            type: boolean
+            example: true
+            description: "You can use this instead of 'nationality' params, it will check nationality bit in selector"
           event_id:
             type: string
             example: "2234556494903931186902189494613533900917417361106374681011849132651019822199"

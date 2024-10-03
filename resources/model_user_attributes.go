@@ -11,6 +11,8 @@ type UserAttributes struct {
 	EventId *string `json:"event_id,omitempty"`
 	// User nationality
 	Nationality *string `json:"nationality,omitempty"`
+	// You can use this instead of 'nationality' params, it will check nationality bit in selector
+	NationalityCheck *bool `json:"nationality_check,omitempty"`
 	// Enable verification of sex param
 	Sex *bool `json:"sex,omitempty"`
 	// Parameters for checking user uniqueness

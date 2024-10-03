@@ -109,6 +109,13 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
+	verifiedUserNationality, err := helpers.DecimalToHexToUtf8(getter.Get(zk.Citizenship))
+	if err != nil {
+		Log(r).WithError(err).Errorf("failed to convert decimal(nationality) to utf8")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	verifiedUser.Nationality = verifiedUserNationality
 	verifiedUser.Status = "verified"
 
 	if verifiedUser.Uniqueness {

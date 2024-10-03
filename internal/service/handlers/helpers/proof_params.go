@@ -93,10 +93,10 @@ func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
 	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
 }
 
-func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality string, sexEnable bool) int {
+func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality string, sexEnable bool, nationalityEnable bool) int {
 	var bitLine uint32
 	bitLine |= 1 << NullifierBit
-	if nationality != "" {
+	if nationality != "" || nationalityEnable {
 		bitLine |= 1 << CitizenshipBit
 	}
 	if sexEnable {

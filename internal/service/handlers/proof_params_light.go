@@ -36,7 +36,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 		TimestampUpperBound       = "0"
 		eventID                   = Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
-		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality, existingUser.SexEnable)
+		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality, existingUser.SexEnable, existingUser.NationalityEnable)
 		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", Callback(r).URL, userIDHash)
 	)
 
