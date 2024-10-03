@@ -56,6 +56,13 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userNationality, err := helpers.DecimalToHexToUtf8(getter.Get(zk.Citizenship))
+	if err != nil {
+		Log(r).WithError(err).Errorf("failed to convert decimal(nationality) to utf8")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
 	userIDHash, err := helpers.ExtractEventData(getter)
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
@@ -88,6 +95,8 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if verifiedUser.Nationality != "" {
 		verifyOpts = append(verifyOpts, zk.WithCitizenships(verifiedUser.Nationality))
+	} else {
+		verifiedUser.Nationality = userNationality
 	}
 
 	err = Verifiers(r).Passport.VerifyProof(proof, verifyOpts...)
@@ -109,13 +118,6 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-	verifiedUserNationality, err := helpers.DecimalToHexToUtf8(getter.Get(zk.Citizenship))
-	if err != nil {
-		Log(r).WithError(err).Errorf("failed to convert decimal(nationality) to utf8")
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-	verifiedUser.Nationality = verifiedUserNationality
 	verifiedUser.Status = "verified"
 
 	if verifiedUser.Uniqueness {
