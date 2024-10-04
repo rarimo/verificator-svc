@@ -54,6 +54,10 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		user.SexEnable = *req.Data.Attributes.Sex
 	}
 
+	if req.Data.Attributes.NationalityCheck != nil {
+		user.NationalityEnable = *req.Data.Attributes.NationalityCheck
+	}
+
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIdHash)
