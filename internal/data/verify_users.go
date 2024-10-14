@@ -17,6 +17,8 @@ type VerifyUsers struct {
 	Sex               string    `db:"sex"`
 	SexEnable         bool      `db:"sex_enable"`
 	NationalityEnable bool      `db:"nationality_enable"`
+	AnonymousID       string    `db:"anonymous_id"`
+	Nullifier         string    `db:"nullifier"`
 }
 
 type VerifyUsersQ interface {
@@ -32,4 +34,5 @@ type VerifyUsersQ interface {
 	WhereID(userId string) VerifyUsersQ
 	WhereHashID(userId string) VerifyUsersQ
 	WhereCreatedAtLt(createdAt time.Time) VerifyUsersQ
+	FilterByInternalAID(aid string) VerifyUsersQ
 }

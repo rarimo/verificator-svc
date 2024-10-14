@@ -80,6 +80,8 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 		"sex":                VerifyUsers.Sex,
 		"sex_enable":         VerifyUsers.SexEnable,
 		"nationality_enable": VerifyUsers.NationalityEnable,
+		"anonymous_id":       VerifyUsers.AnonymousID,
+		"nullifier":          VerifyUsers.Nullifier,
 	})
 
 	if err = q.db.Exec(stmt); err != nil {
@@ -93,10 +95,12 @@ func (q *VerifyUsersQ) Update(VerifyUsers *data.VerifyUsers) error {
 	err := q.db.Exec(
 		sq.Update(verifyUsersTableName).
 			SetMap(map[string]interface{}{
-				"status":      VerifyUsers.Status,
-				"proof":       VerifyUsers.Proof,
-				"sex":         VerifyUsers.Sex,
-				"nationality": VerifyUsers.Nationality,
+				"status":       VerifyUsers.Status,
+				"proof":        VerifyUsers.Proof,
+				"sex":          VerifyUsers.Sex,
+				"nationality":  VerifyUsers.Nationality,
+				"anonymous_id": VerifyUsers.AnonymousID,
+				"nullifier":    VerifyUsers.Nullifier,
 			}).
 			Where(sq.Eq{userIdColumnName: VerifyUsers.UserID}),
 	)
@@ -142,5 +146,10 @@ func (q *VerifyUsersQ) WhereHashID(userHashId string) data.VerifyUsersQ {
 func (q *VerifyUsersQ) WhereCreatedAtLt(createdAt time.Time) data.VerifyUsersQ {
 	q.sel = q.sel.Where(sq.Lt{createdAtColumnName: &createdAt})
 	q.del = q.del.Where(sq.Lt{createdAtColumnName: &createdAt})
+	return q
+}
+
+func (q *VerifyUsersQ) FilterByInternalAID(aid string) data.VerifyUsersQ {
+	q.sel = q.sel.Where(sq.Eq{"anonymous_id": aid})
 	return q
 }
