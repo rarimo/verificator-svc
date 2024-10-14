@@ -54,18 +54,6 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
-	if err != nil {
-		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-	if verifiedUser == nil {
-		Log(r).Error("user not found or eventData != userHashID")
-		ape.RenderErr(w, problems.NotFound())
-		return
-	}
-
 	userIDHashDecimal, ok := new(big.Int).SetString(pubSignals[10], 10)
 	if !ok {
 		Log(r).Error("failed to parse event data")
@@ -89,6 +77,45 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nullifier, ok := new(big.Int).SetString(pubSignals[0], 10)
+	if !ok {
+		Log(r).Error("failed to parse nullifier")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	var nullifierBytes [32]byte
+	nullifier.FillBytes(nullifierBytes[:])
+	nullifierHex := hex.EncodeToString(nullifierBytes[:])
+
+	anonymousID, ok := new(big.Int).SetString(pubSignals[11], 10)
+	if !ok {
+		Log(r).Error("failed to parse anonymous_id")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	var anonymousIDBytes [32]byte
+	anonymousID.FillBytes(anonymousIDBytes[:])
+	anonymousIDHex := hex.EncodeToString(anonymousIDBytes[:])
+
+	byAnonymousID, err := VerifyUsersQ(r).FilterByInternalAID(anonymousIDHex).Get()
+	if err != nil {
+		Log(r).Error("Failed to get user by anonymous_id")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
+	if err != nil {
+		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	if verifiedUser == nil {
+		Log(r).Error("user not found or eventData != userHashID")
+		ape.RenderErr(w, problems.NotFound())
+		return
+	}
+
 	if verifiedUser.Nationality == "" && pubSignals[6] != "0" {
 		verifiedUser.Nationality = nationality
 	}
@@ -97,6 +124,13 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verifiedUser.Status = "verified"
+	if byAnonymousID != nil && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
+		Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
+		verifiedUser.Status = "failed_verification"
+	} else {
+		verifiedUser.Nullifier = nullifierHex
+		verifiedUser.AnonymousID = anonymousIDHex
+	}
 	if eventData != userIDHash {
 		Log(r).WithError(err).Errorf("failed to verify user: EventData from pub-signals [%s] != userIdHash from db [%s]", eventData, userIDHash)
 		verifiedUser.Status = "failed_verification"
