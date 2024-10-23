@@ -7,10 +7,15 @@ allOf:
     properties:
       attributes:
         required:
+          - nullifier
           - age_lower_bound
           - nationality
           - sex
         properties:
+          nullifier:
+            type: string
+            example: "2fe34ac35a35d0672dd9759aaee5e052d978e41b062c9da33aea9914c3a386a3"
+            description: "User nullifier"
           age_lower_bound:
             type: integer
             example: 18

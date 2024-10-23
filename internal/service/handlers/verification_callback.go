@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"github.com/ethereum/go-ethereum/log"
@@ -11,6 +12,7 @@ import (
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
+	"math/big"
 	"net/http"
 	"strconv"
 )
@@ -63,6 +65,16 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nullifier, ok := new(big.Int).SetString(getter.Get(zk.Nullifier), 10)
+	if !ok {
+		Log(r).Error("failed to parse nullifier")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	var nullifierBytes [32]byte
+	nullifier.FillBytes(nullifierBytes[:])
+	nullifierHex := hex.EncodeToString(nullifierBytes[:])
+
 	userIDHash, err := helpers.ExtractEventData(getter)
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
@@ -87,6 +99,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	if verifiedUser.EventId != "" {
 		eventID = verifiedUser.EventId
 	}
+	verifiedUser.Nullifier = nullifierHex
 
 	var verifyOpts = []zk.VerifyOption{
 		zk.WithProofSelectorValue(getter.Get(zk.Selector)),
