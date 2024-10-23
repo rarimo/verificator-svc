@@ -97,13 +97,6 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	anonymousID.FillBytes(anonymousIDBytes[:])
 	anonymousIDHex := hex.EncodeToString(anonymousIDBytes[:])
 
-	byAnonymousID, err := VerifyUsersQ(r).FilterByInternalAID(anonymousIDHex).Get()
-	if err != nil {
-		Log(r).Error("Failed to get user by anonymous_id")
-		ape.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
-
 	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
@@ -124,12 +117,22 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verifiedUser.Status = "verified"
-	if byAnonymousID != nil && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
-		Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
-		verifiedUser.Status = "failed_verification"
-	} else {
-		verifiedUser.Nullifier = nullifierHex
-		verifiedUser.AnonymousID = anonymousIDHex
+
+	if verifiedUser.Uniqueness {
+		byAnonymousID, dbErr := VerifyUsersQ(r).FilterByInternalAID(anonymousIDHex).Get()
+		if dbErr != nil {
+			Log(r).Error("Failed to get user by anonymous_id")
+			ape.RenderErr(w, problems.BadRequest(dbErr)...)
+			return
+		}
+
+		if byAnonymousID != nil && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
+			Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
+			verifiedUser.Status = "failed_verification"
+		} else {
+			verifiedUser.Nullifier = nullifierHex
+			verifiedUser.AnonymousID = anonymousIDHex
+		}
 	}
 	if eventData != userIDHash {
 		Log(r).WithError(err).Errorf("failed to verify user: EventData from pub-signals [%s] != userIdHash from db [%s]", eventData, userIDHash)
