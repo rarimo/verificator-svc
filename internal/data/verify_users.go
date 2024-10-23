@@ -35,4 +35,5 @@ type VerifyUsersQ interface {
 	WhereHashID(userId string) VerifyUsersQ
 	WhereCreatedAtLt(createdAt time.Time) VerifyUsersQ
 	FilterByInternalAID(aid string) VerifyUsersQ
+	FilterByNullifier(nullifier string) VerifyUsersQ
 }

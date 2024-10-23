@@ -99,7 +99,22 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	if verifiedUser.EventId != "" {
 		eventID = verifiedUser.EventId
 	}
-	verifiedUser.Nullifier = nullifierHex
+
+	if verifiedUser.Uniqueness {
+		byNullifier, dbErr := VerifyUsersQ(r).FilterByNullifier(nullifierHex).Get()
+		if dbErr != nil {
+			Log(r).Error("Failed to get user by nullifier")
+			ape.RenderErr(w, problems.BadRequest(dbErr)...)
+			return
+		}
+
+		if byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash {
+			Log(r).WithError(err).Errorf("User with this nullifier [%s] but a different userIDHash already exists", nullifierHex)
+			verifiedUser.Status = "failed_verification"
+		} else {
+			verifiedUser.Nullifier = nullifierHex
+		}
+	}
 
 	var verifyOpts = []zk.VerifyOption{
 		zk.WithProofSelectorValue(getter.Get(zk.Selector)),

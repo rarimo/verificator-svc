@@ -153,3 +153,8 @@ func (q *VerifyUsersQ) FilterByInternalAID(aid string) data.VerifyUsersQ {
 	q.sel = q.sel.Where(sq.Eq{"anonymous_id": aid})
 	return q
 }
+
+func (q *VerifyUsersQ) FilterByNullifier(nullifier string) data.VerifyUsersQ {
+	q.sel = q.sel.Where(sq.Eq{"nullifier": nullifier})
+	return q
+}
