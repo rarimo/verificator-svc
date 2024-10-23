@@ -126,7 +126,15 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if byAnonymousID != nil && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
+		byNullifier, dbErr := VerifyUsersQ(r).FilterByNullifier(nullifierHex).Get()
+		if dbErr != nil {
+			Log(r).Error("Failed to get user by nullifier")
+			ape.RenderErr(w, problems.BadRequest(dbErr)...)
+			return
+		}
+
+		if byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash &&
+			byAnonymousID != nil && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
 			Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
 			verifiedUser.Status = "failed_verification"
 		} else {
