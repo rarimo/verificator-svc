@@ -133,15 +133,27 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash &&
-			byAnonymousID != nil && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
-			Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
-			verifiedUser.Status = "failed_verification"
+		if byAnonymousID != nil {
+			if byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
+				Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
+				verifiedUser.Status = "failed_verification"
+				return
+			}
 		} else {
-			verifiedUser.Nullifier = nullifierHex
 			verifiedUser.AnonymousID = anonymousIDHex
 		}
+
+		if byNullifier != nil {
+			if byNullifier.UserIDHash != verifiedUser.UserIDHash {
+				Log(r).WithError(err).Errorf("User with nullifier [%s] but a different userIDHash already exists", nullifierHex)
+				verifiedUser.Status = "failed_verification"
+				return
+			}
+		} else {
+			verifiedUser.Nullifier = nullifierHex
+		}
 	}
+
 	if eventData != userIDHash {
 		Log(r).WithError(err).Errorf("failed to verify user: EventData from pub-signals [%s] != userIdHash from db [%s]", eventData, userIDHash)
 		verifiedUser.Status = "failed_verification"
