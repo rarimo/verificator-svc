@@ -13,6 +13,7 @@ func NewGetUsersByIdResponse(user data.VerifyUsers) resources.UserParamsRequest 
 				Type: resources.USER,
 			},
 			Attributes: resources.UserParamsAttributes{
+				Nullifier:     user.Nullifier,
 				AgeLowerBound: int32(user.AgeLowerBound),
 				Nationality:   user.Nationality,
 				Sex:           user.Sex,

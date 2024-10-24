@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"github.com/ethereum/go-ethereum/log"
@@ -11,6 +12,7 @@ import (
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
+	"math/big"
 	"net/http"
 	"strconv"
 )
@@ -63,6 +65,16 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nullifier, ok := new(big.Int).SetString(getter.Get(zk.Nullifier), 10)
+	if !ok {
+		Log(r).Error("failed to parse nullifier")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+	var nullifierBytes [32]byte
+	nullifier.FillBytes(nullifierBytes[:])
+	nullifierHex := hex.EncodeToString(nullifierBytes[:])
+
 	userIDHash, err := helpers.ExtractEventData(getter)
 	if err != nil {
 		Log(r).WithError(err).Errorf("failed to extract user hash from event data")
@@ -86,6 +98,22 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	if verifiedUser.EventId != "" {
 		eventID = verifiedUser.EventId
+	}
+
+	if verifiedUser.Uniqueness {
+		byNullifier, dbErr := VerifyUsersQ(r).FilterByNullifier(nullifierHex).Get()
+		if dbErr != nil {
+			Log(r).Error("Failed to get user by nullifier")
+			ape.RenderErr(w, problems.BadRequest(dbErr)...)
+			return
+		}
+
+		if byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash {
+			Log(r).WithError(err).Errorf("User with this nullifier [%s] but a different userIDHash already exists", nullifierHex)
+			verifiedUser.Status = "failed_verification"
+		} else {
+			verifiedUser.Nullifier = nullifierHex
+		}
 	}
 
 	var verifyOpts = []zk.VerifyOption{

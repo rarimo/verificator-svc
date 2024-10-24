@@ -9,6 +9,8 @@ type UserParamsAttributes struct {
 	AgeLowerBound int32 `json:"age_lower_bound"`
 	// User nationality
 	Nationality string `json:"nationality"`
+	// User nullifier
+	Nullifier string `json:"nullifier"`
 	// User sex
 	Sex string `json:"sex"`
 }
