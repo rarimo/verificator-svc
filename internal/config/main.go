@@ -18,7 +18,7 @@ type Config interface {
 	CallbackConfiger
 	Verifiers() Verifiers
 	SignatureVerificationConfiger
-	auth.Auther
+	auth.Auther //nolint:misspell
 }
 
 type config struct {
@@ -30,9 +30,9 @@ type config struct {
 	CallbackConfiger
 	SignatureVerificationConfiger
 
-	verifier comfig.Once
-	passport root.VerifierProvider
-	auth.Auther
+	verifier    comfig.Once
+	passport    root.VerifierProvider
+	auth.Auther //nolint:misspell
 }
 
 func New(getter kv.Getter) Config {
@@ -45,6 +45,6 @@ func New(getter kv.Getter) Config {
 		CallbackConfiger:              NewCallbackConfiger(getter),
 		SignatureVerificationConfiger: NewSignatureVerificationConfiger(getter),
 		passport:                      root.NewVerifierProvider(getter, root.PoseidonSMT),
-		Auther:                        auth.NewAuther(getter),
+		Auther:                        auth.NewAuther(getter), //nolint:misspell
 	}
 }
