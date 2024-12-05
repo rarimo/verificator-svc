@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/rarimo/geo-auth-svc/pkg/auth"
+	"github.com/rarimo/web3-auth-svc/pkg/auth"
 	"github.com/rarimo/zkverifier-kit/root"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus"

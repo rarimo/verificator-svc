@@ -1965,8 +1965,8 @@ github.com/prometheus/procfs v0.6.0/go.mod h1:cz+aTbrPOrUb4q7XlbU9ygM+/jj0fzG6c1
 github.com/prometheus/procfs v0.7.3 h1:4jVXhlkAyzOScmCkXBTOLRLTz8EeU+eyjrwB/EPq0VU=
 github.com/prometheus/procfs v0.7.3/go.mod h1:cz+aTbrPOrUb4q7XlbU9ygM+/jj0fzG6c1xBZuNvfVA=
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
-github.com/rarimo/geo-auth-svc v1.1.1 h1:9H6K1W0UUdFpSWIuPpFPMe4SB5Tj7cPkMUFR1bRRQBM=
-github.com/rarimo/geo-auth-svc v1.1.1/go.mod h1:JrpCGdT0xtAcWIKgPhxPHf7QCW4h845BXuh6M7NdQFw=
+github.com/rarimo/web3-auth-svc v0.0.0-20241205100344-d4dfc3b47082 h1:4W8KAUBu6fHI3kUY0CuKGqsn91y7+15zElfXaXeeM0c=
+github.com/rarimo/web3-auth-svc v0.0.0-20241205100344-d4dfc3b47082/go.mod h1:seisHwHdIdPZpwvTZcg37CAlexQwR56ImCsyuea8Zlc=
 github.com/rarimo/zkverifier-kit v1.2.4 h1:AJ5ZAyOYOGR2QiDlOA2ul/QMZnjBZ/VzPqLjSIUbZgw=
 github.com/rarimo/zkverifier-kit v1.2.4/go.mod h1:3YDg5dTkDRr4IdfaDHGYetopd6gS/2SuwSeseYTWwNw=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=

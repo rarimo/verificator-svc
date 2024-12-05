@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/rarimo/geo-auth-svc/pkg/auth"
-	"github.com/rarimo/geo-auth-svc/resources"
+	"github.com/rarimo/web3-auth-svc/pkg/auth"
+	"github.com/rarimo/web3-auth-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3"

@@ -33,4 +33,3 @@ poseidonsmt_root_verifier:
 
 auth:
   addr: http://rarime-auth
-  enabled: true

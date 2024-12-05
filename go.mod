@@ -11,7 +11,7 @@ require (
 	github.com/iden3/go-iden3-crypto v0.0.15
 	github.com/iden3/go-rapidsnark/types v0.0.3
 	github.com/pkg/errors v0.9.1
-	github.com/rarimo/geo-auth-svc v1.1.1
+	github.com/rarimo/web3-auth-svc v0.0.0-20241205100344-d4dfc3b47082
 	github.com/rarimo/zkverifier-kit v1.2.4
 	github.com/rubenv/sql-migrate v1.7.0
 	github.com/status-im/keycard-go v0.2.0
