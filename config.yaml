@@ -30,3 +30,6 @@ poseidonsmt_root_verifier:
   rpc: "https://rpc.evm.mainnet.rarimo.com"
   contract: "0xA25a197d26Cad659A8fFf7F268cA4F9e0283de03"
   request_timeout: 10s
+
+auth:
+  addr: http://rarime-auth

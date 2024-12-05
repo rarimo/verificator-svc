@@ -5,6 +5,7 @@ import (
 	"github.com/rarimo/verificator-svc/internal/config"
 	"github.com/rarimo/verificator-svc/internal/data/pg"
 	"github.com/rarimo/verificator-svc/internal/service/handlers"
+	"github.com/rarimo/verificator-svc/internal/service/middlewares"
 	"gitlab.com/distributed_lab/ape"
 )
 
@@ -22,12 +23,13 @@ func (s *service) router(cfg config.Config) chi.Router {
 			handlers.CtxSignatureVerification(cfg.SignatureVerificationConfig()),
 		),
 	)
+	authMW := middlewares.Auth(cfg.Auth(), cfg.Log())
 	r.Route("/integrations/verificator-svc", func(r chi.Router) {
 		r.Route("/private", func(r chi.Router) {
 			r.Get("/proof-parameters", handlers.GetProofParameters)
 			r.Get("/proof/{user_id}", handlers.GetProofByUserID)
 			r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
-			r.Delete("/user/{user_id}", handlers.DeleteUser)
+			r.With(authMW(middlewares.AdminGrant)).Delete("/user/{user_id}", handlers.DeleteUser)
 			r.Post("/verification-link", handlers.VerificationLink)
 		})
 		r.Route("/public", func(r chi.Router) {
@@ -42,7 +44,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			})
 			r.Route("/private", func(r chi.Router) {
 				r.Post("/verification-link", handlers.VerificationLinkLight)
-				r.Delete("/user/{user_id}", handlers.DeleteUser)
+				r.With(authMW(middlewares.AdminGrant)).Delete("/user/{user_id}", handlers.DeleteUser)
 				r.Get("/user/{user_id}", handlers.GetUser)
 				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
 			})

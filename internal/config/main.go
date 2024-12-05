@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/rarimo/web3-auth-svc/pkg/auth"
 	"github.com/rarimo/zkverifier-kit/root"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus"
@@ -17,6 +18,7 @@ type Config interface {
 	CallbackConfiger
 	Verifiers() Verifiers
 	SignatureVerificationConfiger
+	auth.Auther //nolint:misspell
 }
 
 type config struct {
@@ -28,8 +30,9 @@ type config struct {
 	CallbackConfiger
 	SignatureVerificationConfiger
 
-	verifier comfig.Once
-	passport root.VerifierProvider
+	verifier    comfig.Once
+	passport    root.VerifierProvider
+	auth.Auther //nolint:misspell
 }
 
 func New(getter kv.Getter) Config {
@@ -42,5 +45,6 @@ func New(getter kv.Getter) Config {
 		CallbackConfiger:              NewCallbackConfiger(getter),
 		SignatureVerificationConfiger: NewSignatureVerificationConfiger(getter),
 		passport:                      root.NewVerifierProvider(getter, root.PoseidonSMT),
+		Auther:                        auth.NewAuther(getter), //nolint:misspell
 	}
 }

@@ -3,6 +3,9 @@ kind: Config
 build:
   artifacts:
     - image: verificator-svc # Change it on your own repo-name
+      docker:
+        buildArgs:
+          CI_JOB_TOKEN: "{{.CI_JOB_TOKEN}}"
 
 #profiles:
 #- name: dev
