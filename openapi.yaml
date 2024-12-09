@@ -143,6 +143,7 @@ paths:
         - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
         - $ref: '#/components/parameters/nationalityParam'
         - $ref: '#/components/parameters/eventIdParam'
+        - $ref: '#/components/parameters/expirationLowerBoundParam'
       responses:
         '200':
           description: Success
@@ -893,6 +894,10 @@ components:
                   type: boolean
                   example: true
                   description: Enable verification of sex param
+                expiration_lower_bound:
+                  type: boolean
+                  example: true
+                  description: 'Enable verification of expiration lower bound param. When nothing (or `false`) set default value is used, otherwise encoded current UTC timestamp will be stored.'
     UserKey:
       type: object
       required:
@@ -973,6 +978,17 @@ components:
       schema:
         type: string
         format: string
+    expirationLowerBoundParam:
+      in: query
+      name: expiration_lower_bound
+      required: false
+      description: |
+        Param to enable or disable passport expiration lower bound check.\n
+        - Empty value or `false` - default date is used (52983525027888)
+        - `true` - encoded current UTC timestamp is used
+      example: true
+      schema:
+        type: boolean
     idParam:
       in: query
       name: user_id
