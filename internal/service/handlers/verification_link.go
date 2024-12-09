@@ -1,14 +1,15 @@
 package handlers
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
-	"time"
 )
 
 func VerificationLink(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +57,10 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 
 	if req.Data.Attributes.NationalityCheck != nil {
 		user.NationalityEnable = *req.Data.Attributes.NationalityCheck
+	}
+
+	if req.Data.Attributes.ExpirationLowerBound != nil {
+		user.ExpirationLowerBound = helpers.GetExpirationLowerBound(*req.Data.Attributes.ExpirationLowerBound)
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()

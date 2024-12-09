@@ -2,14 +2,15 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"github.com/rarimo/verificator-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
-	"strconv"
 )
 
 func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
@@ -36,8 +37,15 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		TimestampUpperBound       = "0"
 		eventID                   = Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
-		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality, existingUser.SexEnable, existingUser.NationalityEnable)
-		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
+		proofSelector             = helpers.CalculateProofSelector(helpers.SelectorParams{
+			Uniqueness:           existingUser.Uniqueness,
+			AgeLowerBound:        existingUser.AgeLowerBound,
+			Nationality:          existingUser.Nationality,
+			SexEnable:            existingUser.SexEnable,
+			NationalityEnable:    existingUser.NationalityEnable,
+			ExpirationLowerBound: existingUser.ExpirationLowerBound != "52983525027888", // If there is non-default value, selector should be enabled
+		})
+		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
 	)
 
 	if existingUser.EventId != "" {
@@ -60,7 +68,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		CitizenshipMask:           helpers.Utf8ToHex(existingUser.Nationality),
 		EventData:                 existingUser.UserIDHash,
 		EventId:                   eventID,
-		ExpirationDateLowerBound:  "52983525027888",
+		ExpirationDateLowerBound:  existingUser.ExpirationLowerBound,
 		ExpirationDateUpperBound:  "52983525027888",
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,

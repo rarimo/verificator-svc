@@ -11,11 +11,12 @@ import (
 )
 
 type UserInputs struct {
-	UserId        string `url:"user_id"`
-	AgeLowerBound int    `url:"age_lower_bound"`
-	Uniqueness    bool   `url:"uniqueness"`
-	Nationality   string `url:"nationality"`
-	EventID       string `url:"event_id"`
+	UserId               string `url:"user_id"`
+	AgeLowerBound        int    `url:"age_lower_bound"`
+	Uniqueness           bool   `url:"uniqueness"`
+	Nationality          string `url:"nationality"`
+	EventID              string `url:"event_id"`
+	ExpirationLowerBound bool   `url:"expiration_lower_bound"`
 }
 
 func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
