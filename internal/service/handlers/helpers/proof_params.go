@@ -22,8 +22,17 @@ const (
 	ExpirationDateUpperbound     = 13
 	BirthDateLowerboundBit       = 14
 	BirthDateUpperboundBit       = 15
-	BirthDateFormat              = "060102"
+	DateFormat                   = "060102"
 )
+
+type SelectorParams struct {
+	Uniqueness           bool
+	AgeLowerBound        int
+	Nationality          string
+	SexEnable            bool
+	NationalityEnable    bool
+	ExpirationLowerBound bool
+}
 
 func PubSignalsToSha256(pubSignals []string) ([]byte, error) {
 	var hash = sha256.New()
@@ -76,11 +85,19 @@ func DecimalToHexToUtf8(input string) (string, error) {
 }
 
 func CalculateBirthDateHex(ageLowerBound int) string {
-	allowedBirthDate := time.Now().UTC().AddDate(-ageLowerBound, 0, 0)
-	formattedDate := []byte(allowedBirthDate.Format(BirthDateFormat))
-	hexBirthDateLoweBound := hexutils.BytesToHex(formattedDate)
+	return FormatDateTime(time.Now().UTC().AddDate(-ageLowerBound, 0, 0))
+}
 
-	return fmt.Sprintf("0x%s", hexBirthDateLoweBound)
+func GetExpirationLowerBound(expirationLowerBound bool) string {
+	if !expirationLowerBound {
+		return "52983525027888"
+	}
+
+	return FormatDateTime(time.Now().UTC())
+}
+
+func FormatDateTime(date time.Time) string {
+	return fmt.Sprintf("0x%s", hexutils.BytesToHex([]byte(date.Format(DateFormat))))
 }
 
 func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
@@ -94,21 +111,24 @@ func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
 	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
 }
 
-func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality string, sexEnable bool, nationalityEnable bool) int {
+func CalculateProofSelector(p SelectorParams) int {
 	var bitLine uint32
 	bitLine |= 1 << NullifierBit
-	if nationality != "" || nationalityEnable {
+	if p.Nationality != "" || p.NationalityEnable {
 		bitLine |= 1 << CitizenshipBit
 	}
-	if sexEnable {
+	if p.SexEnable {
 		bitLine |= 1 << SexBit
 	}
-	if ageLowerBound != -1 {
+	if p.AgeLowerBound != -1 {
 		bitLine |= 1 << BirthDateUpperboundBit
 	}
-	if uniqueness {
+	if p.Uniqueness {
 		bitLine |= 1 << TimestampUpperBoundBit
 		bitLine |= 1 << IdentityCounterUpperBoundBit
+	}
+	if p.ExpirationLowerBound {
+		bitLine |= 1 << ExpirationDateLowerboundBit
 	}
 
 	return int(bitLine)
