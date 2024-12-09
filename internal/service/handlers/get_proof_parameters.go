@@ -2,6 +2,10 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
@@ -9,9 +13,6 @@ import (
 	"github.com/rarimo/verificator-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 func GetProofParameters(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +26,15 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		IdentityCounterUpperBound int32
 		TimestampUpperBound       = "0"
 		eventID                   = Verifiers(r).EventID
-		proofSelector             = helpers.CalculateProofSelector(userInputs.Uniqueness, userInputs.AgeLowerBound, userInputs.Nationality, true, true)
+		proofSelector             = helpers.CalculateProofSelector(helpers.SelectorParams{
+			Uniqueness:           userInputs.Uniqueness,
+			AgeLowerBound:        userInputs.AgeLowerBound,
+			Nationality:          userInputs.Nationality,
+			SexEnable:            true,
+			NationalityEnable:    true,
+			ExpirationLowerBound: userInputs.ExpirationLowerBound,
+		})
+		expirationLowerBound = helpers.GetExpirationLowerBound(userInputs.ExpirationLowerBound)
 	)
 
 	if userInputs.EventID != "" {
@@ -45,14 +54,15 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := &data.VerifyUsers{
-		UserID:        userInputs.UserId,
-		UserIDHash:    userIdHash,
-		CreatedAt:     time.Now().UTC(),
-		Status:        "not_verified",
-		Nationality:   userInputs.Nationality,
-		AgeLowerBound: userInputs.AgeLowerBound,
-		Uniqueness:    userInputs.Uniqueness,
-		Proof:         []byte{},
+		UserID:               userInputs.UserId,
+		UserIDHash:           userIdHash,
+		CreatedAt:            time.Now().UTC(),
+		Status:               "not_verified",
+		Nationality:          userInputs.Nationality,
+		AgeLowerBound:        userInputs.AgeLowerBound,
+		Uniqueness:           userInputs.Uniqueness,
+		Proof:                []byte{},
+		ExpirationLowerBound: expirationLowerBound,
 	}
 
 	proofParameters := resources.ParametersAttributes{
@@ -62,7 +72,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		CitizenshipMask:           helpers.Utf8ToHex(userInputs.Nationality),
 		EventData:                 user.UserIDHash,
 		EventId:                   eventID,
-		ExpirationDateLowerBound:  "52983525027888",
+		ExpirationDateLowerBound:  expirationLowerBound,
 		ExpirationDateUpperBound:  "52983525027888",
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,

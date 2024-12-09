@@ -1,14 +1,15 @@
 package handlers
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
-	"time"
 )
 
 func VerificationLinkLight(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +53,10 @@ func VerificationLinkLight(w http.ResponseWriter, r *http.Request) {
 
 	if req.Data.Attributes.Sex != nil {
 		user.SexEnable = *req.Data.Attributes.Sex
+	}
+
+	if req.Data.Attributes.ExpirationLowerBound != nil {
+		user.ExpirationLowerBound = helpers.GetExpirationLowerBound(*req.Data.Attributes.ExpirationLowerBound)
 	}
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
