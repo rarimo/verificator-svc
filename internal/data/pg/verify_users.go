@@ -69,19 +69,20 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 	}
 
 	stmt := sq.Insert(verifyUsersTableName).SetMap(map[string]interface{}{
-		"user_id":            VerifyUsers.UserID,
-		"user_id_hash":       VerifyUsers.UserIDHash,
-		"age_lower_bound":    VerifyUsers.AgeLowerBound,
-		"nationality":        VerifyUsers.Nationality,
-		"uniqueness":         VerifyUsers.Uniqueness,
-		"event_id":           VerifyUsers.EventId,
-		"status":             VerifyUsers.Status,
-		"proof":              proofJSON,
-		"sex":                VerifyUsers.Sex,
-		"sex_enable":         VerifyUsers.SexEnable,
-		"nationality_enable": VerifyUsers.NationalityEnable,
-		"anonymous_id":       VerifyUsers.AnonymousID,
-		"nullifier":          VerifyUsers.Nullifier,
+		"user_id":                VerifyUsers.UserID,
+		"user_id_hash":           VerifyUsers.UserIDHash,
+		"age_lower_bound":        VerifyUsers.AgeLowerBound,
+		"nationality":            VerifyUsers.Nationality,
+		"uniqueness":             VerifyUsers.Uniqueness,
+		"event_id":               VerifyUsers.EventId,
+		"status":                 VerifyUsers.Status,
+		"proof":                  proofJSON,
+		"sex":                    VerifyUsers.Sex,
+		"sex_enable":             VerifyUsers.SexEnable,
+		"nationality_enable":     VerifyUsers.NationalityEnable,
+		"anonymous_id":           VerifyUsers.AnonymousID,
+		"nullifier":              VerifyUsers.Nullifier,
+		"expiration_lower_bound": VerifyUsers.ExpirationLowerBound,
 	})
 
 	if err = q.db.Exec(stmt); err != nil {
