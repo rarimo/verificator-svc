@@ -11,6 +11,7 @@ get:
       - $ref: '#/components/parameters/typeOfVerificationUniquenessParam'
       - $ref: '#/components/parameters/nationalityParam'
       - $ref: '#/components/parameters/eventIdParam'
+      - $ref: '#/components/parameters/expirationLowerBoundParam'
     responses:
       200:
         description: Success
