@@ -43,7 +43,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 			Nationality:          existingUser.Nationality,
 			SexEnable:            existingUser.SexEnable,
 			NationalityEnable:    existingUser.NationalityEnable,
-			ExpirationLowerBound: existingUser.ExpirationLowerBound != "52983525027888", // If there is non-default value, selector should be enabled
+			ExpirationLowerBound: existingUser.ExpirationLowerBound != helpers.DefaultDateHex, // If there is non-default value, selector should be enabled
 		})
 		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", Callback(r).URL, userIDHash)
 	)
@@ -53,7 +53,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if existingUser.AgeLowerBound == -1 {
-		birthDateUpperBound = "0x303030303030"
+		birthDateUpperBound = helpers.DefaultDateHex
 	}
 
 	if proofSelector&(1<<helpers.TimestampUpperBoundBit) != 0 &&
@@ -63,13 +63,13 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proofParameters := resources.ProofParamsAttributes{
-		BirthDateLowerBound:       "0x303030303030",
+		BirthDateLowerBound:       helpers.DefaultDateHex,
 		BirthDateUpperBound:       birthDateUpperBound,
 		CitizenshipMask:           helpers.Utf8ToHex(existingUser.Nationality),
 		EventData:                 existingUser.UserIDHash,
 		EventId:                   eventID,
 		ExpirationDateLowerBound:  existingUser.ExpirationLowerBound,
-		ExpirationDateUpperBound:  "52983525027888",
+		ExpirationDateUpperBound:  helpers.DefaultDateHex,
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,
 		IdentityCounterUpperBound: IdentityCounterUpperBound,

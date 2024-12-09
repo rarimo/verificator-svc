@@ -66,14 +66,14 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proofParameters := resources.ParametersAttributes{
-		BirthDateLowerBound:       "0x303030303030",
+		BirthDateLowerBound:       helpers.DefaultDateHex,
 		BirthDateUpperBound:       helpers.CalculateBirthDateHex(userInputs.AgeLowerBound),
 		CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, user.UserIDHash),
 		CitizenshipMask:           helpers.Utf8ToHex(userInputs.Nationality),
 		EventData:                 user.UserIDHash,
 		EventId:                   eventID,
 		ExpirationDateLowerBound:  expirationLowerBound,
-		ExpirationDateUpperBound:  "52983525027888",
+		ExpirationDateUpperBound:  helpers.DefaultDateHex,
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,
 		IdentityCounterUpperBound: IdentityCounterUpperBound,
