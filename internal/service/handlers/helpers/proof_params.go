@@ -23,6 +23,7 @@ const (
 	BirthDateLowerboundBit       = 14
 	BirthDateUpperboundBit       = 15
 	DateFormat                   = "060102"
+	DefaultDateHex               = "0x303030303030"
 )
 
 type SelectorParams struct {
@@ -90,7 +91,7 @@ func CalculateBirthDateHex(ageLowerBound int) string {
 
 func GetExpirationLowerBound(expirationLowerBound bool) string {
 	if !expirationLowerBound {
-		return "52983525027888"
+		return DefaultDateHex
 	}
 
 	return FormatDateTime(time.Now().UTC())
