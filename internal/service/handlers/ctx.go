@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"context"
-	"github.com/rarimo/verificator-svc/internal/config"
-	"github.com/rarimo/verificator-svc/internal/data"
 	"net/http"
 
+	"github.com/rarimo/verificator-svc/internal/config"
+	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/web3-auth-svc/resources"
 	"gitlab.com/distributed_lab/logan/v3"
 )
 
@@ -16,7 +17,7 @@ const (
 	verifyUserQCtxKey
 	verifiersCtxKey
 	callbackCtxKey
-	proofParametersCtxKey
+	userClaimsCtxKey
 	signatureVerificationCtxKey
 )
 
@@ -68,4 +69,14 @@ func CtxSignatureVerification(c config.SignatureVerificationConfig) func(context
 
 func SignatureVerification(r *http.Request) config.SignatureVerificationConfig {
 	return r.Context().Value(signatureVerificationCtxKey).(config.SignatureVerificationConfig)
+}
+
+func CtxUserClaims(claim []resources.Claim) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, userClaimsCtxKey, claim)
+	}
+}
+
+func UserClaims(r *http.Request) []resources.Claim {
+	return r.Context().Value(userClaimsCtxKey).([]resources.Claim)
 }
