@@ -11,6 +11,7 @@ import (
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"github.com/rarimo/verificator-svc/resources"
+	"github.com/rarimo/web3-auth-svc/pkg/auth"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 )
@@ -19,6 +20,11 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	userInputs, err := requests.NewGetUserInputs(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	if !auth.Authenticates(UserClaims(r), auth.UserGrant(userInputs.UserId)) {
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 

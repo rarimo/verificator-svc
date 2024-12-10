@@ -8,6 +8,7 @@ import (
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
+	"github.com/rarimo/web3-auth-svc/pkg/auth"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 )
@@ -16,6 +17,11 @@ func VerificationLinkLight(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.VerificationLink(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	if !auth.Authenticates(UserClaims(r), auth.UserGrant(req.Data.ID)) {
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 
