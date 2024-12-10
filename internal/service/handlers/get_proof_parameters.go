@@ -23,7 +23,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !auth.Authenticates(UserClaims(r), auth.UserGrant(userInputs.UserId)) {
+	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(userInputs.UserId)) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}

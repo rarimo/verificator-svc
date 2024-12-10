@@ -20,7 +20,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !auth.Authenticates(UserClaims(r), auth.UserGrant(req.Data.ID)) {
+	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(req.Data.ID)) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
