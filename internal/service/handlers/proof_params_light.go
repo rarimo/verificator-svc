@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
@@ -67,7 +66,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 		BirthDateLowerBound:       helpers.DefaultDateHex,
 		BirthDateUpperBound:       birthDateUpperBound,
 		CitizenshipMask:           helpers.Utf8ToHex(existingUser.Nationality),
-		EventData:                 helpers.GetEventData(common.HexToAddress(existingUser.UserID).Bytes()),
+		EventData:                 existingUser.UserIDHash,
 		EventId:                   eventID,
 		ExpirationDateLowerBound:  existingUser.ExpirationLowerBound,
 		ExpirationDateUpperBound:  helpers.DefaultDateHex,

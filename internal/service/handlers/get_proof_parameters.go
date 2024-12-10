@@ -54,15 +54,9 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		IdentityCounterUpperBound = 1
 	}
 
-	userIdHash, err := helpers.StringToPoseidonHash(userInputs.UserId)
-	if err != nil {
-		Log(r).WithError(err).Errorf("failed to convert user with userID [%s] to poseidon hash", userInputs.UserId)
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
 	user := &data.VerifyUsers{
 		UserID:               userInputs.UserId,
-		UserIDHash:           userIdHash,
+		UserIDHash:           helpers.BytesToKeccak256Hash(common.HexToAddress(userInputs.UserId).Bytes()),
 		CreatedAt:            time.Now().UTC(),
 		Status:               "not_verified",
 		Nationality:          userInputs.Nationality,
@@ -77,7 +71,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		BirthDateUpperBound:       helpers.CalculateBirthDateHex(userInputs.AgeLowerBound),
 		CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, user.UserIDHash),
 		CitizenshipMask:           helpers.Utf8ToHex(userInputs.Nationality),
-		EventData:                 helpers.GetEventData(common.HexToAddress(user.UserID).Bytes()),
+		EventData:                 user.UserIDHash,
 		EventId:                   eventID,
 		ExpirationDateLowerBound:  expirationLowerBound,
 		ExpirationDateUpperBound:  helpers.DefaultDateHex,
