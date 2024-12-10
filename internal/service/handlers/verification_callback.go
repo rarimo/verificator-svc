@@ -4,6 +4,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"math/big"
+	"net/http"
+	"strconv"
+
 	"github.com/ethereum/go-ethereum/log"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -12,9 +16,7 @@ import (
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"math/big"
-	"net/http"
-	"strconv"
+	"gitlab.com/distributed_lab/logan/v3"
 )
 
 func VerificationCallback(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +93,11 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if verifiedUser == nil {
-		Log(r).Error("user not found or eventData != userHashID")
+		Log(r).WithFields(logan.F{
+			"event_data":   getter.Get(zk.EventData),
+			"user_id_hash": userIDHash,
+			"id":           req.Data.ID,
+		}).Error("user not found or eventData != userHashID")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}

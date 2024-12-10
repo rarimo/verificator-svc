@@ -31,3 +31,8 @@ allOf:
             type: boolean
             example: true
             description: "Enable verification of sex param"
+          expiration_lower_bound:
+            type: boolean
+            example: true
+            description: "Enable verification of expiration lower bound param. When nothing (or `false`) set default value is used,
+             otherwise encoded current UTC timestamp will be stored."

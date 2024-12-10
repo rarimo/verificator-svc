@@ -32,4 +32,5 @@ poseidonsmt_root_verifier:
   request_timeout: 10s
 
 auth:
+  enabled: false
   addr: http://rarime-auth

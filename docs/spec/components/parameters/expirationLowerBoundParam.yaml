@@ -1,0 +1,10 @@
+in: query
+name: 'expiration_lower_bound'
+required: false
+description: |
+  Param to enable or disable passport expiration lower bound check.\n
+  - Empty value or `false` - default date is used (52983525027888)
+  - `true` - encoded current UTC timestamp is used
+example: true
+schema:
+  type: boolean

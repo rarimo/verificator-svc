@@ -21,16 +21,17 @@ func (s *service) router(cfg config.Config) chi.Router {
 			handlers.CtxVerifiers(cfg.Verifiers()),
 			handlers.CtxCallback(cfg.CallbackConfig()),
 			handlers.CtxSignatureVerification(cfg.SignatureVerificationConfig()),
+			handlers.CtxAuthClient(cfg.Auth()),
 		),
 	)
 	authMW := middlewares.Auth(cfg.Auth(), cfg.Log())
 	r.Route("/integrations/verificator-svc", func(r chi.Router) {
 		r.Route("/private", func(r chi.Router) {
-			r.Get("/proof-parameters", handlers.GetProofParameters)
+			r.With(authMW).Get("/proof-parameters", handlers.GetProofParameters)
 			r.Get("/proof/{user_id}", handlers.GetProofByUserID)
 			r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
-			r.With(authMW(middlewares.AdminGrant)).Delete("/user/{user_id}", handlers.DeleteUser)
-			r.Post("/verification-link", handlers.VerificationLink)
+			r.With(authMW).Delete("/user/{user_id}", handlers.DeleteUser)
+			r.With(authMW).Post("/verification-link", handlers.VerificationLink)
 		})
 		r.Route("/public", func(r chi.Router) {
 			r.Post("/callback/{user_id}", handlers.VerificationCallback)
@@ -43,8 +44,8 @@ func (s *service) router(cfg config.Config) chi.Router {
 				r.Get("/proof-params/{user_id_hash}", handlers.GetProofParamsLightById)
 			})
 			r.Route("/private", func(r chi.Router) {
-				r.Post("/verification-link", handlers.VerificationLinkLight)
-				r.With(authMW(middlewares.AdminGrant)).Delete("/user/{user_id}", handlers.DeleteUser)
+				r.With(authMW).Post("/verification-link", handlers.VerificationLinkLight)
+				r.With(authMW).Delete("/user/{user_id}", handlers.DeleteUser)
 				r.Get("/user/{user_id}", handlers.GetUser)
 				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
 			})
