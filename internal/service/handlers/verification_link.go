@@ -72,7 +72,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIdHash)
+		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
