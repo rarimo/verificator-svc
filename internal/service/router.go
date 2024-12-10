@@ -21,6 +21,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			handlers.CtxVerifiers(cfg.Verifiers()),
 			handlers.CtxCallback(cfg.CallbackConfig()),
 			handlers.CtxSignatureVerification(cfg.SignatureVerificationConfig()),
+			handlers.CtxAuthClient(cfg.Auth()),
 		),
 	)
 	authMW := middlewares.Auth(cfg.Auth(), cfg.Log())

@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/web3-auth-svc/pkg/auth"
 	"gitlab.com/distributed_lab/ape"
@@ -18,6 +19,11 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID, err := requests.GetPathUserID(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(userID)) {
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 
