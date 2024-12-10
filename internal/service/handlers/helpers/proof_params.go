@@ -7,6 +7,8 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/iden3/go-iden3-crypto/poseidon"
 	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
@@ -66,6 +68,14 @@ func StringToPoseidonHash(inputString string) (string, error) {
 
 	}
 	return fmt.Sprintf("0x%s", hex.EncodeToString(hash.Bytes())), nil
+}
+
+func GetEventData(input []byte) string {
+	hashInt := new(big.Int).SetBytes(crypto.Keccak256(common.LeftPadBytes(input, 32)))
+	mask, _ := new(big.Int).SetString("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
+	result := new(big.Int).And(hashInt, mask)
+
+	return fmt.Sprintf("0x%s", result.Text(16))
 }
 
 func Utf8ToHex(input string) string {

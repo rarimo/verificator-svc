@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
@@ -76,7 +77,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		BirthDateUpperBound:       helpers.CalculateBirthDateHex(userInputs.AgeLowerBound),
 		CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, user.UserIDHash),
 		CitizenshipMask:           helpers.Utf8ToHex(userInputs.Nationality),
-		EventData:                 user.UserIDHash,
+		EventData:                 helpers.GetEventData(common.HexToAddress(user.UserID).Bytes()),
 		EventId:                   eventID,
 		ExpirationDateLowerBound:  expirationLowerBound,
 		ExpirationDateUpperBound:  helpers.DefaultDateHex,
@@ -90,7 +91,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 
 	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIdHash)
+		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
