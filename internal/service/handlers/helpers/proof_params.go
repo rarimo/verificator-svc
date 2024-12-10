@@ -100,14 +100,12 @@ func FormatDateTime(date time.Time) string {
 }
 
 func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
-	userIDHashDecimal, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
+	userIDBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
 	if !ok {
 		return "", fmt.Errorf("failed to parse event data")
 	}
-	var userIDHash [32]byte
-	userIDHashDecimal.FillBytes(userIDHash[:])
 
-	return fmt.Sprintf("0x%s", hex.EncodeToString(userIDHash[:])), nil
+	return fmt.Sprintf("0x%s", userIDBig.Text(16)), nil
 }
 
 func CalculateProofSelector(p SelectorParams) int {
