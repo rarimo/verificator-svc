@@ -24,7 +24,7 @@ func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
 		return
 	}
 	err = val.Errors{
-		"user_id":         val.Validate(userInputs.UserId, val.Required, is.Email),
+		"user_id":         val.Validate(userInputs.UserId, val.Required),
 		"age_lower_bound": val.Validate(userInputs.AgeLowerBound, val.Required),
 		"uniqueness":      val.Validate(val.Required),
 		"nationality":     val.Validate(userInputs.Nationality, val.Required),
