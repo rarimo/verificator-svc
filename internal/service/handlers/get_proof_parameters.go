@@ -83,22 +83,12 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		TimestampUpperBound:       TimestampUpperBound,
 	}
 
-	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
+	dbUser, err := VerifyUsersQ(r).Upsert(user)
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", user.UserIDHash)
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-	if existingUser != nil {
-		ape.Render(w, responses.NewProofParametersResponse(*existingUser, proofParameters))
-		return
-	}
-
-	if err = VerifyUsersQ(r).Insert(user); err != nil {
-		Log(r).WithError(err).Errorf("failed to insert user with userID [%s]", user.UserIDHash)
+		Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	ape.Render(w, responses.NewProofParametersResponse(*user, proofParameters))
+	ape.Render(w, responses.NewProofParametersResponse(dbUser, proofParameters))
 }

@@ -64,23 +64,12 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		user.ExpirationLowerBound = helpers.GetExpirationLowerBound(*req.Data.Attributes.ExpirationLowerBound)
 	}
 
-	existingUser, err := VerifyUsersQ(r).WhereHashID(user.UserIDHash).Get()
+	dbUser, err := VerifyUsersQ(r).Upsert(user)
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", user.UserIDHash)
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-	if existingUser != nil {
-		ape.Render(w, responses.NewVerificationLinkResponse(*existingUser, Callback(r).URL))
-		return
-	}
-
-	if err = VerifyUsersQ(r).Insert(user); err != nil {
-		Log(r).WithError(err).Errorf("failed to insert user with userID [%s]", user.UserIDHash)
+		Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	ape.Render(w, responses.NewVerificationLinkResponse(*user, Callback(r).URL))
-
+	ape.Render(w, responses.NewVerificationLinkResponse(dbUser, Callback(r).URL))
 }
