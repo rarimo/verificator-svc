@@ -28,7 +28,7 @@ type VerifyUsersQ interface {
 	Get() (*VerifyUsers, error)
 	Select() ([]VerifyUsers, error)
 	Update(*VerifyUsers) error
-	Insert(*VerifyUsers) error
+	Upsert(*VerifyUsers) (VerifyUsers, error)
 	Delete() error
 
 	DeleteByID(*VerifyUsers) error

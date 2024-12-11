@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-	"gitlab.com/distributed_lab/kit/pgdb"
-
 	sq "github.com/Masterminds/squirrel"
-
+	"github.com/pkg/errors"
 	"github.com/rarimo/verificator-svc/internal/data"
+	"gitlab.com/distributed_lab/kit/pgdb"
 )
 
 type VerifyUsersQ struct {
@@ -62,14 +60,14 @@ func (q *VerifyUsersQ) Get() (*data.VerifyUsers, error) {
 	return &result, nil
 }
 
-func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
+func (q *VerifyUsersQ) Upsert(VerifyUsers *data.VerifyUsers) (data.VerifyUsers, error) {
+	var response data.VerifyUsers
 	proofJSON, err := json.Marshal(VerifyUsers.Proof)
 	if err != nil {
-		return fmt.Errorf("failed to marshal proof for user %s: %w", VerifyUsers.UserID, err)
+		return response, fmt.Errorf("failed to marshal proof for user %s: %w", VerifyUsers.UserID, err)
 	}
 
-	stmt := sq.Insert(verifyUsersTableName).SetMap(map[string]interface{}{
-		"user_id":                VerifyUsers.UserID,
+	newData := map[string]interface{}{
 		"user_id_hash":           VerifyUsers.UserIDHash,
 		"age_lower_bound":        VerifyUsers.AgeLowerBound,
 		"nationality":            VerifyUsers.Nationality,
@@ -83,13 +81,21 @@ func (q *VerifyUsersQ) Insert(VerifyUsers *data.VerifyUsers) error {
 		"anonymous_id":           VerifyUsers.AnonymousID,
 		"nullifier":              VerifyUsers.Nullifier,
 		"expiration_lower_bound": VerifyUsers.ExpirationLowerBound,
-	})
-
-	if err = q.db.Exec(stmt); err != nil {
-		return fmt.Errorf("insert user %+v: %w", VerifyUsers, err)
 	}
 
-	return nil
+	updateStmt, args, _ := sq.Update(" ").SetMap(newData).ToSql()
+
+	newData["user_id"] = VerifyUsers.UserID
+
+	query := sq.Insert(verifyUsersTableName).SetMap(newData).
+		Suffix("ON CONFLICT (user_id) DO "+updateStmt, args...).
+		Suffix("RETURNING *")
+
+	if err = q.db.Get(&response, query); err != nil {
+		return response, errors.Wrap(err, "failed to upsert new row")
+	}
+
+	return response, nil
 }
 
 func (q *VerifyUsersQ) Update(VerifyUsers *data.VerifyUsers) error {
