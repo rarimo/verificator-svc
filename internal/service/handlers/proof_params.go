@@ -43,7 +43,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 			Nationality:          existingUser.Nationality,
 			SexEnable:            existingUser.SexEnable,
 			NationalityEnable:    existingUser.NationalityEnable,
-			ExpirationLowerBound: existingUser.ExpirationLowerBound != helpers.DefaultDateHex, // If there is non-default value, selector should be enabled
+			ExpirationLowerBound: !helpers.IsDefaultZKDate(existingUser.ExpirationLowerBound), // If there is non-default value, selector should be enabled
 		})
 		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
 	)
