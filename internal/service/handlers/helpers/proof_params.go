@@ -157,3 +157,7 @@ func CheckUniqueness(selectorInt int, serviceStartTimestamp, identityTimestampUp
 
 	return status, nil
 }
+
+func IsDefaultZKDate(date string) bool {
+	return date == DefaultDateHex
+}
