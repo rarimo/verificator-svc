@@ -8,11 +8,11 @@ import (
 	val "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func GetPathUserID(r *http.Request) (userId string, err error) {
-	userId = strings.ToLower(chi.URLParam(r, "user_id"))
+func GetPathUserID(r *http.Request) (userID string, err error) {
+	userID = strings.ToLower(chi.URLParam(r, "user_id"))
 
 	err = val.Errors{
-		"user_id": val.Validate(userId, val.Required),
+		"user_id": val.Validate(userID, val.Required),
 	}.Filter()
 	return
 }
