@@ -26,5 +26,10 @@ allOf:
             description: "User nationality"
           sex:
             type: string
+            enum:
+              - "F"
+              - "M"
+              - "O"
+              - ""
             example: "F"
             description: "User sex"
