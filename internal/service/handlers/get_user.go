@@ -1,15 +1,16 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	userID, err := requests.DeleteUserByID(r)
+	userID, err := requests.GetPathUserID(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return

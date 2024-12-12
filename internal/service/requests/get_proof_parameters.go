@@ -2,10 +2,12 @@ package requests
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	val "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"gitlab.com/distributed_lab/urlval/v4"
-	"net/http"
 )
 
 type UserInputs struct {
@@ -21,14 +23,16 @@ func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
 		err = newDecodeError("query", err)
 		return
 	}
+
+	userInputs.UserId = strings.ToLower(userInputs.UserId)
+
 	err = val.Errors{
-		"user_id":         val.Validate(userInputs.UserId, val.Required, is.Email),
+		"user_id":         val.Validate(userInputs.UserId, val.Required),
 		"age_lower_bound": val.Validate(userInputs.AgeLowerBound, val.Required),
 		"uniqueness":      val.Validate(val.Required),
 		"nationality":     val.Validate(userInputs.Nationality, val.Required),
 		"event_id":        val.Validate(userInputs.EventID, is.Hexadecimal),
-	}.
-		Filter()
+	}.Filter()
 	return
 }
 
