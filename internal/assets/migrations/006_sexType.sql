@@ -16,8 +16,12 @@ $$ LANGUAGE plpgsql;
 -- +migrate StatementEnd
 
 ALTER TABLE verify_users ALTER COLUMN sex TYPE gender_enum USING transform_gender(sex);
+DROP INDEX verify_users_nullifier_unique;
+DROP INDEX verify_users_anonymous_id_unique;
 
 -- +migrate Down
+CREATE UNIQUE INDEX verify_users_anonymous_id_unique ON verify_users(anonymous_id) WHERE anonymous_id != '';
+CREATE UNIQUE INDEX verify_users_nullifier_unique ON verify_users(nullifier) WHERE nullifier != '';
 ALTER TABLE verify_users ALTER COLUMN sex TYPE TEXT;
 
 DROP FUNCTION transform_gender;
