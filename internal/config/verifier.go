@@ -12,6 +12,7 @@ type Verifiers struct {
 	Passport              *zk.Verifier
 	ServiceStartTimestamp int64
 	EventID               string
+	Multiproof            bool
 }
 
 func (c *config) Verifiers() Verifiers {
@@ -20,6 +21,7 @@ func (c *config) Verifiers() Verifiers {
 			VerificationKeyPath      string `fig:"verification_key_path,required"`
 			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
 			EventID                  string `fig:"event_id,required"`
+			Multiproof               bool   `fig:"multiproof"`
 		}
 
 		err := figure.
@@ -43,6 +45,7 @@ func (c *config) Verifiers() Verifiers {
 			Passport:              pass,
 			ServiceStartTimestamp: cfg.AllowedIdentityTimestamp,
 			EventID:               cfg.EventID,
+			Multiproof:            cfg.Multiproof,
 		}
 	}).(Verifiers)
 }

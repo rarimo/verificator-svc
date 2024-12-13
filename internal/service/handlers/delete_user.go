@@ -8,7 +8,7 @@ import (
 )
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	userID, err := requests.DeleteUserByID(r)
+	userID, err := requests.GetPathUserID(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return

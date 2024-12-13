@@ -3,6 +3,10 @@ package handlers
 import (
 	"encoding/hex"
 	"fmt"
+	"math/big"
+	"net/http"
+	"strings"
+
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -10,8 +14,6 @@ import (
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"math/big"
-	"net/http"
 )
 
 func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
@@ -76,6 +78,7 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
+	sex = transformGender(sex)
 
 	nullifier, ok := new(big.Int).SetString(pubSignals[0], 10)
 	if !ok {
@@ -133,21 +136,19 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if byAnonymousID != nil {
+		if !Verifiers(r).Multiproof && byAnonymousID != nil {
 			if byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
 				Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
 				verifiedUser.Status = "failed_verification"
-				return
 			}
 		} else {
 			verifiedUser.AnonymousID = anonymousIDHex
 		}
 
-		if byNullifier != nil {
+		if !Verifiers(r).Multiproof && byNullifier != nil {
 			if byNullifier.UserIDHash != verifiedUser.UserIDHash {
 				Log(r).WithError(err).Errorf("User with nullifier [%s] but a different userIDHash already exists", nullifierHex)
 				verifiedUser.Status = "failed_verification"
-				return
 			}
 		} else {
 			verifiedUser.Nullifier = nullifierHex
@@ -176,4 +177,18 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 
 	log.Debug("Signature successfully verified")
 	ape.Render(w, responses.NewVerificationCallbackResponse(*verifiedUser))
+}
+
+func transformGender(input string) string {
+	switch strings.ToUpper(input) {
+	case "MALE":
+		return "M"
+	case "FEMALE":
+		return "F"
+	case "OTHERS":
+		return "O"
+	// assume that other cases are valid (M,F,O)
+	default:
+		return input
+	}
 }

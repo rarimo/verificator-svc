@@ -13,7 +13,7 @@ import (
 )
 
 func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
-	userIDHash, err := requests.GetProofParamsByID(r)
+	userIDHash, err := requests.GetPathUserIDHash(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return

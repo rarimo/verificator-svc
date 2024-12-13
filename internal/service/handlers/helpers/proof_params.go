@@ -4,11 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"math/big"
+	"time"
+
 	"github.com/iden3/go-iden3-crypto/poseidon"
 	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
-	"math/big"
-	"time"
 )
 
 const (
@@ -113,15 +114,14 @@ func CalculateProofSelector(uniqueness bool, ageLowerBound int, nationality stri
 	return int(bitLine)
 }
 
-func CheckUniqueness(selectorInt int, serviceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound int64) (string, error) {
+func CheckUniqueness(selectorInt int, serviceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound int64) (bool, error) {
 	var (
-		status           = "uniqueness_check_failed"
 		timestampSuccess = false
 		counterSuccess   = false
 	)
 
 	if selectorInt&(1<<TimestampUpperBoundBit) == 0 && selectorInt&(1<<IdentityCounterUpperBoundBit) == 0 {
-		return "", fmt.Errorf("both timestampUpperBoundBit and identityCounterUpperBoundBit are not set in selector")
+		return false, fmt.Errorf("both timestampUpperBoundBit and identityCounterUpperBoundBit are not set in selector")
 	}
 	if selectorInt&(1<<TimestampUpperBoundBit) == 1<<TimestampUpperBoundBit {
 		if identityTimestampUpperBound <= serviceStartTimestamp {
@@ -134,8 +134,8 @@ func CheckUniqueness(selectorInt int, serviceStartTimestamp, identityTimestampUp
 		}
 	}
 	if timestampSuccess || counterSuccess {
-		return "verified", nil
+		return true, nil
 	}
 
-	return status, nil
+	return false, nil
 }
