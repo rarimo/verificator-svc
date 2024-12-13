@@ -137,20 +137,18 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if byAnonymousID != nil {
-			if byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
+			if !Verifiers(r).Multiproof && byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
 				Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
 				verifiedUser.Status = "failed_verification"
-				return
 			}
 		} else {
 			verifiedUser.AnonymousID = anonymousIDHex
 		}
 
 		if byNullifier != nil {
-			if byNullifier.UserIDHash != verifiedUser.UserIDHash {
+			if !Verifiers(r).Multiproof && byNullifier.UserIDHash != verifiedUser.UserIDHash {
 				Log(r).WithError(err).Errorf("User with nullifier [%s] but a different userIDHash already exists", nullifierHex)
 				verifiedUser.Status = "failed_verification"
-				return
 			}
 		} else {
 			verifiedUser.Nullifier = nullifierHex

@@ -4,6 +4,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"math/big"
+	"net/http"
+	"strconv"
+
 	"github.com/ethereum/go-ethereum/log"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -12,9 +16,7 @@ import (
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"math/big"
-	"net/http"
-	"strconv"
+	"gitlab.com/distributed_lab/logan/v3"
 )
 
 func VerificationCallback(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +98,8 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	verifiedUser.Status = "verified"
+
 	if verifiedUser.EventId != "" {
 		eventID = verifiedUser.EventId
 	}
@@ -108,7 +112,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash {
+		if !Verifiers(r).Multiproof && byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash {
 			Log(r).WithError(err).Errorf("User with this nullifier [%s] but a different userIDHash already exists", nullifierHex)
 			verifiedUser.Status = "failed_verification"
 		} else {
@@ -146,16 +150,24 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-	verifiedUser.Status = "verified"
 
 	if verifiedUser.Uniqueness {
-		status, uniquenessErr := helpers.CheckUniqueness(selectorInt, Verifiers(r).ServiceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound)
+		unique, uniquenessErr := helpers.CheckUniqueness(selectorInt, Verifiers(r).ServiceStartTimestamp, identityTimestampUpperBound, identityCounterUpperBound)
 		if uniquenessErr != nil {
 			Log(r).WithError(err).Errorf("failed to check uniqueness")
 			ape.RenderErr(w, problems.BadRequest(uniquenessErr)...)
 			return
 		}
-		verifiedUser.Status = status
+		if !unique {
+			Log(r).WithFields(logan.F{
+				"selector":                       selectorInt,
+				"service_timestamp":              Verifiers(r).ServiceStartTimestamp,
+				"identity_timestamp_upper_bound": identityTimestampUpperBound,
+				"identity_counter_upper_bound":   identityCounterUpperBound,
+				"user_id_hash":                   userIDHash,
+			}).Errorf("failed to check uniqueness")
+			verifiedUser.Status = "uniqueness_check_failed"
+		}
 	}
 
 	verifiedUser.Proof = proofJSON
