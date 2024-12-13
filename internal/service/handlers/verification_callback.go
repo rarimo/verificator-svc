@@ -104,8 +104,8 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 	verifiedUser.Status = "verified"
 
-	if verifiedUser.EventId != "" {
-		eventID = verifiedUser.EventId
+	if verifiedUser.EventID != "" {
+		eventID = verifiedUser.EventID
 	}
 
 	if verifiedUser.Uniqueness {

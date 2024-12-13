@@ -41,7 +41,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Data.Attributes.EventId != nil && *req.Data.Attributes.EventId != "" {
-		user.EventId = *req.Data.Attributes.EventId
+		user.EventID = *req.Data.Attributes.EventId
 	}
 
 	if req.Data.Attributes.AgeLowerBound != nil {

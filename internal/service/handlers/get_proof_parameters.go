@@ -24,7 +24,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(userInputs.UserId)) {
+	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(userInputs.UserID)) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
@@ -55,8 +55,8 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &data.VerifyUsers{
-		UserID:               userInputs.UserId,
-		UserIDHash:           helpers.BytesToKeccak256Hash(common.HexToAddress(userInputs.UserId).Bytes()),
+		UserID:               userInputs.UserID,
+		UserIDHash:           helpers.BytesToKeccak256Hash(common.HexToAddress(userInputs.UserID).Bytes()),
 		CreatedAt:            time.Now().UTC(),
 		Status:               "not_verified",
 		Nationality:          userInputs.Nationality,

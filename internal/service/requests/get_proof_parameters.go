@@ -11,7 +11,7 @@ import (
 )
 
 type UserInputs struct {
-	UserId               string `url:"user_id"`
+	UserID               string `url:"user_id"`
 	AgeLowerBound        int    `url:"age_lower_bound"`
 	Uniqueness           bool   `url:"uniqueness"`
 	Nationality          string `url:"nationality"`
@@ -25,10 +25,10 @@ func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
 		return
 	}
 
-	userInputs.UserId = strings.ToLower(userInputs.UserId)
+	userInputs.UserID = strings.ToLower(userInputs.UserID)
 
 	err = val.Errors{
-		"user_id":         val.Validate(userInputs.UserId, val.Required),
+		"user_id":         val.Validate(userInputs.UserID, val.Required),
 		"age_lower_bound": val.Validate(userInputs.AgeLowerBound, val.Required),
 		"uniqueness":      val.Validate(val.Required),
 		"nationality":     val.Validate(userInputs.Nationality, val.Required),

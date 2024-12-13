@@ -48,8 +48,8 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", Callback(r).URL, userIDHash)
 	)
 
-	if existingUser.EventId != "" {
-		eventID = existingUser.EventId
+	if existingUser.EventID != "" {
+		eventID = existingUser.EventID
 	}
 
 	if existingUser.AgeLowerBound == -1 {
