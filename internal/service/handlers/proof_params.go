@@ -2,14 +2,15 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"github.com/rarimo/verificator-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
-	"strconv"
 )
 
 func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
@@ -36,16 +37,23 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		TimestampUpperBound       = "0"
 		eventID                   = Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
-		proofSelector             = helpers.CalculateProofSelector(existingUser.Uniqueness, existingUser.AgeLowerBound, existingUser.Nationality, existingUser.SexEnable, existingUser.NationalityEnable)
-		callbackURL               = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
+		proofSelector             = helpers.CalculateProofSelector(helpers.SelectorParams{
+			Uniqueness:           existingUser.Uniqueness,
+			AgeLowerBound:        existingUser.AgeLowerBound,
+			Nationality:          existingUser.Nationality,
+			SexEnable:            existingUser.SexEnable,
+			NationalityEnable:    existingUser.NationalityEnable,
+			ExpirationLowerBound: !helpers.IsDefaultZKDate(existingUser.ExpirationLowerBound), // If there is non-default value, selector should be enabled
+		})
+		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, userIDHash)
 	)
 
-	if existingUser.EventId != "" {
-		eventID = existingUser.EventId
+	if existingUser.EventID != "" {
+		eventID = existingUser.EventID
 	}
 
 	if existingUser.AgeLowerBound == -1 {
-		birthDateUpperBound = "0x303030303030"
+		birthDateUpperBound = helpers.DefaultDateHex
 	}
 
 	if proofSelector&(1<<helpers.TimestampUpperBoundBit) != 0 &&
@@ -55,13 +63,13 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proofParameters := resources.ProofParamsAttributes{
-		BirthDateLowerBound:       "0x303030303030",
+		BirthDateLowerBound:       helpers.DefaultDateHex,
 		BirthDateUpperBound:       birthDateUpperBound,
 		CitizenshipMask:           helpers.Utf8ToHex(existingUser.Nationality),
 		EventData:                 existingUser.UserIDHash,
 		EventId:                   eventID,
-		ExpirationDateLowerBound:  "52983525027888",
-		ExpirationDateUpperBound:  "52983525027888",
+		ExpirationDateLowerBound:  existingUser.ExpirationLowerBound,
+		ExpirationDateUpperBound:  helpers.DefaultDateHex,
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,
 		IdentityCounterUpperBound: IdentityCounterUpperBound,

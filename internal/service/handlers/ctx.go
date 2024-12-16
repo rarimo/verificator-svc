@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"context"
-	"github.com/rarimo/verificator-svc/internal/config"
-	"github.com/rarimo/verificator-svc/internal/data"
 	"net/http"
 
+	"github.com/rarimo/verificator-svc/internal/config"
+	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/web3-auth-svc/pkg/auth"
+	"github.com/rarimo/web3-auth-svc/resources"
 	"gitlab.com/distributed_lab/logan/v3"
 )
 
@@ -16,8 +18,9 @@ const (
 	verifyUserQCtxKey
 	verifiersCtxKey
 	callbackCtxKey
-	proofParametersCtxKey
+	userClaimsCtxKey
 	signatureVerificationCtxKey
+	authCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -68,4 +71,24 @@ func CtxSignatureVerification(c config.SignatureVerificationConfig) func(context
 
 func SignatureVerification(r *http.Request) config.SignatureVerificationConfig {
 	return r.Context().Value(signatureVerificationCtxKey).(config.SignatureVerificationConfig)
+}
+
+func CtxUserClaims(claim []resources.Claim) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, userClaimsCtxKey, claim)
+	}
+}
+
+func UserClaims(r *http.Request) []resources.Claim {
+	return r.Context().Value(userClaimsCtxKey).([]resources.Claim)
+}
+
+func CtxAuthClient(auth *auth.Client) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, authCtxKey, auth)
+	}
+}
+
+func AuthClient(r *http.Request) *auth.Client {
+	return r.Context().Value(authCtxKey).(*auth.Client)
 }

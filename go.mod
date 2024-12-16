@@ -8,10 +8,9 @@ require (
 	github.com/ethereum/go-ethereum v1.14.12
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/iden3/go-iden3-crypto v0.0.15
 	github.com/iden3/go-rapidsnark/types v0.0.3
 	github.com/pkg/errors v0.9.1
-	github.com/rarimo/web3-auth-svc v0.1.1-rc0
+	github.com/rarimo/web3-auth-svc v0.1.4
 	github.com/rarimo/zkverifier-kit v1.2.4
 	github.com/rubenv/sql-migrate v1.7.0
 	github.com/status-im/keycard-go v0.2.0
@@ -49,6 +48,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/holiman/uint256 v1.3.1 // indirect
+	github.com/iden3/go-iden3-crypto v0.0.15 // indirect
 	github.com/iden3/go-rapidsnark/verifier v0.0.5 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
