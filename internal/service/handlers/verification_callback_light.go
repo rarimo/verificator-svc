@@ -62,10 +62,8 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
-	var eventDataBytes [32]byte
-	userIDHashDecimal.FillBytes(eventDataBytes[:])
 
-	eventData := fmt.Sprintf("0x%s", hex.EncodeToString(eventDataBytes[:]))
+	eventData := fmt.Sprintf("0x%s", userIDHashDecimal.Text(16))
 	nationality, err := helpers.DecimalToHexToUtf8(pubSignals[6])
 	if err != nil {
 		Log(r).Error("failed to convert nationality from decimal to UTF8")
