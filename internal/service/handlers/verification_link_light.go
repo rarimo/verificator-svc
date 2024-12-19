@@ -40,6 +40,10 @@ func VerificationLinkLight(w http.ResponseWriter, r *http.Request) {
 		user.Nationality = *req.Data.Attributes.Nationality
 	}
 
+	if req.Data.Attributes.NationalityCheck != nil {
+		user.NationalityEnable = *req.Data.Attributes.NationalityCheck
+	}
+
 	if req.Data.Attributes.EventId != nil && *req.Data.Attributes.EventId != "" {
 		user.EventID = *req.Data.Attributes.EventId
 	}
