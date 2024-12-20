@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -27,9 +26,16 @@ func VerificationLinkLight(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userIDHash, err := helpers.BuildUserIDHash(req.Data.ID)
+	if err != nil {
+		ctx.Log(r).WithError(err).WithField("user_id", req.Data.ID).Error("error building user ID hash")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
 	user := &data.VerifyUsers{
 		UserID:               req.Data.ID,
-		UserIDHash:           helpers.BytesToKeccak256Hash(common.HexToAddress(req.Data.ID).Bytes()),
+		UserIDHash:           userIDHash,
 		CreatedAt:            time.Now().UTC(),
 		Status:               "not_verified",
 		Proof:                []byte{},
