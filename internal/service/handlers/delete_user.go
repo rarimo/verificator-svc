@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/web3-auth-svc/pkg/auth"
@@ -11,7 +12,7 @@ import (
 )
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	if !auth.Authenticates(UserClaims(r), auth.AdminGrant) {
+	if !auth.Authenticates(ctx.UserClaims(r), auth.AdminGrant) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
@@ -22,25 +23,25 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(userID)) {
+	if !helpers.Authenticates(ctx.AuthClient(r), ctx.UserClaims(r), auth.UserGrant(userID)) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 
-	deletedUser, err := VerifyUsersQ(r).WhereID(userID).Get()
+	deletedUser, err := ctx.VerifyUsersQ(r).WhereID(userID).Get()
 	if err != nil {
-		Log(r).WithError(err).Error("failed to get user by userID")
+		ctx.Log(r).WithError(err).Error("failed to get user by userID")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if deletedUser == nil {
-		Log(r).Debugf("User with userID=%s not found", userID)
+		ctx.Log(r).Debugf("User with userID=%s not found", userID)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	if err = VerifyUsersQ(r).DeleteByID(deletedUser); err != nil {
-		Log(r).Debugf("failed to delete user with UserID=%s", userID)
+	if err = ctx.VerifyUsersQ(r).DeleteByID(deletedUser); err != nil {
+		ctx.Log(r).Debugf("failed to delete user with UserID=%s", userID)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

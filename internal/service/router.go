@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/rarimo/verificator-svc/internal/config"
 	"github.com/rarimo/verificator-svc/internal/data/pg"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers"
 	"github.com/rarimo/verificator-svc/internal/service/middlewares"
 	"gitlab.com/distributed_lab/ape"
@@ -16,12 +17,12 @@ func (s *service) router(cfg config.Config) chi.Router {
 		ape.RecoverMiddleware(s.log),
 		ape.LoganMiddleware(s.log),
 		ape.CtxMiddleware(
-			handlers.CtxLog(cfg.Log()),
-			handlers.CtxVerifyUsersQ(pg.NewVerifyUsersQ(cfg.DB().Clone())),
-			handlers.CtxVerifiers(cfg.Verifiers()),
-			handlers.CtxCallback(cfg.CallbackConfig()),
-			handlers.CtxSignatureVerification(cfg.SignatureVerificationConfig()),
-			handlers.CtxAuthClient(cfg.Auth()),
+			ctx.CtxLog(cfg.Log()),
+			ctx.CtxVerifyUsersQ(pg.NewVerifyUsersQ(cfg.DB().Clone())),
+			ctx.CtxVerifiers(cfg.Verifiers()),
+			ctx.CtxCallback(cfg.CallbackConfig()),
+			ctx.CtxSignatureVerification(cfg.SignatureVerificationConfig()),
+			ctx.CtxAuthClient(cfg.Auth()),
 		),
 	)
 	authMW := middlewares.Auth(cfg.Auth(), cfg.Log())

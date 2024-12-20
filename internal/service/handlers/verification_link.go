@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
@@ -21,7 +22,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(req.Data.ID)) {
+	if !helpers.Authenticates(ctx.AuthClient(r), ctx.UserClaims(r), auth.UserGrant(req.Data.ID)) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
@@ -64,12 +65,12 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		user.ExpirationLowerBound = helpers.GetExpirationLowerBound(*req.Data.Attributes.ExpirationLowerBound)
 	}
 
-	dbUser, err := VerifyUsersQ(r).Upsert(user)
+	dbUser, err := ctx.VerifyUsersQ(r).Upsert(user)
 	if err != nil {
-		Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
+		ctx.Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	ape.Render(w, responses.NewVerificationLinkResponse(dbUser, Callback(r).URL))
+	ape.Render(w, responses.NewVerificationLinkResponse(dbUser, ctx.Callback(r).URL))
 }

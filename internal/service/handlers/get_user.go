@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
 	"gitlab.com/distributed_lab/ape"
@@ -16,14 +17,14 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := VerifyUsersQ(r).WhereID(userID).Get()
+	user, err := ctx.VerifyUsersQ(r).WhereID(userID).Get()
 	if err != nil {
-		Log(r).WithError(err).Error("failed to get user by userID")
+		ctx.Log(r).WithError(err).Error("failed to get user by userID")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if user == nil {
-		Log(r).Debugf("User with userID=%s not found", userID)
+		ctx.Log(r).Debugf("User with userID=%s not found", userID)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
