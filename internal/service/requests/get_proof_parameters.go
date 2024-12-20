@@ -26,7 +26,7 @@ func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
 		return
 	}
 
-	if ctx.Verifiers(r).NormalizedID {
+	if ctx.Verifiers(r).LowerCaseUserID {
 		userInputs.UserID = strings.ToLower(userInputs.UserID)
 	}
 

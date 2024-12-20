@@ -13,19 +13,17 @@ type Verifiers struct {
 	ServiceStartTimestamp int64
 	EventID               string
 	Multiproof            bool
-	NormalizedID          bool
+	LowerCaseUserID       bool
 }
 
 func (c *config) Verifiers() Verifiers {
 	return c.verifier.Do(func() interface{} {
-		var cfg = struct {
+		var cfg struct {
 			VerificationKeyPath      string `fig:"verification_key_path,required"`
 			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
 			EventID                  string `fig:"event_id,required"`
 			Multiproof               bool   `fig:"multiproof"`
-			NormalizedID             bool   `fig:"normalized_id"`
-		}{
-			NormalizedID: true,
+			LowerCaseUserID          bool   `fig:"lower_case_user_id"`
 		}
 
 		err := figure.
@@ -50,7 +48,7 @@ func (c *config) Verifiers() Verifiers {
 			ServiceStartTimestamp: cfg.AllowedIdentityTimestamp,
 			EventID:               cfg.EventID,
 			Multiproof:            cfg.Multiproof,
-			NormalizedID:          cfg.NormalizedID,
+			LowerCaseUserID:       cfg.LowerCaseUserID,
 		}
 	}).(Verifiers)
 }

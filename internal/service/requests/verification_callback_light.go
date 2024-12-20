@@ -15,7 +15,7 @@ func GetVerificationCallbackSignatureByID(r *http.Request) (req resources.Signat
 		return req, newDecodeError("body", err)
 	}
 
-	if ctx.Verifiers(r).NormalizedID {
+	if ctx.Verifiers(r).LowerCaseUserID {
 		req.Data.ID = strings.ToLower(req.Data.ID)
 	}
 

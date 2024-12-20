@@ -12,7 +12,7 @@ import (
 func GetPathUserID(r *http.Request) (userID string, err error) {
 	userID = chi.URLParam(r, "user_id")
 
-	if ctx.Verifiers(r).NormalizedID {
+	if ctx.Verifiers(r).LowerCaseUserID {
 		userID = strings.ToLower(userID)
 	}
 
