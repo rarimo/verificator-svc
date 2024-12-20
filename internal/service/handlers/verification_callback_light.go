@@ -64,9 +64,6 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var eventDataBytes [31]byte
-	userIDHashDecimal.FillBytes(eventDataBytes[:])
-
 	eventData := fmt.Sprintf("0x%s", userIDHashDecimal.Text(16))
 	nationality, err := helpers.DecimalToHexToUtf8(pubSignals[6])
 	if err != nil {
