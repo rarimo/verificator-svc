@@ -26,6 +26,7 @@ const (
 	BirthDateUpperboundBit       = 15
 	DateFormat                   = "060102"
 	DefaultDateHex               = "0x303030303030"
+	HashMaskValue                = "00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 )
 
 type SelectorParams struct {
@@ -69,7 +70,7 @@ func StringToPoseidonHash(inputString string) (string, error) {
 	}
 
 	// workaround for compatibility with "keccak248"
-	mask, _ := new(big.Int).SetString("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
+	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
 	result := new(big.Int).And(hash, mask)
 
 	return fmt.Sprintf("0x%s", result.Text(16)), nil
@@ -77,7 +78,7 @@ func StringToPoseidonHash(inputString string) (string, error) {
 
 func BytesToKeccak256Hash(input []byte) string {
 	hashInt := new(big.Int).SetBytes(crypto.Keccak256(common.LeftPadBytes(input, 32)))
-	mask, _ := new(big.Int).SetString("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
+	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
 	result := new(big.Int).And(hashInt, mask)
 
 	return fmt.Sprintf("0x%s", result.Text(16))
