@@ -6,10 +6,15 @@ import (
 
 	"github.com/go-chi/chi"
 	val "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 )
 
 func GetPathUserID(r *http.Request) (userID string, err error) {
-	userID = strings.ToLower(chi.URLParam(r, "user_id"))
+	userID = chi.URLParam(r, "user_id")
+
+	if ctx.Verifiers(r).NormalizedID {
+		userID = strings.ToLower(userID)
+	}
 
 	err = val.Errors{
 		"user_id": val.Validate(userID, val.Required),

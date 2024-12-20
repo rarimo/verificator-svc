@@ -2,10 +2,12 @@ package requests
 
 import (
 	"encoding/json"
-	val "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/rarimo/verificator-svc/resources"
 	"net/http"
 	"strings"
+
+	val "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
+	"github.com/rarimo/verificator-svc/resources"
 )
 
 func GetVerificationCallbackSignatureByID(r *http.Request) (req resources.SignatureRequest, err error) {
@@ -13,7 +15,9 @@ func GetVerificationCallbackSignatureByID(r *http.Request) (req resources.Signat
 		return req, newDecodeError("body", err)
 	}
 
-	req.Data.ID = strings.ToLower(req.Data.ID)
+	if ctx.Verifiers(r).NormalizedID {
+		req.Data.ID = strings.ToLower(req.Data.ID)
+	}
 
 	return req, val.Errors{
 		"data/id":                     val.Validate(req.Data.ID, val.Required),
