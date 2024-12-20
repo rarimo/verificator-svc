@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -55,9 +54,16 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		IdentityCounterUpperBound = 1
 	}
 
+	userIDHash, err := helpers.BuildUserIDHash(userInputs.UserID)
+	if err != nil {
+		ctx.Log(r).WithError(err).WithField("user_id", userInputs.UserID).Error("error building user ID hash")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
 	user := &data.VerifyUsers{
 		UserID:               userInputs.UserID,
-		UserIDHash:           helpers.BytesToKeccak256Hash(common.HexToAddress(userInputs.UserID).Bytes()),
+		UserIDHash:           userIDHash,
 		CreatedAt:            time.Now().UTC(),
 		Status:               "not_verified",
 		Nationality:          userInputs.Nationality,

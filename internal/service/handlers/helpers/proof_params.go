@@ -9,6 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/iden3/go-iden3-crypto/poseidon"
 	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
 )
@@ -58,12 +59,38 @@ func PubSignalsToSha256(pubSignals []string) ([]byte, error) {
 	return messageHash, nil
 }
 
+func StringToPoseidonHash(inputString string) (string, error) {
+	inputBytes := []byte(inputString)
+
+	hash, err := poseidon.HashBytes(inputBytes)
+	if err != nil {
+		return "", fmt.Errorf("failde to convert input bytes to hash: %w", err)
+
+	}
+
+	// workaround for compatibility with "keccak248"
+	mask, _ := new(big.Int).SetString("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
+	result := new(big.Int).And(hash, mask)
+
+	return fmt.Sprintf("0x%s", result.Text(16)), nil
+}
+
 func BytesToKeccak256Hash(input []byte) string {
 	hashInt := new(big.Int).SetBytes(crypto.Keccak256(common.LeftPadBytes(input, 32)))
 	mask, _ := new(big.Int).SetString("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
 	result := new(big.Int).And(hashInt, mask)
 
 	return fmt.Sprintf("0x%s", result.Text(16))
+}
+
+func BuildUserIDHash(input string) (string, error) {
+	// If input is eth address build hash in SC compatible way
+	if common.IsHexAddress(input) {
+		return BytesToKeccak256Hash(common.HexToAddress(input).Bytes()), nil
+	}
+
+	// Otherwise hash with poseidon
+	return StringToPoseidonHash(input)
 }
 
 func Utf8ToHex(input string) string {
