@@ -15,7 +15,7 @@ func GetVerificationCallbackByID(r *http.Request) (req resources.ProofRequest, e
 		return req, newDecodeError("body", err)
 	}
 
-	if ctx.Verifiers(r).LowerCaseUserID {
+	if !ctx.Verifiers(r).PreserveUserIDCase {
 		req.Data.ID = strings.ToLower(req.Data.ID)
 	}
 	var attr = req.Data.Attributes

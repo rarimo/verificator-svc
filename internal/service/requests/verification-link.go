@@ -15,7 +15,7 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 		return req, newDecodeError("body", err)
 	}
 
-	if ctx.Verifiers(r).LowerCaseUserID {
+	if !ctx.Verifiers(r).PreserveUserIDCase {
 		req.Data.ID = strings.ToLower(req.Data.ID)
 	}
 
