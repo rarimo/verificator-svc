@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
@@ -20,14 +21,14 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existingUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
+	existingUser, err := ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIDHash)
+		ctx.Log(r).WithError(err).Errorf("failed to query user with userID [%s]", userIDHash)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	if existingUser == nil {
-		Log(r).WithError(err).Errorf("user with userID [%s] not found", userIDHash)
+		ctx.Log(r).WithError(err).Errorf("user with userID [%s] not found", userIDHash)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -35,7 +36,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 	var (
 		IdentityCounterUpperBound int32
 		TimestampUpperBound       = "0"
-		eventID                   = Verifiers(r).EventID
+		eventID                   = ctx.Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)
 		proofSelector             = helpers.CalculateProofSelector(helpers.SelectorParams{
 			Uniqueness:           existingUser.Uniqueness,
@@ -45,7 +46,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 			NationalityEnable:    existingUser.NationalityEnable,
 			ExpirationLowerBound: !helpers.IsDefaultZKDate(existingUser.ExpirationLowerBound), // If there is non-default value, selector should be enabled
 		})
-		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", Callback(r).URL, userIDHash)
+		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/light/public/callback-sign/%s", ctx.Callback(r).URL, userIDHash)
 	)
 
 	if existingUser.EventID != "" {
@@ -58,7 +59,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 
 	if proofSelector&(1<<helpers.TimestampUpperBoundBit) != 0 &&
 		proofSelector&(1<<helpers.IdentityCounterUpperBoundBit) != 0 {
-		TimestampUpperBound = strconv.FormatInt(Verifiers(r).ServiceStartTimestamp, 10)
+		TimestampUpperBound = strconv.FormatInt(ctx.Verifiers(r).ServiceStartTimestamp, 10)
 		IdentityCounterUpperBound = 1
 	}
 

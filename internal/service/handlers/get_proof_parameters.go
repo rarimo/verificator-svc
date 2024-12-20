@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/rarimo/verificator-svc/internal/data"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
@@ -24,7 +25,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !helpers.Authenticates(AuthClient(r), UserClaims(r), auth.UserGrant(userInputs.UserID)) {
+	if !helpers.Authenticates(ctx.AuthClient(r), ctx.UserClaims(r), auth.UserGrant(userInputs.UserID)) {
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
@@ -32,7 +33,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	var (
 		IdentityCounterUpperBound int32
 		TimestampUpperBound       = "0"
-		eventID                   = Verifiers(r).EventID
+		eventID                   = ctx.Verifiers(r).EventID
 		proofSelector             = helpers.CalculateProofSelector(helpers.SelectorParams{
 			Uniqueness:           userInputs.Uniqueness,
 			AgeLowerBound:        userInputs.AgeLowerBound,
@@ -50,7 +51,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 
 	if proofSelector&(1<<helpers.TimestampUpperBoundBit) != 0 &&
 		proofSelector&(1<<helpers.IdentityCounterUpperBoundBit) != 0 {
-		TimestampUpperBound = strconv.FormatInt(Verifiers(r).ServiceStartTimestamp, 10)
+		TimestampUpperBound = strconv.FormatInt(ctx.Verifiers(r).ServiceStartTimestamp, 10)
 		IdentityCounterUpperBound = 1
 	}
 
@@ -69,7 +70,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	proofParameters := resources.ParametersAttributes{
 		BirthDateLowerBound:       helpers.DefaultDateHex,
 		BirthDateUpperBound:       helpers.CalculateBirthDateHex(userInputs.AgeLowerBound),
-		CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", Callback(r).URL, user.UserIDHash),
+		CallbackUrl:               fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", ctx.Callback(r).URL, user.UserIDHash),
 		CitizenshipMask:           helpers.Utf8ToHex(userInputs.Nationality),
 		EventData:                 user.UserIDHash,
 		EventId:                   eventID,
@@ -83,9 +84,9 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		TimestampUpperBound:       TimestampUpperBound,
 	}
 
-	dbUser, err := VerifyUsersQ(r).Upsert(user)
+	dbUser, err := ctx.VerifyUsersQ(r).Upsert(user)
 	if err != nil {
-		Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
+		ctx.Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

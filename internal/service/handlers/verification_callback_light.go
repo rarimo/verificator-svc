@@ -9,6 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
 	"github.com/rarimo/verificator-svc/internal/service/requests"
 	"github.com/rarimo/verificator-svc/internal/service/responses"
@@ -30,35 +31,35 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 
 	signature, err := hex.DecodeString(req.Data.Attributes.Signature)
 	if err != nil {
-		Log(r).Error("cannot decode signature from string to bytes")
+		ctx.Log(r).Error("cannot decode signature from string to bytes")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	pubKey, err := hex.DecodeString(SignatureVerification(r).PubKey)
+	pubKey, err := hex.DecodeString(ctx.SignatureVerification(r).PubKey)
 	if err != nil {
-		Log(r).Error("cannot decode public-key from string to bytes")
+		ctx.Log(r).Error("cannot decode public-key from string to bytes")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
 	pubSignalsHash, err := helpers.PubSignalsToSha256(pubSignals)
 	if err != nil {
-		Log(r).Error("failed to convert pubSignal array to sha256")
+		ctx.Log(r).Error("failed to convert pubSignal array to sha256")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
 	validSignature := secp256k1.VerifySignature(pubKey, pubSignalsHash, signature[:64])
 	if !validSignature {
-		Log(r).Error("provided signature not valid")
+		ctx.Log(r).Error("provided signature not valid")
 		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 
 	userIDHashDecimal, ok := new(big.Int).SetString(pubSignals[10], 10)
 	if !ok {
-		Log(r).Error("failed to parse event data")
+		ctx.Log(r).Error("failed to parse event data")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -66,13 +67,13 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	eventData := fmt.Sprintf("0x%s", userIDHashDecimal.Text(16))
 	nationality, err := helpers.DecimalToHexToUtf8(pubSignals[6])
 	if err != nil {
-		Log(r).Error("failed to convert nationality from decimal to UTF8")
+		ctx.Log(r).Error("failed to convert nationality from decimal to UTF8")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	sex, err := helpers.DecimalToHexToUtf8(pubSignals[7])
 	if err != nil {
-		Log(r).Error("failed to convert sex from decimal to UTF8")
+		ctx.Log(r).Error("failed to convert sex from decimal to UTF8")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -80,7 +81,7 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 
 	nullifier, ok := new(big.Int).SetString(pubSignals[0], 10)
 	if !ok {
-		Log(r).Error("failed to parse nullifier")
+		ctx.Log(r).Error("failed to parse nullifier")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -90,7 +91,7 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 
 	anonymousID, ok := new(big.Int).SetString(pubSignals[11], 10)
 	if !ok {
-		Log(r).Error("failed to parse anonymous_id")
+		ctx.Log(r).Error("failed to parse anonymous_id")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -98,14 +99,14 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	anonymousID.FillBytes(anonymousIDBytes[:])
 	anonymousIDHex := hex.EncodeToString(anonymousIDBytes[:])
 
-	verifiedUser, err := VerifyUsersQ(r).WhereHashID(userIDHash).Get()
+	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
+		ctx.Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	if verifiedUser == nil {
-		Log(r).Error("user not found or eventData != userHashID")
+		ctx.Log(r).Error("user not found or eventData != userHashID")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -120,32 +121,32 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	verifiedUser.Status = "verified"
 
 	if verifiedUser.Uniqueness {
-		byAnonymousID, dbErr := VerifyUsersQ(r).FilterByInternalAID(anonymousIDHex).Get()
+		byAnonymousID, dbErr := ctx.VerifyUsersQ(r).FilterByInternalAID(anonymousIDHex).Get()
 		if dbErr != nil {
-			Log(r).Error("Failed to get user by anonymous_id")
+			ctx.Log(r).Error("Failed to get user by anonymous_id")
 			ape.RenderErr(w, problems.BadRequest(dbErr)...)
 			return
 		}
 
-		byNullifier, dbErr := VerifyUsersQ(r).FilterByNullifier(nullifierHex).Get()
+		byNullifier, dbErr := ctx.VerifyUsersQ(r).FilterByNullifier(nullifierHex).Get()
 		if dbErr != nil {
-			Log(r).Error("Failed to get user by nullifier")
+			ctx.Log(r).Error("Failed to get user by nullifier")
 			ape.RenderErr(w, problems.BadRequest(dbErr)...)
 			return
 		}
 
-		if !Verifiers(r).Multiproof && byAnonymousID != nil {
+		if !ctx.Verifiers(r).Multiproof && byAnonymousID != nil {
 			if byAnonymousID.UserIDHash != verifiedUser.UserIDHash {
-				Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
+				ctx.Log(r).WithError(err).Errorf("User with anonymous_id [%s] but a different userIDHash already exists", anonymousIDHex)
 				verifiedUser.Status = "failed_verification"
 			}
 		} else {
 			verifiedUser.AnonymousID = anonymousIDHex
 		}
 
-		if !Verifiers(r).Multiproof && byNullifier != nil {
+		if !ctx.Verifiers(r).Multiproof && byNullifier != nil {
 			if byNullifier.UserIDHash != verifiedUser.UserIDHash {
-				Log(r).WithError(err).Errorf("User with nullifier [%s] but a different userIDHash already exists", nullifierHex)
+				ctx.Log(r).WithError(err).Errorf("User with nullifier [%s] but a different userIDHash already exists", nullifierHex)
 				verifiedUser.Status = "failed_verification"
 			}
 		} else {
@@ -154,21 +155,21 @@ func VerificationSignatureCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if eventData != userIDHash {
-		Log(r).WithError(err).Errorf("failed to verify user: EventData from pub-signals [%s] != userIdHash from db [%s]", eventData, userIDHash)
+		ctx.Log(r).WithError(err).Errorf("failed to verify user: EventData from pub-signals [%s] != userIdHash from db [%s]", eventData, userIDHash)
 		verifiedUser.Status = "failed_verification"
 	}
 	if verifiedUser.Nationality != nationality {
-		Log(r).WithError(err).Errorf("failed to verify user with UserIdHash[%s]: Citizenship from pub-signals [%s] != User.Citizenship from db [%s]", userIDHash, nationality, verifiedUser.Nationality)
+		ctx.Log(r).WithError(err).Errorf("failed to verify user with UserIdHash[%s]: Citizenship from pub-signals [%s] != User.Citizenship from db [%s]", userIDHash, nationality, verifiedUser.Nationality)
 		verifiedUser.Status = "failed_verification"
 	}
 	if verifiedUser.Sex != sex {
-		Log(r).WithError(err).Errorf("failed to verify user with UserIdHash[%s]: Sex from pub-signals [%s] != User.Sex from db [%s]", userIDHash, sex, verifiedUser.Sex)
+		ctx.Log(r).WithError(err).Errorf("failed to verify user with UserIdHash[%s]: Sex from pub-signals [%s] != User.Sex from db [%s]", userIDHash, sex, verifiedUser.Sex)
 		verifiedUser.Status = "failed_verification"
 	}
 
-	err = VerifyUsersQ(r).Update(verifiedUser)
+	err = ctx.VerifyUsersQ(r).Update(verifiedUser)
 	if err != nil {
-		Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
+		ctx.Log(r).WithError(err).Errorf("failed to update user status for userID [%s]", verifiedUser.UserIDHash)
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

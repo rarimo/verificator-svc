@@ -7,6 +7,7 @@ import (
 
 	val "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"gitlab.com/distributed_lab/urlval/v4"
 )
 
@@ -25,7 +26,9 @@ func NewGetUserInputs(r *http.Request) (userInputs UserInputs, err error) {
 		return
 	}
 
-	userInputs.UserID = strings.ToLower(userInputs.UserID)
+	if !ctx.Verifiers(r).PreserveUserIDCase {
+		userInputs.UserID = strings.ToLower(userInputs.UserID)
+	}
 
 	err = val.Errors{
 		"user_id":         val.Validate(userInputs.UserID, val.Required),

@@ -13,6 +13,7 @@ type Verifiers struct {
 	ServiceStartTimestamp int64
 	EventID               string
 	Multiproof            bool
+	PreserveUserIDCase    bool
 }
 
 func (c *config) Verifiers() Verifiers {
@@ -22,6 +23,7 @@ func (c *config) Verifiers() Verifiers {
 			AllowedIdentityTimestamp int64  `fig:"allowed_identity_timestamp,required"`
 			EventID                  string `fig:"event_id,required"`
 			Multiproof               bool   `fig:"multiproof"`
+			PreserveUserIDCase       bool   `fig:"preserve_user_id_case"`
 		}
 
 		err := figure.
@@ -46,6 +48,7 @@ func (c *config) Verifiers() Verifiers {
 			ServiceStartTimestamp: cfg.AllowedIdentityTimestamp,
 			EventID:               cfg.EventID,
 			Multiproof:            cfg.Multiproof,
+			PreserveUserIDCase:    cfg.PreserveUserIDCase,
 		}
 	}).(Verifiers)
 }
