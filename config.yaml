@@ -24,6 +24,7 @@ verifier:
   event_id: "event_id"
   multiproof: false
   preserve_user_id_case: false
+  erc_1155: "0x0000000000000000000000000000000000000000"
 
 signature_verification:
   pub_key: "04e29323ad356ab524fa5dbe3e490244e741b4d445ac7d2ee5f321556b3fda616bb9d2f2216fc27e099ab3019103cca872679e130629b2b90ea16cedb2b2136371"
