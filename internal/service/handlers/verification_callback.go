@@ -78,12 +78,10 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	nullifier.FillBytes(nullifierBytes[:])
 	nullifierHex := hex.EncodeToString(nullifierBytes[:])
 
-	userIDHash, err := helpers.ExtractEventData(getter)
+	userIDHash, err := helpers.BuildUserIDHash(req.Data.ID)
 	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to extract user hash from event data")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"pub_signals/event_data": err,
-		})...)
+		ctx.Log(r).WithError(err).Errorf("failed to build user ID hash")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
@@ -95,7 +93,6 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if verifiedUser == nil {
 		ctx.Log(r).WithFields(logan.F{
-			"event_data":   getter.Get(zk.EventData),
 			"user_id_hash": userIDHash,
 			"id":           req.Data.ID,
 		}).Error("user not found or eventData != userHashID")

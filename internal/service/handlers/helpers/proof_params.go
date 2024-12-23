@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/iden3/go-iden3-crypto/poseidon"
-	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
 )
 
@@ -127,13 +127,23 @@ func FormatDateTime(date time.Time) string {
 	return fmt.Sprintf("0x%s", hexutils.BytesToHex([]byte(date.Format(DateFormat))))
 }
 
-func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
-	userIDBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
-	if !ok {
-		return "", fmt.Errorf("failed to parse event data")
+func BuildEventData(userID string, erc1155 common.Address) string {
+	var msgBuf bytes.Buffer
+
+	switch {
+	case common.IsHexAddress(userID):
+		msgBuf.Write(common.HexToAddress(userID).Bytes())
+	default:
+		msgBuf.Write([]byte(userID))
 	}
 
-	return fmt.Sprintf("0x%s", userIDBig.Text(16)), nil
+	msgBuf.Write(erc1155.Bytes())
+
+	hashInt := new(big.Int).SetBytes(crypto.Keccak256(msgBuf.Bytes()))
+	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
+	result := new(big.Int).And(hashInt, mask)
+
+	return fmt.Sprintf("0x%s", result.Text(16))
 }
 
 func CalculateProofSelector(p SelectorParams) int {

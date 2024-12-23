@@ -67,7 +67,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		BirthDateLowerBound:       helpers.DefaultDateHex,
 		BirthDateUpperBound:       birthDateUpperBound,
 		CitizenshipMask:           helpers.Utf8ToHex(existingUser.Nationality),
-		EventData:                 existingUser.UserIDHash,
+		EventData:                 helpers.BuildEventData(existingUser.UserID, ctx.Verifiers(r).ERC1155),
 		EventId:                   eventID,
 		ExpirationDateLowerBound:  existingUser.ExpirationLowerBound,
 		ExpirationDateUpperBound:  helpers.DefaultDateHex,
