@@ -92,10 +92,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if verifiedUser == nil {
-		ctx.Log(r).WithFields(logan.F{
-			"user_id_hash": userIDHash,
-			"id":           req.Data.ID,
-		}).Error("user not found or eventData != userHashID")
+		ctx.Log(r).WithFields(logan.F{"user_id_hash": userIDHash, "id": req.Data.ID}).Error("user not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
