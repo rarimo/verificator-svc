@@ -78,21 +78,14 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	nullifier.FillBytes(nullifierBytes[:])
 	nullifierHex := hex.EncodeToString(nullifierBytes[:])
 
-	userIDHash, err := helpers.BuildUserIDHash(req.Data.ID)
+	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(req.Data.ID).Get()
 	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to build user ID hash")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
-	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
+		ctx.Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", req.Data.ID)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	if verifiedUser == nil {
-		ctx.Log(r).WithFields(logan.F{"user_id_hash": userIDHash, "id": req.Data.ID}).Error("user not found")
+		ctx.Log(r).WithField("user_id_hash", req.Data.ID).Error("user not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -163,7 +156,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 				"service_timestamp":              ctx.Verifiers(r).ServiceStartTimestamp,
 				"identity_timestamp_upper_bound": identityTimestampUpperBound,
 				"identity_counter_upper_bound":   identityCounterUpperBound,
-				"user_id_hash":                   userIDHash,
+				"user_id_hash":                   req.Data.ID,
 			}).Errorf("failed to check uniqueness")
 			verifiedUser.Status = "uniqueness_check_failed"
 		}
