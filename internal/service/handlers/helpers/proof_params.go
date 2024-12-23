@@ -79,8 +79,8 @@ func StringToPoseidonHash(inputString string) (string, error) {
 
 func BytesToKeccak256Hash(input []byte, erc1155 common.Address) string {
 	var msgBuf bytes.Buffer
-	msgBuf.Write(input)
-	msgBuf.Write(erc1155.Bytes())
+	msgBuf.Write(common.LeftPadBytes(input, 32))
+	msgBuf.Write(common.LeftPadBytes(erc1155.Bytes(), 32))
 
 	hashInt := new(big.Int).SetBytes(crypto.Keccak256(msgBuf.Bytes()))
 	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
