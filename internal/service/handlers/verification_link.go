@@ -26,7 +26,7 @@ func VerificationLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIDHash, err := helpers.BuildUserIDHash(req.Data.ID)
+	userIDHash, err := helpers.BuildUserIDHash(req.Data.ID, ctx.Verifiers(r).ERC1155)
 	if err != nil {
 		ctx.Log(r).WithError(err).WithField("user_id", req.Data.ID).Error("error building user ID hash")
 		ape.RenderErr(w, problems.InternalError())
