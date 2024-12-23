@@ -78,14 +78,27 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	nullifier.FillBytes(nullifierBytes[:])
 	nullifierHex := hex.EncodeToString(nullifierBytes[:])
 
-	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(req.Data.ID).Get()
+	userIDHash, err := helpers.ExtractEventData(getter)
 	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", req.Data.ID)
+		ctx.Log(r).WithError(err).Errorf("failed to extract user hash from event data")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"pub_signals/event_data": err,
+		})...)
+		return
+	}
+
+	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
+	if err != nil {
+		ctx.Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	if verifiedUser == nil {
-		ctx.Log(r).WithField("user_id_hash", req.Data.ID).Error("user not found")
+		ctx.Log(r).WithFields(logan.F{
+			"event_data":   getter.Get(zk.EventData),
+			"user_id_hash": userIDHash,
+			"id":           req.Data.ID,
+		}).Error("user not found or eventData != userHashID")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -156,7 +169,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 				"service_timestamp":              ctx.Verifiers(r).ServiceStartTimestamp,
 				"identity_timestamp_upper_bound": identityTimestampUpperBound,
 				"identity_counter_upper_bound":   identityCounterUpperBound,
-				"user_id_hash":                   req.Data.ID,
+				"user_id_hash":                   userIDHash,
 			}).Errorf("failed to check uniqueness")
 			verifiedUser.Status = "uniqueness_check_failed"
 		}

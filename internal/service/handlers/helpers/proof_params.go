@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/iden3/go-iden3-crypto/poseidon"
+	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
 )
 
@@ -76,18 +77,22 @@ func StringToPoseidonHash(inputString string) (string, error) {
 	return fmt.Sprintf("0x%s", result.Text(16)), nil
 }
 
-func BytesToKeccak256Hash(input []byte) string {
-	hashInt := new(big.Int).SetBytes(crypto.Keccak256(common.LeftPadBytes(input, 32)))
+func BytesToKeccak256Hash(input []byte, erc1155 common.Address) string {
+	var msgBuf bytes.Buffer
+	msgBuf.Write(input)
+	msgBuf.Write(erc1155.Bytes())
+
+	hashInt := new(big.Int).SetBytes(crypto.Keccak256(msgBuf.Bytes()))
 	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
 	result := new(big.Int).And(hashInt, mask)
 
 	return fmt.Sprintf("0x%s", result.Text(16))
 }
 
-func BuildUserIDHash(input string) (string, error) {
+func BuildUserIDHash(input string, erc1155 common.Address) (string, error) {
 	// If input is eth address build hash in SC compatible way
 	if common.IsHexAddress(input) {
-		return BytesToKeccak256Hash(common.HexToAddress(input).Bytes()), nil
+		return BytesToKeccak256Hash(common.HexToAddress(input).Bytes(), erc1155), nil
 	}
 
 	// Otherwise hash with poseidon
@@ -127,23 +132,13 @@ func FormatDateTime(date time.Time) string {
 	return fmt.Sprintf("0x%s", hexutils.BytesToHex([]byte(date.Format(DateFormat))))
 }
 
-func BuildEventData(userID string, erc1155 common.Address) string {
-	var msgBuf bytes.Buffer
-
-	switch {
-	case common.IsHexAddress(userID):
-		msgBuf.Write(common.HexToAddress(userID).Bytes())
-	default:
-		msgBuf.Write([]byte(userID))
+func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
+	userIDHashBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
+	if !ok {
+		return "", fmt.Errorf("failed to parse event data")
 	}
 
-	msgBuf.Write(erc1155.Bytes())
-
-	hashInt := new(big.Int).SetBytes(crypto.Keccak256(msgBuf.Bytes()))
-	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
-	result := new(big.Int).And(hashInt, mask)
-
-	return fmt.Sprintf("0x%s", result.Text(16))
+	return fmt.Sprintf("0x%s", userIDHashBig.Text(16)), nil
 }
 
 func CalculateProofSelector(p SelectorParams) int {
