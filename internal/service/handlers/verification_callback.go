@@ -119,7 +119,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 
 		if !ctx.Verifiers(r).Multiproof && byNullifier != nil && byNullifier.UserIDHash != verifiedUser.UserIDHash {
 			ctx.Log(r).WithError(err).Errorf("User with this nullifier [%s] but a different userIDHash already exists", nullifierHex)
-			verifiedUser.Status = "failed_verification"
+			verifiedUser.Status = "uniqueness_check_failed"
 		} else {
 			verifiedUser.Nullifier = nullifierHex
 		}
