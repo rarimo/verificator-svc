@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -76,18 +77,22 @@ func StringToPoseidonHash(inputString string) (string, error) {
 	return fmt.Sprintf("0x%s", result.Text(16)), nil
 }
 
-func BytesToKeccak256Hash(input []byte) string {
-	hashInt := new(big.Int).SetBytes(crypto.Keccak256(common.LeftPadBytes(input, 32)))
+func BytesToKeccak256Hash(input []byte, erc1155 common.Address) string {
+	var msgBuf bytes.Buffer
+	msgBuf.Write(common.LeftPadBytes(input, 32))
+	msgBuf.Write(common.LeftPadBytes(erc1155.Bytes(), 32))
+
+	hashInt := new(big.Int).SetBytes(crypto.Keccak256(msgBuf.Bytes()))
 	mask, _ := new(big.Int).SetString(HashMaskValue, 16)
 	result := new(big.Int).And(hashInt, mask)
 
 	return fmt.Sprintf("0x%s", result.Text(16))
 }
 
-func BuildUserIDHash(input string) (string, error) {
+func BuildUserIDHash(input string, erc1155 common.Address) (string, error) {
 	// If input is eth address build hash in SC compatible way
 	if common.IsHexAddress(input) {
-		return BytesToKeccak256Hash(common.HexToAddress(input).Bytes()), nil
+		return BytesToKeccak256Hash(common.HexToAddress(input).Bytes(), erc1155), nil
 	}
 
 	// Otherwise hash with poseidon
@@ -128,12 +133,12 @@ func FormatDateTime(date time.Time) string {
 }
 
 func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
-	userIDBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
+	userIDHashBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
 	if !ok {
 		return "", fmt.Errorf("failed to parse event data")
 	}
 
-	return fmt.Sprintf("0x%s", userIDBig.Text(16)), nil
+	return fmt.Sprintf("0x%s", userIDHashBig.Text(16)), nil
 }
 
 func CalculateProofSelector(p SelectorParams) int {

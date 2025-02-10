@@ -54,7 +54,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 		IdentityCounterUpperBound = 1
 	}
 
-	userIDHash, err := helpers.BuildUserIDHash(userInputs.UserID)
+	userIDHash, err := helpers.BuildUserIDHash(userInputs.UserID, ctx.Verifiers(r).ERC1155)
 	if err != nil {
 		ctx.Log(r).WithError(err).WithField("user_id", userInputs.UserID).Error("error building user ID hash")
 		ape.RenderErr(w, problems.InternalError())
