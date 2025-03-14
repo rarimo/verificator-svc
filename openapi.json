@@ -12,259 +12,6 @@
     }
   ],
   "paths": {
-    "/integrations/verification-svc/light/private/verification-status/{user_id}": {
-      "get": {
-        "tags": [
-          "Light User verification"
-        ],
-        "summary": "Get user verification status",
-        "description": "Get user verification status by UserID.\n",
-        "operationId": "getUserStatus",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pathID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Status"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/integrations/verification-svc/private/proof/{user_id}": {
-      "get": {
-        "tags": [
-          "User verification"
-        ],
-        "summary": "Get verified proof",
-        "description": "Get verified proof by userID.\n",
-        "operationId": "getProof",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/idParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/GetProof"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/integrations/verification-svc/private/verification-status/{user_id}": {
-      "get": {
-        "tags": [
-          "User verification"
-        ],
-        "summary": "Get user verification status",
-        "description": "Get user verification status by UserID.\n",
-        "operationId": "getUserStatus",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pathID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Status"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/integrations/verification-svc/public/callback/{user_id_hash}": {
-      "post": {
-        "tags": [
-          "Proof"
-        ],
-        "summary": "Receive Proof by callback(mobile)",
-        "description": "It receives the proof for verification by callback url",
-        "operationId": "receiveProofByCallback",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pathIDHash"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/Proof"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Status"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/integrations/verification-svc/public/proof-parameters": {
-      "get": {
-        "tags": [
-          "Proof"
-        ],
-        "summary": "Get Proof Parameters(internal)",
-        "description": "Get proof parameters for user with provided query parameters(internal, better to use verification links to get proof-parameters).\n",
-        "operationId": "getVerificationParameters",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/idParam"
-          },
-          {
-            "$ref": "#/components/parameters/typeOfVerificationAgeParam"
-          },
-          {
-            "$ref": "#/components/parameters/typeOfVerificationUniquenessParam"
-          },
-          {
-            "$ref": "#/components/parameters/nationalityParam"
-          },
-          {
-            "$ref": "#/components/parameters/eventIdParam"
-          },
-          {
-            "$ref": "#/components/parameters/expirationLowerBoundParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Parameters"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
     "/integrations/verificator-svc/light/private/user/{user_id}": {
       "delete": {
         "tags": [
@@ -393,6 +140,50 @@
         }
       }
     },
+    "/integrations/verificator-svc/light/private/verification-status/{user_id}": {
+      "get": {
+        "tags": [
+          "Light User verification"
+        ],
+        "summary": "Get user verification status",
+        "description": "Get user verification status by UserID.\n",
+        "operationId": "getUserStatus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pathID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
     "/integrations/verificator-svc/light/public/callback-sign/{user_id_hash}": {
       "post": {
         "tags": [
@@ -502,6 +293,50 @@
         }
       }
     },
+    "/integrations/verificator-svc/private/proof/{user_id}": {
+      "get": {
+        "tags": [
+          "User verification"
+        ],
+        "summary": "Get verified proof",
+        "description": "Get verified proof by userID.\n",
+        "operationId": "getProof",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GetProof"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
     "/integrations/verificator-svc/private/user/{user_id}": {
       "delete": {
         "tags": [
@@ -570,6 +405,171 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Links"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/integrations/verificator-svc/private/verification-status/{user_id}": {
+      "get": {
+        "tags": [
+          "User verification"
+        ],
+        "summary": "Get user verification status",
+        "description": "Get user verification status by UserID.\n",
+        "operationId": "getUserStatus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pathID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/integrations/verificator-svc/public/callback/{user_id_hash}": {
+      "post": {
+        "tags": [
+          "Proof"
+        ],
+        "summary": "Receive Proof by callback(mobile)",
+        "description": "It receives the proof for verification by callback url",
+        "operationId": "receiveProofByCallback",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pathIDHash"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Proof"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/integrations/verificator-svc/public/proof-parameters": {
+      "get": {
+        "tags": [
+          "Proof"
+        ],
+        "summary": "Get Proof Parameters(internal)",
+        "description": "Get proof parameters for user with provided query parameters(internal, better to use verification links to get proof-parameters).\n",
+        "operationId": "getVerificationParameters",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          },
+          {
+            "$ref": "#/components/parameters/typeOfVerificationAgeParam"
+          },
+          {
+            "$ref": "#/components/parameters/typeOfVerificationUniquenessParam"
+          },
+          {
+            "$ref": "#/components/parameters/nationalityParam"
+          },
+          {
+            "$ref": "#/components/parameters/eventIdParam"
+          },
+          {
+            "$ref": "#/components/parameters/expirationLowerBoundParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Parameters"
                     }
                   }
                 }
