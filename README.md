@@ -2,7 +2,10 @@
 
 ## Description
 
-[//]: # (TODO: add description)
+The service allows to verify [query proofs](https://github.com/rarimo/passport-zk-circuits/?tab=readme-ov-file#query-circuit).
+The private endpoints must be available only inside your backend system.
+
+Light verification is deprecated.
 
 ## Install
 
