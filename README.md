@@ -6,6 +6,7 @@ The service allows to verify [query proofs](https://github.com/rarimo/passport-z
 The private endpoints must be available only inside your backend system.
 
 Light verification is deprecated.
+See also [integration doc](https://rarimo.notion.site/Requesting-ZK-Passport-proofs-dc43d1102e104d008e0d1c7db5326286)
 
 ## Install
 
