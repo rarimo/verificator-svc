@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	zk "github.com/rarimo/zkverifier-kit"
@@ -10,6 +11,9 @@ import (
 )
 
 const emptyETHAddr = "0x0000000000000000000000000000000000000000"
+
+// 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+const maxEventId = 452312848583266388373324160190187140051835877600158453279131187530910662655
 
 type Verifiers struct {
 	Passport              *zk.Verifier
@@ -49,6 +53,15 @@ func (c *config) Verifiers() Verifiers {
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to initialize passport verifier: %w", err))
+		}
+
+		eventID, err := strconv.ParseInt(cfg.EventID, 10, 64)
+		if err != nil {
+			panic(fmt.Errorf("event_id must be valid int, %w", err))
+		}
+
+		if eventID > maxEventId {
+			panic(fmt.Errorf("event_id must be less than 31 bytes"))
 		}
 
 		return Verifiers{
