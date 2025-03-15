@@ -19,6 +19,13 @@ See also [integration doc](https://rarimo.notion.site/Requesting-ZK-Passport-pro
   ./main run service
   ```
 
+## Configuration
+
+You must specify following parameters before run the service:
+- event_id - random decimal (up to 31 byte)
+- callback_url - domain of your instance of the service
+- allowed_identity_timestamp - date of your first production launch
+
 ## Documentation
 
 We do use openapi:json standard for API. We use swagger for documenting our API.

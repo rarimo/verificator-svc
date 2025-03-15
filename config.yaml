@@ -20,7 +20,7 @@ callback:
 
 verifier:
   verification_key_path: "./proof_keys/passport.json"
-  allowed_identity_timestamp: 1715698750
+  allowed_identity_timestamp: 1741972260
   event_id: "event_id"
   multiproof: false
   preserve_user_id_case: false
