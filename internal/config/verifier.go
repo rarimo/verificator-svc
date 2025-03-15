@@ -2,18 +2,16 @@ package config
 
 import (
 	"fmt"
-	"strconv"
-
 	"github.com/ethereum/go-ethereum/common"
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/figure/v3"
 	"gitlab.com/distributed_lab/kit/kv"
+	"math/big"
 )
 
 const emptyETHAddr = "0x0000000000000000000000000000000000000000"
 
-// 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-const maxEventId = 452312848583266388373324160190187140051835877600158453279131187530910662655
+var maxEventId, _ = big.NewInt(0).SetString("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
 
 type Verifiers struct {
 	Passport              *zk.Verifier
@@ -55,12 +53,12 @@ func (c *config) Verifiers() Verifiers {
 			panic(fmt.Errorf("failed to initialize passport verifier: %w", err))
 		}
 
-		eventID, err := strconv.ParseInt(cfg.EventID, 10, 64)
-		if err != nil {
-			panic(fmt.Errorf("event_id must be valid int, %w", err))
+		eventID, ok := new(big.Int).SetString(cfg.EventID, 10)
+		if !ok {
+			panic(fmt.Errorf("event_id must be valid decimal"))
 		}
 
-		if eventID > maxEventId {
+		if eventID.Cmp(maxEventId) == 1 {
 			panic(fmt.Errorf("event_id must be less than 31 bytes"))
 		}
 
