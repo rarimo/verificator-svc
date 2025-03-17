@@ -11,7 +11,7 @@ import (
 
 const emptyETHAddr = "0x0000000000000000000000000000000000000000"
 
-var MaxEventId, _ = big.NewInt(0).SetString("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
+var MaxEventId, _ = new(big.Int).SetString("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
 
 type Verifiers struct {
 	Passport              *zk.Verifier
