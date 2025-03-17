@@ -11,7 +11,7 @@ import (
 
 const emptyETHAddr = "0x0000000000000000000000000000000000000000"
 
-var maxEventId, _ = big.NewInt(0).SetString("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
+var MaxEventId, _ = big.NewInt(0).SetString("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
 
 type Verifiers struct {
 	Passport              *zk.Verifier
@@ -58,7 +58,7 @@ func (c *config) Verifiers() Verifiers {
 			panic(fmt.Errorf("event_id must be valid decimal"))
 		}
 
-		if eventID.Cmp(maxEventId) == 1 {
+		if eventID.Cmp(MaxEventId) == 1 {
 			panic(fmt.Errorf("event_id must be less than 31 bytes"))
 		}
 

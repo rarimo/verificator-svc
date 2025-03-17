@@ -2,6 +2,8 @@ package requests
 
 import (
 	"encoding/json"
+	"github.com/rarimo/verificator-svc/internal/config"
+	"math/big"
 	"net/http"
 	"strings"
 
@@ -22,5 +24,24 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 	return req, val.Errors{
 		"data/id":   val.Validate(req.Data.ID, val.Required),
 		"data/type": val.Validate(req.Data.Type, val.Required, val.In(resources.USER)),
+		"data/attributes/event_id": val.Validate(req.Data.Attributes.EventId, val.NilOrNotEmpty,
+			val.When(
+				!val.IsEmpty(req.Data.Attributes.EventId),
+				val.NewStringRule(validateEventID, "must be decimal and less than 31 bytes"),
+			),
+		),
 	}.Filter()
+}
+
+func validateEventID(value string) bool {
+	eventID, ok := new(big.Int).SetString(value, 10)
+	if !ok {
+		return false
+	}
+
+	if eventID.Cmp(config.MaxEventId) == 1 {
+		return false
+	}
+
+	return true
 }
