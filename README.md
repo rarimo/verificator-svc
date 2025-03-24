@@ -4,9 +4,12 @@
 
 The service allows to verify [query proofs](https://github.com/rarimo/passport-zk-circuits/?tab=readme-ov-file#query-circuit).
 The private endpoints must be available only inside your backend system.
+Only one proof is stored per one user_id. 
+If you request verification links second time for the same user_id, previous proof will be deleted.
+Think of it as a proxy server between your system and the mobile app.
 
 Light verification is deprecated.
-See also [integration doc](https://rarimo.notion.site/Requesting-ZK-Passport-proofs-dc43d1102e104d008e0d1c7db5326286)
+See also [integration doc](https://rarimo.notion.site/Requesting-ZK-Passport-proofs-dc43d1102e104d008e0d1c7db5326286).
 
 ## Install
 
