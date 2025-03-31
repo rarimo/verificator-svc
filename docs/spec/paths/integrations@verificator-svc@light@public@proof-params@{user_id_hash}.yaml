@@ -1,9 +1,12 @@
 get:
   tags:
-    - Light Signature
+    - Light Signature[DEPRECATED]
   summary: Get Proof Parameters(mobile)
   description: |
+    DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
     Get proof parameters by userIDHash, returns: proof-params and callback_url.
+  deprecated: true
   operationId: getProofParameters
   parameters:
     - $ref: '#/components/parameters/pathIDHash'

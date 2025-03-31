@@ -1,9 +1,12 @@
 delete:
   tags:
-    - Light User verification
+    - Light User verification[DEPRECATED]
   summary: Delete user
   description: |
+    DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
     Delete user by UserID.
+  deprecated: true
   operationId: deleteUser
   parameters:
     - $ref: '#/components/parameters/pathID'
@@ -18,10 +21,13 @@ delete:
       $ref: '#/components/responses/internalError'
 get:
   tags:
-    - Light User verification
+    - Light User verification[DEPRECATED]
   summary: Get user
   description: |
+    DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
     Get information about user by UserID
+  deprecated: true
   operationId: getUser
   parameters:
     - $ref: '#/components/parameters/pathID'

@@ -23,3 +23,8 @@ paths:
               $ref: "#/headers/Rate-Limit-Limit"
 ```
 
+## Deprecation Notice
+
+**The light verification flow is deprecated and will be removed in a future version.**
+All endpoints under the path `/integrations/verificator-svc/light/` are affected by this deprecation.
+Please use the full verification flow instead.

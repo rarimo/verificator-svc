@@ -1,9 +1,12 @@
 get:
   tags:
-    - Light User verification
+    - Light User verification[DEPRECATED]
   summary: Get user verification status
   description: |
+    DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
     Get user verification status by UserID.
+  deprecated: true
   operationId: getUserStatus
   parameters:
     - $ref: '#/components/parameters/pathID'
