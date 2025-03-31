@@ -1,9 +1,12 @@
 post:
   tags:
-    - Light User verification
+    - Light User verification[DEPRECATED]
   summary: Request verification links for qr-code generation
   description: |
+    DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
     Requests verification links for user to generate qr-code, returns: get_proof_params.
+  deprecated: true
   operationId: getVerificationLink
   requestBody:
     required: true
