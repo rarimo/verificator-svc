@@ -10,10 +10,13 @@ paths:
   '/integrations/verificator-svc/light/private/user/{user_id}':
     delete:
       tags:
-        - Light User verification
+        - 'Light User verification[DEPRECATED]'
       summary: Delete user
       description: |
+        DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
         Delete user by UserID.
+      deprecated: true
       operationId: deleteUser
       parameters:
         - $ref: '#/components/parameters/pathID'
@@ -28,10 +31,13 @@ paths:
           $ref: '#/components/responses/internalError'
     get:
       tags:
-        - Light User verification
+        - 'Light User verification[DEPRECATED]'
       summary: Get user
       description: |
+        DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
         Get information about user by UserID
+      deprecated: true
       operationId: getUser
       parameters:
         - $ref: '#/components/parameters/pathID'
@@ -56,10 +62,13 @@ paths:
   /integrations/verificator-svc/light/private/verification-link:
     post:
       tags:
-        - Light User verification
+        - 'Light User verification[DEPRECATED]'
       summary: Request verification links for qr-code generation
       description: |
+        DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
         Requests verification links for user to generate qr-code, returns: get_proof_params.
+      deprecated: true
       operationId: getVerificationLink
       requestBody:
         required: true
@@ -93,10 +102,13 @@ paths:
   '/integrations/verificator-svc/light/private/verification-status/{user_id}':
     get:
       tags:
-        - Light User verification
+        - 'Light User verification[DEPRECATED]'
       summary: Get user verification status
       description: |
+        DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
         Get user verification status by UserID.
+      deprecated: true
       operationId: getUserStatus
       parameters:
         - $ref: '#/components/parameters/pathID'
@@ -121,9 +133,12 @@ paths:
   '/integrations/verificator-svc/light/public/callback-sign/{user_id_hash}':
     post:
       tags:
-        - Light Signature
+        - 'Light Signature[DEPRECATED]'
       summary: Receive signature and message by callback(mobile)
-      description: It receives the signature and message for verification by callback url
+      description: |-
+        DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+        It receives the signature and message for verification by callback url
+      deprecated: true
       operationId: receiveSignatureByCallback
       parameters:
         - $ref: '#/components/parameters/pathIDHash'
@@ -161,10 +176,13 @@ paths:
   '/integrations/verificator-svc/light/public/proof-params/{user_id_hash}':
     get:
       tags:
-        - Light Signature
+        - 'Light Signature[DEPRECATED]'
       summary: Get Proof Parameters(mobile)
       description: |
+        DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.
+
         Get proof parameters by userIDHash, returns: proof-params and callback_url.
+      deprecated: true
       operationId: getProofParameters
       parameters:
         - $ref: '#/components/parameters/pathIDHash'

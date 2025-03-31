@@ -15,10 +15,11 @@
     "/integrations/verificator-svc/light/private/user/{user_id}": {
       "delete": {
         "tags": [
-          "Light User verification"
+          "Light User verification[DEPRECATED]"
         ],
         "summary": "Delete user",
-        "description": "Delete user by UserID.\n",
+        "description": "DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.\n\nDelete user by UserID.\n",
+        "deprecated": true,
         "operationId": "deleteUser",
         "parameters": [
           {
@@ -42,10 +43,11 @@
       },
       "get": {
         "tags": [
-          "Light User verification"
+          "Light User verification[DEPRECATED]"
         ],
         "summary": "Get user",
-        "description": "Get information about user by UserID\n",
+        "description": "DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.\n\nGet information about user by UserID\n",
+        "deprecated": true,
         "operationId": "getUser",
         "parameters": [
           {
@@ -86,10 +88,11 @@
     "/integrations/verificator-svc/light/private/verification-link": {
       "post": {
         "tags": [
-          "Light User verification"
+          "Light User verification[DEPRECATED]"
         ],
         "summary": "Request verification links for qr-code generation",
-        "description": "Requests verification links for user to generate qr-code, returns: get_proof_params.\n",
+        "description": "DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.\n\nRequests verification links for user to generate qr-code, returns: get_proof_params.\n",
+        "deprecated": true,
         "operationId": "getVerificationLink",
         "requestBody": {
           "required": true,
@@ -143,10 +146,11 @@
     "/integrations/verificator-svc/light/private/verification-status/{user_id}": {
       "get": {
         "tags": [
-          "Light User verification"
+          "Light User verification[DEPRECATED]"
         ],
         "summary": "Get user verification status",
-        "description": "Get user verification status by UserID.\n",
+        "description": "DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.\n\nGet user verification status by UserID.\n",
+        "deprecated": true,
         "operationId": "getUserStatus",
         "parameters": [
           {
@@ -187,10 +191,11 @@
     "/integrations/verificator-svc/light/public/callback-sign/{user_id_hash}": {
       "post": {
         "tags": [
-          "Light Signature"
+          "Light Signature[DEPRECATED]"
         ],
         "summary": "Receive signature and message by callback(mobile)",
-        "description": "It receives the signature and message for verification by callback url",
+        "description": "DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.\nIt receives the signature and message for verification by callback url",
+        "deprecated": true,
         "operationId": "receiveSignatureByCallback",
         "parameters": [
           {
@@ -252,10 +257,11 @@
     "/integrations/verificator-svc/light/public/proof-params/{user_id_hash}": {
       "get": {
         "tags": [
-          "Light Signature"
+          "Light Signature[DEPRECATED]"
         ],
         "summary": "Get Proof Parameters(mobile)",
-        "description": "Get proof parameters by userIDHash, returns: proof-params and callback_url.\n",
+        "description": "DEPRECATED: The light verification flow is deprecated and will be removed in a future version. Please use the full verification flow instead.\n\nGet proof parameters by userIDHash, returns: proof-params and callback_url.\n",
+        "deprecated": true,
         "operationId": "getProofParameters",
         "parameters": [
           {
