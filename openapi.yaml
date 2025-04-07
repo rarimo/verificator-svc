@@ -555,6 +555,7 @@ components:
               properties:
                 event_id:
                   type: string
+                  description: 'Unique random decimal on which the nullifiers depends. [See more details](https://github.com/rarimo/passport-zk-circuits?tab=readme-ov-file#eventid).'
                   example: '134934934030489134341633902189494613533900917417361106374681011849132651019822199'
                 event_data:
                   type: string
@@ -666,6 +667,7 @@ components:
               properties:
                 event_id:
                   type: string
+                  description: 'Unique random decimal on which the nullifiers depends. [See more details](https://github.com/rarimo/passport-zk-circuits?tab=readme-ov-file#eventid).'
                   example: '134934934030489134341633902189494613533900917417361106374681011849132651019822199'
                 event_data:
                   type: string
@@ -746,6 +748,7 @@ components:
               properties:
                 event_id:
                   type: string
+                  description: 'Unique random decimal on which the nullifiers depends. [See more details](https://github.com/rarimo/passport-zk-circuits?tab=readme-ov-file#eventid).'
                   example: '134934934030489134341633902189494613533900917417361106374681011849132651019822199'
                 event_data:
                   type: string
@@ -907,7 +910,7 @@ components:
                 event_id:
                   type: string
                   example: '2234556494903931186902189494613533900917417361106374681011849132651019822199'
-                  description: Event ID of event
+                  description: 'Unique random decimal on which the nullifiers depends. [See more details](https://github.com/rarimo/passport-zk-circuits?tab=readme-ov-file#eventid).'
                 sex:
                   type: boolean
                   example: true
@@ -996,7 +999,7 @@ components:
       in: query
       name: event_id
       required: false
-      description: Event ID
+      description: 'Unique random decimal on which the nullifiers depends. [See more details](https://github.com/rarimo/passport-zk-circuits?tab=readme-ov-file#eventid).'
       example: '2234556494903931186902189494613533900917417361106374681011849132651019822199'
       schema:
         type: string
