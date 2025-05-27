@@ -1,35 +1,41 @@
+version: "2"
 linters:
   enable:
     - asciicheck
     - bodyclose
     - dogsled
     - dupl
-    - errcheck
-    - exportloopref
     - goconst
-    - gofmt
-    - goimports
-    - revive
-    - gosimple
-    - govet
-    - ineffassign
     - misspell
     - nakedret
     - nolintlint
     - prealloc
+    - revive
     - staticcheck
-    - stylecheck
-    - typecheck
     - unconvert
-    - unused
-
+  settings:
+    dogsled:
+      max-blank-identifiers: 3
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-same-issues: 50
-
-linters-settings:
-  dogsled:
-    max-blank-identifiers: 3
-  golint:
-    min-confidence: 0
-  maligned:
-    suggest-new: true
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
