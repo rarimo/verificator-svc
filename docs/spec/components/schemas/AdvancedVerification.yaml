@@ -15,7 +15,7 @@ allOf:
             example: "12345678900987654321"
             description: "Event ID"
           selector:
-            type: string
+            type: integer
             example: "35425"
             description: "Selector value"
           # Optional  
@@ -23,22 +23,10 @@ allOf:
             type: integer
             example: 18
             description: "Lower user age limit"
-          uniqueness:
-            type: boolean
-            example: true
-            description: "Parameters for checking user uniqueness"
-          nationality:
+          citizenship_mask:
             type: string
             example: "UKR"
-            description: "User nationality"
-          nationality_check:
-            type: boolean
-            example: true
-            description: "Enable nationality verification"
-          sex:
-            type: boolean
-            example: true
-            description: "Enable verification of sex param"
+            description: "User citezenship mask"
           expiration_lower_bound:
             type: boolean
             example: true
@@ -76,10 +64,12 @@ allOf:
             example: "0x303030303030"
             description: "Expiration date upper bound in hex format"
           timestamp_lower_bound:
-            type: string
+            type: integer
+            format: int64
             example: "0"
             description: "Timestamp lower bound"
           timestamp_upper_bound:
-            type: string
+            type: integer
+            format: int64
             example: "1726059494"
             description: "Timestamp upper bound"

@@ -52,24 +52,12 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// base v1
-	if req.Data.Attributes.Nationality != nil {
-		user.Nationality = *req.Data.Attributes.Nationality
+	if req.Data.Attributes.CitizenshipMask != nil {
+		user.Nationality = *req.Data.Attributes.CitizenshipMask
 	}
 
 	if req.Data.Attributes.AgeLowerBound != nil {
 		user.AgeLowerBound = int(*req.Data.Attributes.AgeLowerBound)
-	}
-
-	if req.Data.Attributes.Uniqueness != nil {
-		user.Uniqueness = *req.Data.Attributes.Uniqueness
-	}
-
-	if req.Data.Attributes.Sex != nil {
-		user.SexEnable = *req.Data.Attributes.Sex
-	}
-
-	if req.Data.Attributes.NationalityCheck != nil {
-		user.NationalityEnable = *req.Data.Attributes.NationalityCheck
 	}
 
 	if req.Data.Attributes.ExpirationLowerBound != nil {
@@ -107,11 +95,11 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Data.Attributes.TimestampLowerBound != nil {
-		user.TimestampLowerBound = sql.NullString{String: *req.Data.Attributes.TimestampLowerBound, Valid: true}
+		user.TimestampLowerBound = sql.NullTime{Time: time.Unix(*req.Data.Attributes.TimestampLowerBound, 0), Valid: true}
 	}
 
 	if req.Data.Attributes.TimestampUpperBound != nil {
-		user.TimestampUpperBound = sql.NullString{String: *req.Data.Attributes.TimestampUpperBound, Valid: true}
+		user.TimestampUpperBound = sql.NullTime{Time: time.Unix(*req.Data.Attributes.TimestampUpperBound, 0), Valid: true}
 	}
 
 	dbUser, err := ctx.VerifyUsersQ(r).Upsert(user)

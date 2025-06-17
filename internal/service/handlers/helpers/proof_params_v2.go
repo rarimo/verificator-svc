@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"strconv"
+
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/resources"
 )
@@ -28,12 +30,12 @@ func BuildV2ProofParams(user *data.VerifyUsers, callbackURL string) resources.Pr
 
 	timestampLowerBound := "0"
 	if user.TimestampLowerBound.Valid {
-		timestampLowerBound = user.TimestampLowerBound.String
+		timestampLowerBound = strconv.FormatInt(user.TimestampLowerBound.Time.Unix(), 10)
 	}
 
 	timestampUpperBound := "0"
 	if user.TimestampUpperBound.Valid {
-		timestampUpperBound = user.TimestampUpperBound.String
+		timestampUpperBound = strconv.FormatInt(user.TimestampUpperBound.Time.Unix(), 10)
 	}
 
 	return resources.ProofParamsAttributes{
@@ -47,7 +49,7 @@ func BuildV2ProofParams(user *data.VerifyUsers, callbackURL string) resources.Pr
 		IdentityCounter:           user.IdentityCounter,
 		IdentityCounterLowerBound: user.IdentityCounterLowerBound,
 		IdentityCounterUpperBound: user.IdentityCounterUpperBound,
-		Selector:                  user.Selector,
+		Selector:                  strconv.FormatInt(int64(user.Selector), 10),
 		TimestampLowerBound:       timestampLowerBound,
 		TimestampUpperBound:       timestampUpperBound,
 		CallbackUrl:               &callbackURL,

@@ -11,6 +11,8 @@ type AdvancedVerificationAttributes struct {
 	BirthDateLowerBound *string `json:"birth_date_lower_bound,omitempty"`
 	// Birth date upper bound in hex format
 	BirthDateUpperBound *string `json:"birth_date_upper_bound,omitempty"`
+	// User citezenship mask
+	CitizenshipMask *string `json:"citizenship_mask,omitempty"`
 	// Event data in hex format
 	EventData *string `json:"event_data,omitempty"`
 	// Event ID
@@ -27,18 +29,10 @@ type AdvancedVerificationAttributes struct {
 	IdentityCounterLowerBound *int32 `json:"identity_counter_lower_bound,omitempty"`
 	// Identity counter upper bound
 	IdentityCounterUpperBound *int32 `json:"identity_counter_upper_bound,omitempty"`
-	// User nationality
-	Nationality *string `json:"nationality,omitempty"`
-	// Enable nationality verification
-	NationalityCheck *bool `json:"nationality_check,omitempty"`
 	// Selector value
-	Selector string `json:"selector"`
-	// Enable verification of sex param
-	Sex *bool `json:"sex,omitempty"`
+	Selector int32 `json:"selector"`
 	// Timestamp lower bound
-	TimestampLowerBound *string `json:"timestamp_lower_bound,omitempty"`
+	TimestampLowerBound *int64 `json:"timestamp_lower_bound,omitempty"`
 	// Timestamp upper bound
-	TimestampUpperBound *string `json:"timestamp_upper_bound,omitempty"`
-	// Parameters for checking user uniqueness
-	Uniqueness *bool `json:"uniqueness,omitempty"`
+	TimestampUpperBound *int64 `json:"timestamp_upper_bound,omitempty"`
 }

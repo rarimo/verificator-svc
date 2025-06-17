@@ -29,9 +29,9 @@ type VerifyUsers struct {
 	IdentityCounter           int32          `db:"identity_counter"`
 	IdentityCounterLowerBound int32          `db:"identity_counter_lower_bound"`
 	IdentityCounterUpperBound int32          `db:"identity_counter_upper_bound"`
-	Selector                  string         `db:"selector"`
-	TimestampLowerBound       sql.NullString `db:"timestamp_lower_bound"`
-	TimestampUpperBound       sql.NullString `db:"timestamp_upper_bound"`
+	Selector                  int32          `db:"selector"`
+	TimestampLowerBound       sql.NullTime   `db:"timestamp_lower_bound"`
+	TimestampUpperBound       sql.NullTime   `db:"timestamp_upper_bound"`
 }
 
 type VerifyUsersQ interface {

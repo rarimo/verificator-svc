@@ -27,10 +27,7 @@ func VerificationLinkV2(r *http.Request) (req resources.AdvancedVerificationRequ
 		"data/attributes/selector": val.Validate(req.Data.Attributes.Selector, val.Required),
 		// base v1
 		"data/attributes/age_lower_bound":        val.Validate(req.Data.Attributes.AgeLowerBound, val.NilOrNotEmpty),
-		"data/attributes/uniqueness":             val.Validate(req.Data.Attributes.Uniqueness, val.NilOrNotEmpty),
-		"data/attributes/nationality":            val.Validate(req.Data.Attributes.Nationality, val.NilOrNotEmpty),
-		"data/attributes/nationality_check":      val.Validate(req.Data.Attributes.NationalityCheck, val.NilOrNotEmpty),
-		"data/attributes/sex":                    val.Validate(req.Data.Attributes.Sex, val.NilOrNotEmpty),
+		"data/attributes/citezenship_mask":       val.Validate(req.Data.Attributes.CitizenshipMask, val.NilOrNotEmpty),
 		"data/attributes/expiration_lower_bound": val.Validate(req.Data.Attributes.ExpirationLowerBound, val.NilOrNotEmpty),
 		// advanced v2
 		"data/attributes/identity_counter":             val.Validate(req.Data.Attributes.IdentityCounter, val.NilOrNotEmpty, val.Min(0)),

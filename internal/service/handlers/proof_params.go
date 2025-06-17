@@ -36,7 +36,7 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 	callbackURL := fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", ctx.Callback(r).URL, userIDHash)
 
 	// check if selector is not empty to use v2 params
-	if existingUser.Selector != "" {
+	if existingUser.Selector > 0 {
 		proofParameters := helpers.BuildV2ProofParams(existingUser, callbackURL)
 		ape.Render(w, responses.NewProofParamsByIdResponse(*existingUser, proofParameters))
 		return

@@ -7,9 +7,9 @@ ALTER TABLE verify_users
     ADD COLUMN identity_counter INTEGER DEFAULT 0,
     ADD COLUMN identity_counter_lower_bound INTEGER DEFAULT 0,
     ADD COLUMN identity_counter_upper_bound INTEGER DEFAULT 0,
-    ADD COLUMN selector TEXT NOT NULL DEFAULT '',
-    ADD COLUMN timestamp_lower_bound TEXT,
-    ADD COLUMN timestamp_upper_bound TEXT;
+    ADD COLUMN selector INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN timestamp_lower_bound TIMESTAMP,
+    ADD COLUMN timestamp_upper_bound TIMESTAMP;
 
 -- +migrate Down
 ALTER TABLE verify_users 
