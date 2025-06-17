@@ -1,6 +1,6 @@
 post:
   tags:
-    - User verification v2
+    - Advanced verification
   summary: Request verification links with custom proof parameters
   description: |
     Requests verification links for user to generate qr-code with custom proof parameters provided.
