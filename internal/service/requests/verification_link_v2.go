@@ -27,18 +27,18 @@ func VerificationLinkV2(r *http.Request) (req resources.AdvancedVerificationRequ
 		"data/attributes/selector": val.Validate(req.Data.Attributes.Selector, val.Required),
 		// base v1
 		"data/attributes/age_lower_bound":        val.Validate(req.Data.Attributes.AgeLowerBound, val.NilOrNotEmpty),
-		"data/attributes/citezenship_mask":       val.Validate(req.Data.Attributes.CitizenshipMask, val.NilOrNotEmpty),
+		"data/attributes/citizenship_mask":       val.Validate(req.Data.Attributes.CitizenshipMask, val.NilOrNotEmpty),
 		"data/attributes/expiration_lower_bound": val.Validate(req.Data.Attributes.ExpirationLowerBound, val.NilOrNotEmpty),
 		// advanced v2
-		"data/attributes/identity_counter":             val.Validate(req.Data.Attributes.IdentityCounter, val.NilOrNotEmpty, val.Min(0)),
-		"data/attributes/identity_counter_lower_bound": val.Validate(req.Data.Attributes.IdentityCounterLowerBound, val.NilOrNotEmpty, val.Min(0)),
-		"data/attributes/identity_counter_upper_bound": val.Validate(req.Data.Attributes.IdentityCounterUpperBound, val.NilOrNotEmpty, val.Min(0)),
+		"data/attributes/identity_counter":             val.Validate(req.Data.Attributes.IdentityCounter, val.When(req.Data.Attributes.IdentityCounter != nil, val.Min(0))),
+		"data/attributes/identity_counter_lower_bound": val.Validate(req.Data.Attributes.IdentityCounterLowerBound, val.When(req.Data.Attributes.IdentityCounterLowerBound != nil, val.Min(0))),
+		"data/attributes/identity_counter_upper_bound": val.Validate(req.Data.Attributes.IdentityCounterUpperBound, val.When(req.Data.Attributes.IdentityCounterUpperBound != nil, val.Min(0))),
 		"data/attributes/birth_date_lower_bound":       val.Validate(req.Data.Attributes.BirthDateLowerBound, val.NilOrNotEmpty),
 		"data/attributes/birth_date_upper_bound":       val.Validate(req.Data.Attributes.BirthDateUpperBound, val.NilOrNotEmpty),
 		"data/attributes/event_data":                   val.Validate(req.Data.Attributes.EventData, val.NilOrNotEmpty),
 		"data/attributes/expiration_date_lower_bound":  val.Validate(req.Data.Attributes.ExpirationDateLowerBound, val.NilOrNotEmpty),
 		"data/attributes/expiration_date_upper_bound":  val.Validate(req.Data.Attributes.ExpirationDateUpperBound, val.NilOrNotEmpty),
-		"data/attributes/timestamp_lower_bound":        val.Validate(req.Data.Attributes.TimestampLowerBound, val.NilOrNotEmpty),
-		"data/attributes/timestamp_upper_bound":        val.Validate(req.Data.Attributes.TimestampUpperBound, val.NilOrNotEmpty),
+		"data/attributes/timestamp_lower_bound":        val.Validate(req.Data.Attributes.TimestampLowerBound, val.When(req.Data.Attributes.TimestampLowerBound != nil, val.Min(0))),
+		"data/attributes/timestamp_upper_bound":        val.Validate(req.Data.Attributes.TimestampUpperBound, val.When(req.Data.Attributes.TimestampUpperBound != nil, val.Min(0))),
 	}.Filter()
 }
