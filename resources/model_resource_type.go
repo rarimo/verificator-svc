@@ -16,4 +16,5 @@ const (
 	RECEIVE_SIGNATURE ResourceType = "receive_signature"
 	USER_STATUS       ResourceType = "user_status"
 	USER              ResourceType = "user"
+	USER_V2           ResourceType = "user-v2"
 )

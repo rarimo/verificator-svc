@@ -33,6 +33,15 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	callbackURL := fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", ctx.Callback(r).URL, userIDHash)
+
+	// check if selector is not empty to use v2 params
+	if existingUser.Selector != "" {
+		proofParameters := helpers.BuildV2ProofParams(existingUser, callbackURL)
+		ape.Render(w, responses.NewProofParamsByIdResponse(*existingUser, proofParameters))
+		return
+	}
+
 	var (
 		IdentityCounterUpperBound int32
 		TimestampUpperBound       = "0"
@@ -46,7 +55,6 @@ func GetProofParamsById(w http.ResponseWriter, r *http.Request) {
 			NationalityEnable:    existingUser.NationalityEnable,
 			ExpirationLowerBound: !helpers.IsDefaultZKDate(existingUser.ExpirationLowerBound), // If there is non-default value, selector should be enabled
 		})
-		callbackURL = fmt.Sprintf("%s/integrations/verificator-svc/public/callback/%s", ctx.Callback(r).URL, userIDHash)
 	)
 
 	if existingUser.EventID != "" {

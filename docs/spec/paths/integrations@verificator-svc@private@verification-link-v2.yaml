@@ -1,0 +1,37 @@
+post:
+  tags:
+    - User verification v2
+  summary: Request verification links with custom proof parameters
+  description: |
+    Requests verification links for user to generate qr-code with custom proof parameters provided.
+    This endpoint accepts all proof parameters directly instead of calculating them.
+  operationId: getVerificationLinkV2
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/UserV2'
+  responses:
+    200:
+      description: Success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Links'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'
