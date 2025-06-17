@@ -33,7 +33,6 @@ func (s *service) router(cfg config.Config) chi.Router {
 			r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
 			r.With(authMW).Delete("/user/{user_id}", handlers.DeleteUser)
 			r.With(authMW).Post("/verification-link", handlers.VerificationLink)
-			r.With(authMW).Post("/verification-link-v2", handlers.VerificationLinkV2)
 		})
 		r.Route("/public", func(r chi.Router) {
 			r.Post("/callback/{user_id}", handlers.VerificationCallback)
@@ -50,6 +49,11 @@ func (s *service) router(cfg config.Config) chi.Router {
 				r.With(authMW).Delete("/user/{user_id}", handlers.DeleteUser)
 				r.Get("/user/{user_id}", handlers.GetUser)
 				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
+			})
+		})
+		r.Route("/v2", func(r chi.Router) {
+			r.Route("/private", func(r chi.Router) {
+				r.With(authMW).Post("/verification-link", handlers.VerificationLinkV2)
 			})
 		})
 

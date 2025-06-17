@@ -35,26 +35,83 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &data.VerifyUsers{
-		UserID:        req.Data.ID,
-		UserIDHash:    userIDHash,
-		CreatedAt:     time.Now().UTC(),
-		Status:        "not_verified",
-		Proof:         []byte{},
-		AgeLowerBound: -1,
+		UserID:               req.Data.ID,
+		UserIDHash:           userIDHash,
+		CreatedAt:            time.Now().UTC(),
+		Status:               "not_verified",
+		Proof:                []byte{},
+		AgeLowerBound:        -1,
+		ExpirationLowerBound: helpers.DefaultDateHex,
 
+		// required v2
 		EventID:                   req.Data.Attributes.EventId,
-		ExpirationLowerBound:      req.Data.Attributes.ExpirationDateLowerBound,
-		BirthDateLowerBound:       sql.NullString{String: req.Data.Attributes.BirthDateLowerBound, Valid: true},
-		BirthDateUpperBound:       sql.NullString{String: req.Data.Attributes.BirthDateUpperBound, Valid: true},
-		CitizenshipMask:           sql.NullString{String: req.Data.Attributes.CitizenshipMask, Valid: true},
-		EventData:                 sql.NullString{String: req.Data.Attributes.EventData, Valid: true},
-		ExpirationDateUpperBound:  sql.NullString{String: req.Data.Attributes.ExpirationDateUpperBound, Valid: true},
-		IdentityCounter:           req.Data.Attributes.IdentityCounter,
-		IdentityCounterLowerBound: req.Data.Attributes.IdentityCounterLowerBound,
-		IdentityCounterUpperBound: req.Data.Attributes.IdentityCounterUpperBound,
 		Selector:                  req.Data.Attributes.Selector,
-		TimestampLowerBound:       sql.NullString{String: req.Data.Attributes.TimestampLowerBound, Valid: true},
-		TimestampUpperBound:       sql.NullString{String: req.Data.Attributes.TimestampUpperBound, Valid: true},
+		IdentityCounter:           0,
+		IdentityCounterLowerBound: 0,
+		IdentityCounterUpperBound: 0,
+	}
+
+	// base v1
+	if req.Data.Attributes.Nationality != nil {
+		user.Nationality = *req.Data.Attributes.Nationality
+	}
+
+	if req.Data.Attributes.AgeLowerBound != nil {
+		user.AgeLowerBound = int(*req.Data.Attributes.AgeLowerBound)
+	}
+
+	if req.Data.Attributes.Uniqueness != nil {
+		user.Uniqueness = *req.Data.Attributes.Uniqueness
+	}
+
+	if req.Data.Attributes.Sex != nil {
+		user.SexEnable = *req.Data.Attributes.Sex
+	}
+
+	if req.Data.Attributes.NationalityCheck != nil {
+		user.NationalityEnable = *req.Data.Attributes.NationalityCheck
+	}
+
+	if req.Data.Attributes.ExpirationLowerBound != nil {
+		user.ExpirationLowerBound = helpers.GetExpirationLowerBound(*req.Data.Attributes.ExpirationLowerBound)
+	}
+
+	// V2 identity counter
+	if req.Data.Attributes.IdentityCounter != nil {
+		user.IdentityCounter = *req.Data.Attributes.IdentityCounter
+	}
+
+	if req.Data.Attributes.IdentityCounterLowerBound != nil {
+		user.IdentityCounterLowerBound = *req.Data.Attributes.IdentityCounterLowerBound
+	}
+
+	if req.Data.Attributes.IdentityCounterUpperBound != nil {
+		user.IdentityCounterUpperBound = *req.Data.Attributes.IdentityCounterUpperBound
+	}
+
+	// V2 nullable
+	if req.Data.Attributes.BirthDateLowerBound != nil {
+		user.BirthDateLowerBound = sql.NullString{String: *req.Data.Attributes.BirthDateLowerBound, Valid: true}
+	}
+
+	if req.Data.Attributes.BirthDateUpperBound != nil {
+		user.BirthDateUpperBound = sql.NullString{String: *req.Data.Attributes.BirthDateUpperBound, Valid: true}
+	}
+
+	if req.Data.Attributes.EventData != nil {
+		user.EventData = sql.NullString{String: *req.Data.Attributes.EventData, Valid: true}
+	}
+
+	if req.Data.Attributes.ExpirationDateUpperBound != nil {
+		user.ExpirationDateUpperBound = sql.NullString{String: *req.Data.Attributes.ExpirationDateUpperBound, Valid: true}
+	}
+
+	if req.Data.Attributes.TimestampLowerBound != nil {
+		user.TimestampLowerBound = sql.NullString{String: *req.Data.Attributes.TimestampLowerBound, Valid: true}
+	}
+
+	if req.Data.Attributes.TimestampUpperBound != nil {
+		user.TimestampUpperBound = sql.NullString{String: *req.Data.Attributes.TimestampUpperBound, Valid: true}
 	}
 
 	dbUser, err := ctx.VerifyUsersQ(r).Upsert(user)

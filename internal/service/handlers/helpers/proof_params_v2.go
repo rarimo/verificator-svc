@@ -16,11 +16,6 @@ func BuildV2ProofParams(user *data.VerifyUsers, callbackURL string) resources.Pr
 		birthDateUpperBound = user.BirthDateUpperBound.String
 	}
 
-	citizenshipMask := Utf8ToHex(user.Nationality)
-	if user.CitizenshipMask.Valid {
-		citizenshipMask = user.CitizenshipMask.String
-	}
-
 	eventData := user.UserIDHash
 	if user.EventData.Valid {
 		eventData = user.EventData.String
@@ -44,7 +39,7 @@ func BuildV2ProofParams(user *data.VerifyUsers, callbackURL string) resources.Pr
 	return resources.ProofParamsAttributes{
 		BirthDateLowerBound:       birthDateLowerBound,
 		BirthDateUpperBound:       birthDateUpperBound,
-		CitizenshipMask:           citizenshipMask,
+		CitizenshipMask:           Utf8ToHex(user.Nationality),
 		EventData:                 eventData,
 		EventId:                   user.EventID,
 		ExpirationDateLowerBound:  user.ExpirationLowerBound,

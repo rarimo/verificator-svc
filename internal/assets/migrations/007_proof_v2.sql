@@ -2,7 +2,6 @@
 ALTER TABLE verify_users 
     ADD COLUMN birth_date_lower_bound TEXT,
     ADD COLUMN birth_date_upper_bound TEXT,
-    ADD COLUMN citizenship_mask TEXT,
     ADD COLUMN event_data TEXT,
     ADD COLUMN expiration_date_upper_bound TEXT,
     ADD COLUMN identity_counter INTEGER DEFAULT 0,
@@ -16,7 +15,6 @@ ALTER TABLE verify_users
 ALTER TABLE verify_users 
     DROP COLUMN birth_date_lower_bound,
     DROP COLUMN birth_date_upper_bound,
-    DROP COLUMN citizenship_mask,
     DROP COLUMN event_data,
     DROP COLUMN expiration_date_upper_bound,
     DROP COLUMN identity_counter,

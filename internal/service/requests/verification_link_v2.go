@@ -10,7 +10,7 @@ import (
 	"github.com/rarimo/verificator-svc/resources"
 )
 
-func VerificationLinkV2(r *http.Request) (req resources.UserV2Request, err error) {
+func VerificationLinkV2(r *http.Request) (req resources.AdvancedVerificationRequest, err error) {
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return req, newDecodeError("body", err)
 	}
@@ -20,20 +20,28 @@ func VerificationLinkV2(r *http.Request) (req resources.UserV2Request, err error
 	}
 
 	return req, val.Errors{
-		"data/id":                                      val.Validate(req.Data.ID, val.Required),
-		"data/type":                                    val.Validate(req.Data.Type, val.Required, val.In(resources.USER_V2)),
-		"data/attributes/birth_date_lower_bound":       val.Validate(req.Data.Attributes.BirthDateLowerBound, val.Required),
-		"data/attributes/birth_date_upper_bound":       val.Validate(req.Data.Attributes.BirthDateUpperBound, val.Required),
-		"data/attributes/citizenship_mask":             val.Validate(req.Data.Attributes.CitizenshipMask, val.Required),
-		"data/attributes/event_data":                   val.Validate(req.Data.Attributes.EventData, val.Required),
-		"data/attributes/event_id":                     val.Validate(req.Data.Attributes.EventId, val.Required),
-		"data/attributes/expiration_date_lower_bound":  val.Validate(req.Data.Attributes.ExpirationDateLowerBound, val.Required),
-		"data/attributes/expiration_date_upper_bound":  val.Validate(req.Data.Attributes.ExpirationDateUpperBound, val.Required),
-		"data/attributes/identity_counter":             val.Validate(req.Data.Attributes.IdentityCounter, val.Required),
-		"data/attributes/identity_counter_lower_bound": val.Validate(req.Data.Attributes.IdentityCounterLowerBound, val.Required),
-		"data/attributes/identity_counter_upper_bound": val.Validate(req.Data.Attributes.IdentityCounterUpperBound, val.Required),
-		"data/attributes/selector":                     val.Validate(req.Data.Attributes.Selector, val.Required),
-		"data/attributes/timestamp_lower_bound":        val.Validate(req.Data.Attributes.TimestampLowerBound, val.Required),
-		"data/attributes/timestamp_upper_bound":        val.Validate(req.Data.Attributes.TimestampUpperBound, val.Required),
+		"data/id":   val.Validate(req.Data.ID, val.Required),
+		"data/type": val.Validate(req.Data.Type, val.Required, val.In(resources.ADVANCED_VERIFICATION)),
+		// required
+		"data/attributes/event_id": val.Validate(req.Data.Attributes.EventId, val.Required),
+		"data/attributes/selector": val.Validate(req.Data.Attributes.Selector, val.Required),
+		// base v1
+		"data/attributes/age_lower_bound":        val.Validate(req.Data.Attributes.AgeLowerBound, val.NilOrNotEmpty),
+		"data/attributes/uniqueness":             val.Validate(req.Data.Attributes.Uniqueness, val.NilOrNotEmpty),
+		"data/attributes/nationality":            val.Validate(req.Data.Attributes.Nationality, val.NilOrNotEmpty),
+		"data/attributes/nationality_check":      val.Validate(req.Data.Attributes.NationalityCheck, val.NilOrNotEmpty),
+		"data/attributes/sex":                    val.Validate(req.Data.Attributes.Sex, val.NilOrNotEmpty),
+		"data/attributes/expiration_lower_bound": val.Validate(req.Data.Attributes.ExpirationLowerBound, val.NilOrNotEmpty),
+		// advanced v2
+		"data/attributes/identity_counter":             val.Validate(req.Data.Attributes.IdentityCounter, val.NilOrNotEmpty, val.Min(0)),
+		"data/attributes/identity_counter_lower_bound": val.Validate(req.Data.Attributes.IdentityCounterLowerBound, val.NilOrNotEmpty, val.Min(0)),
+		"data/attributes/identity_counter_upper_bound": val.Validate(req.Data.Attributes.IdentityCounterUpperBound, val.NilOrNotEmpty, val.Min(0)),
+		"data/attributes/birth_date_lower_bound":       val.Validate(req.Data.Attributes.BirthDateLowerBound, val.NilOrNotEmpty),
+		"data/attributes/birth_date_upper_bound":       val.Validate(req.Data.Attributes.BirthDateUpperBound, val.NilOrNotEmpty),
+		"data/attributes/event_data":                   val.Validate(req.Data.Attributes.EventData, val.NilOrNotEmpty),
+		"data/attributes/expiration_date_lower_bound":  val.Validate(req.Data.Attributes.ExpirationDateLowerBound, val.NilOrNotEmpty),
+		"data/attributes/expiration_date_upper_bound":  val.Validate(req.Data.Attributes.ExpirationDateUpperBound, val.NilOrNotEmpty),
+		"data/attributes/timestamp_lower_bound":        val.Validate(req.Data.Attributes.TimestampLowerBound, val.NilOrNotEmpty),
+		"data/attributes/timestamp_upper_bound":        val.Validate(req.Data.Attributes.TimestampUpperBound, val.NilOrNotEmpty),
 	}.Filter()
 }

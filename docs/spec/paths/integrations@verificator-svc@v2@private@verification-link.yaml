@@ -16,7 +16,7 @@ post:
             - data
           properties:
             data:
-              $ref: '#/components/schemas/UserV2'
+              $ref: '#/components/schemas/AdvancedVerification'
   responses:
     200:
       description: Success

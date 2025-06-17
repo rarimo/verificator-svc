@@ -24,7 +24,6 @@ type VerifyUsers struct {
 
 	BirthDateLowerBound       sql.NullString `db:"birth_date_lower_bound"`
 	BirthDateUpperBound       sql.NullString `db:"birth_date_upper_bound"`
-	CitizenshipMask           sql.NullString `db:"citizenship_mask"`
 	EventData                 sql.NullString `db:"event_data"`
 	ExpirationDateUpperBound  sql.NullString `db:"expiration_date_upper_bound"`
 	IdentityCounter           int32          `db:"identity_counter"`

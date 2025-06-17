@@ -1,0 +1,85 @@
+allOf:
+  - $ref: '#/components/schemas/AdvancedVerificationKey'
+  - type: object
+    x-go-is-request: true
+    required:
+      - attributes
+    properties:
+      attributes:
+        required:
+          - event_id
+          - selector
+        properties:
+          event_id:
+            type: string
+            example: "12345678900987654321"
+            description: "Event ID"
+          selector:
+            type: string
+            example: "35425"
+            description: "Selector value"
+          # Optional  
+          age_lower_bound:
+            type: integer
+            example: 18
+            description: "Lower user age limit"
+          uniqueness:
+            type: boolean
+            example: true
+            description: "Parameters for checking user uniqueness"
+          nationality:
+            type: string
+            example: "UKR"
+            description: "User nationality"
+          nationality_check:
+            type: boolean
+            example: true
+            description: "Enable nationality verification"
+          sex:
+            type: boolean
+            example: true
+            description: "Enable verification of sex param"
+          expiration_lower_bound:
+            type: boolean
+            example: true
+            description: "Enable verification of expiration lower bound param"
+          identity_counter:
+            type: integer
+            example: 0
+            description: "Identity counter"
+          identity_counter_lower_bound:
+            type: integer
+            example: 0
+            description: "Identity counter lower bound"
+          identity_counter_upper_bound:
+            type: integer
+            example: 1
+            description: "Identity counter upper bound"
+          birth_date_lower_bound:
+            type: string
+            example: "0x303030303030"
+            description: "Birth date lower bound in hex format"
+          birth_date_upper_bound:
+            type: string
+            example: "0x303430363137"
+            description: "Birth date upper bound in hex format"
+          event_data:
+            type: string
+            example: "0x69d9c5f9dd91dbaff7815947e58dade0db8c8d89e1223259399de86bfc9abd"
+            description: "Event data in hex format"
+          expiration_date_lower_bound:
+            type: string
+            example: "0x303030303030"
+            description: "Expiration date lower bound in hex format"
+          expiration_date_upper_bound:
+            type: string
+            example: "0x303030303030"
+            description: "Expiration date upper bound in hex format"
+          timestamp_lower_bound:
+            type: string
+            example: "0"
+            description: "Timestamp lower bound"
+          timestamp_upper_bound:
+            type: string
+            example: "1726059494"
+            description: "Timestamp upper bound"
