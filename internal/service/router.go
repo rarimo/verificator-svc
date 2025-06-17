@@ -51,6 +51,11 @@ func (s *service) router(cfg config.Config) chi.Router {
 				r.Get("/verification-status/{user_id}", handlers.GetVerificationStatusById)
 			})
 		})
+		r.Route("/v2", func(r chi.Router) {
+			r.Route("/private", func(r chi.Router) {
+				r.With(authMW).Post("/verification-link", handlers.VerificationLinkV2)
+			})
+		})
 
 	})
 

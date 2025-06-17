@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -20,6 +21,17 @@ type VerifyUsers struct {
 	AnonymousID          string    `db:"anonymous_id"`
 	Nullifier            string    `db:"nullifier"`
 	ExpirationLowerBound string    `db:"expiration_lower_bound"`
+
+	BirthDateLowerBound       sql.NullString `db:"birth_date_lower_bound"`
+	BirthDateUpperBound       sql.NullString `db:"birth_date_upper_bound"`
+	EventData                 sql.NullString `db:"event_data"`
+	ExpirationDateUpperBound  sql.NullString `db:"expiration_date_upper_bound"`
+	IdentityCounter           int32          `db:"identity_counter"`
+	IdentityCounterLowerBound int32          `db:"identity_counter_lower_bound"`
+	IdentityCounterUpperBound int32          `db:"identity_counter_upper_bound"`
+	Selector                  int32          `db:"selector"`
+	TimestampLowerBound       sql.NullTime   `db:"timestamp_lower_bound"`
+	TimestampUpperBound       sql.NullTime   `db:"timestamp_upper_bound"`
 }
 
 type VerifyUsersQ interface {
