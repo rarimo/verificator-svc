@@ -15,7 +15,7 @@ allOf:
             example: "12345678900987654321"
             description: "Event ID"
           selector:
-            type: integer
+            type: string
             example: "35425"
             description: "Selector value"
           # Optional  

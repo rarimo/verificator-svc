@@ -2,12 +2,12 @@ package requests
 
 import (
 	"encoding/json"
-	"github.com/rarimo/verificator-svc/internal/config"
 	"math/big"
 	"net/http"
 	"strings"
 
 	val "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/rarimo/verificator-svc/internal/config"
 	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/resources"
 )
@@ -36,6 +36,10 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 func validateEventID(value string) bool {
 	eventID, ok := new(big.Int).SetString(value, 10)
 	if !ok {
+		return false
+	}
+
+	if eventID.Cmp(big.NewInt(0)) <= 0 {
 		return false
 	}
 

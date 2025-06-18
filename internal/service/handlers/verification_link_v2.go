@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rarimo/verificator-svc/internal/data"
@@ -34,6 +35,14 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	selectorInt64, err := strconv.ParseInt(req.Data.Attributes.Selector, 10, 32)
+	if err != nil {
+		ctx.Log(r).WithError(err).WithField("selector", req.Data.Attributes.Selector).Error("failed to parse selector")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	selector := int32(selectorInt64)
+
 	user := &data.VerifyUsers{
 		UserID:               req.Data.ID,
 		UserIDHash:           userIDHash,
@@ -45,7 +54,7 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 
 		// required v2
 		EventID:                   req.Data.Attributes.EventId,
-		Selector:                  req.Data.Attributes.Selector,
+		Selector:                  selector,
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,
 		IdentityCounterUpperBound: 0,

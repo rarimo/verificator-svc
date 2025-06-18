@@ -23,7 +23,9 @@ func VerificationLinkV2(r *http.Request) (req resources.AdvancedVerificationRequ
 		"data/id":   val.Validate(req.Data.ID, val.Required),
 		"data/type": val.Validate(req.Data.Type, val.Required, val.In(resources.ADVANCED_VERIFICATION)),
 		// required
-		"data/attributes/event_id": val.Validate(req.Data.Attributes.EventId, val.Required),
+		"data/attributes/event_id": val.Validate(req.Data.Attributes.EventId, val.Required,
+			val.NewStringRule(validateEventID, "must be decimal and less than 31 bytes"),
+		),
 		"data/attributes/selector": val.Validate(req.Data.Attributes.Selector, val.Required),
 		// base v1
 		"data/attributes/age_lower_bound":        val.Validate(req.Data.Attributes.AgeLowerBound, val.NilOrNotEmpty),
