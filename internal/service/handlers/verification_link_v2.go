@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/internal/service/handlers/helpers"
@@ -38,7 +39,9 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 	selectorInt64, err := strconv.ParseInt(req.Data.Attributes.Selector, 10, 32)
 	if err != nil {
 		ctx.Log(r).WithError(err).WithField("selector", req.Data.Attributes.Selector).Error("failed to parse selector")
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"selector": err,
+		})...)
 		return
 	}
 	selector := int32(selectorInt64)
