@@ -44,7 +44,6 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 		})...)
 		return
 	}
-	selector := int32(selectorInt64)
 
 	user := &data.VerifyUsers{
 		UserID:               req.Data.ID,
@@ -57,7 +56,7 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 
 		// required v2
 		EventID:                   req.Data.Attributes.EventId,
-		Selector:                  selector,
+		Selector:                  int32(selectorInt64),
 		IdentityCounter:           0,
 		IdentityCounterLowerBound: 0,
 		IdentityCounterUpperBound: 0,
