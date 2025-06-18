@@ -30,7 +30,7 @@ type AdvancedVerificationAttributes struct {
 	// Identity counter upper bound
 	IdentityCounterUpperBound *int32 `json:"identity_counter_upper_bound,omitempty"`
 	// Selector value
-	Selector int32 `json:"selector"`
+	Selector string `json:"selector"`
 	// Timestamp lower bound
 	TimestampLowerBound *int64 `json:"timestamp_lower_bound,omitempty"`
 	// Timestamp upper bound
