@@ -722,7 +722,7 @@
                     "description": "Event ID"
                   },
                   "selector": {
-                    "type": "integer",
+                    "type": "string",
                     "example": "35425",
                     "description": "Selector value"
                   },
