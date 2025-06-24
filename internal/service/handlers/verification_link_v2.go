@@ -113,6 +113,10 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 		user.TimestampUpperBound = sql.NullTime{Time: time.Unix(*req.Data.Attributes.TimestampUpperBound, 0), Valid: true}
 	}
 
+	if req.Data.Attributes.Sex != nil {
+		user.Sex = *req.Data.Attributes.Sex
+	}
+
 	dbUser, err := ctx.VerifyUsersQ(r).Upsert(user)
 	if err != nil {
 		ctx.Log(r).WithError(err).WithField("user", user).Errorf("failed to upsert user with userID [%s]", user.UserIDHash)
