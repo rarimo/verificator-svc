@@ -736,6 +736,17 @@
                     "example": "UKR",
                     "description": "User citezenship mask"
                   },
+                  "sex": {
+                    "type": "string",
+                    "enum": [
+                      "F",
+                      "M",
+                      "O",
+                      ""
+                    ],
+                    "example": "F",
+                    "description": "User sex"
+                  },
                   "expiration_lower_bound": {
                     "type": "boolean",
                     "example": true,
