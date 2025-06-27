@@ -132,13 +132,22 @@ func FormatDateTime(date time.Time) string {
 	return fmt.Sprintf("0x%s", hexutils.BytesToHex([]byte(date.Format(DateFormat))))
 }
 
-func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
+func ExtractUserIDHash(getter zk.PubSignalGetter) (string, error) {
 	userIDHashBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
+	if !ok {
+		return "", fmt.Errorf("failed to parse user ID hash")
+	}
+
+	return fmt.Sprintf("0x%s", userIDHashBig.Text(16)), nil
+}
+
+func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
+	eventDataBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
 	if !ok {
 		return "", fmt.Errorf("failed to parse event data")
 	}
 
-	return fmt.Sprintf("0x%s", userIDHashBig.Text(16)), nil
+	return eventDataBig.String(), nil
 }
 
 func CalculateProofSelector(p SelectorParams) int {
