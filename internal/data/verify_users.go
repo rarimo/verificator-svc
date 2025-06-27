@@ -49,4 +49,5 @@ type VerifyUsersQ interface {
 	WhereCreatedAtLt(createdAt time.Time) VerifyUsersQ
 	FilterByInternalAID(aid string) VerifyUsersQ
 	FilterByNullifier(nullifier string) VerifyUsersQ
+	FilterByEventData(eventData string) VerifyUsersQ
 }
