@@ -1,11 +1,13 @@
-FROM golang:1.22.0-alpine as buildbase
+FROM golang:1.23.0-alpine as buildbase
 
 ARG CI_JOB_TOKEN
 
 RUN apk add git build-base ca-certificates
 
 WORKDIR /go/src/github.com/rarimo/verificator-svc
-COPY . .
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
 RUN git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com".insteadOf https://gitlab.com
 RUN git config --global url."https://${CI_JOB_TOKEN}@github.com/".insteadOf https://github.com/

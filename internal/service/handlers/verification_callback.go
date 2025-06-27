@@ -78,27 +78,37 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	nullifier.FillBytes(nullifierBytes[:])
 	nullifierHex := hex.EncodeToString(nullifierBytes[:])
 
-	userIDHash, err := helpers.ExtractEventData(getter)
+	eventDataFromProof, err := helpers.ExtractEventData(getter)
 	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to extract user hash from event data")
+		ctx.Log(r).WithError(err).Errorf("failed to extract event data")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"pub_signals/event_data": err,
 		})...)
 		return
 	}
 
-	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
+	verifiedUser, err := ctx.VerifyUsersQ(r).FilterByEventData(eventDataFromProof).Get()
 	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to get user with userHashID [%s]", userIDHash)
-		ape.RenderErr(w, problems.BadRequest(err)...)
+		ctx.Log(r).WithError(err).Error("failed to get user with event_data")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
+
+	if verifiedUser == nil {
+		verifiedUser, err = ctx.VerifyUsersQ(r).WhereHashID(eventDataFromProof).Get()
+		if err != nil {
+			ctx.Log(r).WithError(err).Error("failed to get user with user_id_hash")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
+	}
+
 	if verifiedUser == nil {
 		ctx.Log(r).WithFields(logan.F{
 			"event_data":   getter.Get(zk.EventData),
-			"user_id_hash": userIDHash,
+			"user_id_hash": eventDataFromProof,
 			"id":           req.Data.ID,
-		}).Error("user not found or eventData != userHashID")
+		}).Error("user not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -169,7 +179,7 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 				"service_timestamp":              ctx.Verifiers(r).ServiceStartTimestamp,
 				"identity_timestamp_upper_bound": identityTimestampUpperBound,
 				"identity_counter_upper_bound":   identityCounterUpperBound,
-				"user_id_hash":                   userIDHash,
+				"user_id_hash":                   eventDataFromProof,
 			}).Errorf("failed to check uniqueness")
 			verifiedUser.Status = "uniqueness_check_failed"
 		}

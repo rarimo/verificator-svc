@@ -175,3 +175,12 @@ func (q *VerifyUsersQ) FilterByNullifier(nullifier string) data.VerifyUsersQ {
 	q.sel = q.sel.Where(sq.Eq{"nullifier": nullifier})
 	return q
 }
+
+func (q *VerifyUsersQ) FilterByEventData(eventData string) data.VerifyUsersQ {
+	q.sel = q.sel.Where(sq.And{
+		sq.Eq{"event_data": eventData},
+		sq.NotEq{"event_data": ""},
+		sq.Expr("event_data IS NOT NULL"),
+	})
+	return q
+}
