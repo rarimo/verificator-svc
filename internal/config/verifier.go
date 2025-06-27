@@ -59,7 +59,7 @@ func (c *config) Verifiers() Verifiers {
 		}
 
 		if eventID.Cmp(ff.Modulus()) == 1 {
-			panic(fmt.Errorf("event_id must be less than 254 bits"))
+			panic(fmt.Errorf("event_id must be less than field modulo"))
 		}
 
 		return Verifiers{

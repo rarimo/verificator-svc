@@ -27,7 +27,7 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 		"data/attributes/event_id": val.Validate(req.Data.Attributes.EventId, val.NilOrNotEmpty,
 			val.When(
 				!val.IsEmpty(req.Data.Attributes.EventId),
-				val.NewStringRule(validateEventID, "must be decimal and less than 254 bits"),
+				val.NewStringRule(validateEventID, "must be decimal and less than field modulo"),
 			),
 		),
 	}.Filter()
