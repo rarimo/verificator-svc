@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	val "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/rarimo/verificator-svc/internal/config"
+	"github.com/iden3/go-iden3-crypto/ff"
 	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/resources"
 )
@@ -27,7 +27,7 @@ func VerificationLink(r *http.Request) (req resources.UserRequest, err error) {
 		"data/attributes/event_id": val.Validate(req.Data.Attributes.EventId, val.NilOrNotEmpty,
 			val.When(
 				!val.IsEmpty(req.Data.Attributes.EventId),
-				val.NewStringRule(validateEventID, "must be decimal and less than 31 bytes"),
+				val.NewStringRule(validateEventID, "must be decimal and less than field modulo"),
 			),
 		),
 	}.Filter()
@@ -43,7 +43,7 @@ func validateEventID(value string) bool {
 		return false
 	}
 
-	if eventID.Cmp(config.MaxEventId) == 1 {
+	if eventID.Cmp(ff.Modulus()) == 1 {
 		return false
 	}
 
