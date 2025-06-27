@@ -5,14 +5,13 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/iden3/go-iden3-crypto/ff"
 	zk "github.com/rarimo/zkverifier-kit"
 	"gitlab.com/distributed_lab/figure/v3"
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
 const emptyETHAddr = "0x0000000000000000000000000000000000000000"
-
-var MaxEventId, _ = new(big.Int).SetString("3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16)
 
 type Verifiers struct {
 	Passport              *zk.Verifier
@@ -59,7 +58,7 @@ func (c *config) Verifiers() Verifiers {
 			panic(fmt.Errorf("event_id must be valid decimal"))
 		}
 
-		if eventID.Cmp(MaxEventId) == 1 {
+		if eventID.Cmp(ff.Modulus()) == 1 {
 			panic(fmt.Errorf("event_id must be less than 254 bits"))
 		}
 
