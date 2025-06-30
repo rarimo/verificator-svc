@@ -24,11 +24,11 @@ type AdvancedVerificationAttributes struct {
 	// Enable verification of expiration lower bound param
 	ExpirationLowerBound *bool `json:"expiration_lower_bound,omitempty"`
 	// Identity counter
-	IdentityCounter *int32 `json:"identity_counter,omitempty"`
+	IdentityCounter *int64 `json:"identity_counter,omitempty"`
 	// Identity counter lower bound
-	IdentityCounterLowerBound *int32 `json:"identity_counter_lower_bound,omitempty"`
+	IdentityCounterLowerBound *int64 `json:"identity_counter_lower_bound,omitempty"`
 	// Identity counter upper bound
-	IdentityCounterUpperBound *int32 `json:"identity_counter_upper_bound,omitempty"`
+	IdentityCounterUpperBound *int64 `json:"identity_counter_upper_bound,omitempty"`
 	// Selector value
 	Selector string `json:"selector"`
 	// User sex

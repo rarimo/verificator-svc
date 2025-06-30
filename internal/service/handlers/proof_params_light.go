@@ -43,7 +43,7 @@ func GetProofParamsLightById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		IdentityCounterUpperBound int32
+		IdentityCounterUpperBound int64
 		TimestampUpperBound       = "0"
 		eventID                   = ctx.Verifiers(r).EventID
 		birthDateUpperBound       = helpers.CalculateBirthDateHex(existingUser.AgeLowerBound)

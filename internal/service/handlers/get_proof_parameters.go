@@ -30,7 +30,7 @@ func GetProofParameters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		IdentityCounterUpperBound int32
+		IdentityCounterUpperBound int64
 		TimestampUpperBound       = "0"
 		eventID                   = ctx.Verifiers(r).EventID
 		proofSelector             = helpers.CalculateProofSelector(helpers.SelectorParams{
