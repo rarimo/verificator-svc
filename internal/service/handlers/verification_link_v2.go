@@ -75,6 +75,10 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 		user.ExpirationLowerBound = helpers.GetExpirationLowerBound(*req.Data.Attributes.ExpirationLowerBound)
 	}
 
+	if req.Data.Attributes.ExpirationDateLowerBound != nil {
+		user.ExpirationLowerBound = *req.Data.Attributes.ExpirationDateLowerBound
+	}
+
 	// V2 identity counter
 	if req.Data.Attributes.IdentityCounter != nil {
 		user.IdentityCounter = *req.Data.Attributes.IdentityCounter
