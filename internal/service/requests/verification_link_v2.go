@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	val "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/rarimo/verificator-svc/internal/service/ctx"
 	"github.com/rarimo/verificator-svc/resources"
 )
@@ -41,7 +40,7 @@ func VerificationLinkV2(r *http.Request) (req resources.AdvancedVerificationRequ
 		"data/attributes/identity_counter_upper_bound": val.Validate(req.Data.Attributes.IdentityCounterUpperBound, val.When(req.Data.Attributes.IdentityCounterUpperBound != nil, val.Min(0))),
 		"data/attributes/birth_date_lower_bound":       val.Validate(req.Data.Attributes.BirthDateLowerBound, val.NilOrNotEmpty),
 		"data/attributes/birth_date_upper_bound":       val.Validate(req.Data.Attributes.BirthDateUpperBound, val.NilOrNotEmpty),
-		"data/attributes/event_data":                   val.Validate(req.Data.Attributes.EventData, val.NilOrNotEmpty, val.When(req.Data.Attributes.EventData != nil, is.Hexadecimal)),
+		"data/attributes/event_data":                   val.Validate(req.Data.Attributes.EventData, val.NilOrNotEmpty),
 		"data/attributes/expiration_date_lower_bound":  val.Validate(req.Data.Attributes.ExpirationDateLowerBound, val.NilOrNotEmpty),
 		"data/attributes/expiration_date_upper_bound":  val.Validate(req.Data.Attributes.ExpirationDateUpperBound, val.NilOrNotEmpty),
 		"data/attributes/timestamp_lower_bound":        val.Validate(req.Data.Attributes.TimestampLowerBound, val.When(req.Data.Attributes.TimestampLowerBound != nil, val.Min(0))),
