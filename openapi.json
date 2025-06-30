@@ -754,16 +754,19 @@
                   },
                   "identity_counter": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0,
                     "description": "Identity counter"
                   },
                   "identity_counter_lower_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0,
                     "description": "Identity counter lower bound"
                   },
                   "identity_counter_upper_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 1,
                     "description": "Identity counter upper bound"
                   },
@@ -1044,6 +1047,7 @@
                   },
                   "identity_counter": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0
                   },
                   "timestamp_lower_bound": {
@@ -1056,10 +1060,12 @@
                   },
                   "identity_counter_lower_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0
                   },
                   "identity_counter_upper_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 1
                   },
                   "expiration_date_lower_bound": {
@@ -1204,6 +1210,7 @@
                   },
                   "identity_counter": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0
                   },
                   "timestamp_lower_bound": {
@@ -1216,10 +1223,12 @@
                   },
                   "identity_counter_lower_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0
                   },
                   "identity_counter_upper_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 1
                   },
                   "expiration_date_lower_bound": {
@@ -1316,6 +1325,7 @@
                   },
                   "identity_counter": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0
                   },
                   "timestamp_lower_bound": {
@@ -1328,10 +1338,12 @@
                   },
                   "identity_counter_lower_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 0
                   },
                   "identity_counter_upper_bound": {
                     "type": "integer",
+                    "format": "int64",
                     "example": 1
                   },
                   "expiration_date_lower_bound": {
