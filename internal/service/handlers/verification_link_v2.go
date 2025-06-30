@@ -98,7 +98,15 @@ func VerificationLinkV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Data.Attributes.EventData != nil {
-		user.EventData = sql.NullString{String: *req.Data.Attributes.EventData, Valid: true}
+		eventDataDecimal, err := helpers.HexToDecimal(*req.Data.Attributes.EventData)
+		if err != nil {
+			ctx.Log(r).WithError(err).Error("failed to convert event_data from hex to decimal")
+			ape.RenderErr(w, problems.BadRequest(validation.Errors{
+				"event_data": err,
+			})...)
+			return
+		}
+		user.EventData = sql.NullString{String: eventDataDecimal, Valid: true}
 	}
 
 	if req.Data.Attributes.ExpirationDateUpperBound != nil {

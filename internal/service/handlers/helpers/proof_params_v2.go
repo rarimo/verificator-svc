@@ -1,7 +1,10 @@
 package helpers
 
 import (
+	"fmt"
+	"math/big"
 	"strconv"
+	"strings"
 
 	"github.com/rarimo/verificator-svc/internal/data"
 	"github.com/rarimo/verificator-svc/resources"
@@ -54,4 +57,15 @@ func BuildV2ProofParams(user *data.VerifyUsers, callbackURL string) resources.Pr
 		TimestampUpperBound:       timestampUpperBound,
 		CallbackUrl:               &callbackURL,
 	}
+}
+
+func HexToDecimal(hexStr string) (string, error) {
+	hexStr = strings.TrimPrefix(hexStr, "0x")
+
+	decimal, ok := new(big.Int).SetString(hexStr, 16)
+	if !ok {
+		return "", fmt.Errorf("invalid hex format")
+	}
+
+	return decimal.String(), nil
 }
