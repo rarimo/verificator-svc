@@ -28,9 +28,10 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		proof   = req.Data.Attributes.Proof
-		getter  = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
-		eventID = ctx.Verifiers(r).EventID
+		userIDHash = req.Data.ID
+		proof      = req.Data.Attributes.Proof
+		getter     = zk.PubSignalGetter{Signals: proof.PubSignals, ProofType: zk.GlobalPassport}
+		eventID    = ctx.Verifiers(r).EventID
 	)
 
 	proofJSON, err := json.Marshal(proof)
@@ -78,45 +79,17 @@ func VerificationCallback(w http.ResponseWriter, r *http.Request) {
 	nullifier.FillBytes(nullifierBytes[:])
 	nullifierHex := hex.EncodeToString(nullifierBytes[:])
 
-	userIDHash, err := helpers.ExtractUserIDHash(getter)
+	verifiedUser, err := ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
 	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to extract user id hash")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"pub_signals/event_data": err,
-		})...)
-		return
-	}
-
-	eventDataFromProof, err := helpers.ExtractEventData(getter)
-	if err != nil {
-		ctx.Log(r).WithError(err).Errorf("failed to extract event data")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"pub_signals/event_data": err,
-		})...)
-		return
-	}
-
-	verifiedUser, err := ctx.VerifyUsersQ(r).FilterByEventData(eventDataFromProof).Get()
-	if err != nil {
-		ctx.Log(r).WithError(err).Error("failed to get user with event_data")
+		ctx.Log(r).WithError(err).Error("failed to get user with user_id_hash")
 		ape.RenderErr(w, problems.InternalError())
 		return
-	}
-
-	if verifiedUser == nil {
-		verifiedUser, err = ctx.VerifyUsersQ(r).WhereHashID(userIDHash).Get()
-		if err != nil {
-			ctx.Log(r).WithError(err).Error("failed to get user with user_id_hash")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
 	}
 
 	if verifiedUser == nil {
 		ctx.Log(r).WithFields(logan.F{
 			"event_data":   getter.Get(zk.EventData),
 			"user_id_hash": userIDHash,
-			"id":           req.Data.ID,
 		}).Error("user not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
