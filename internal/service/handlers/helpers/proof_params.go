@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/iden3/go-iden3-crypto/poseidon"
-	zk "github.com/rarimo/zkverifier-kit"
 	"github.com/status-im/keycard-go/hexutils"
 )
 
@@ -130,24 +129,6 @@ func GetExpirationLowerBound(expirationLowerBound bool) string {
 
 func FormatDateTime(date time.Time) string {
 	return fmt.Sprintf("0x%s", hexutils.BytesToHex([]byte(date.Format(DateFormat))))
-}
-
-func ExtractUserIDHash(getter zk.PubSignalGetter) (string, error) {
-	userIDHashBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
-	if !ok {
-		return "", fmt.Errorf("failed to parse user ID hash")
-	}
-
-	return fmt.Sprintf("0x%s", userIDHashBig.Text(16)), nil
-}
-
-func ExtractEventData(getter zk.PubSignalGetter) (string, error) {
-	eventDataBig, ok := new(big.Int).SetString(getter.Get(zk.EventData), 10)
-	if !ok {
-		return "", fmt.Errorf("failed to parse event data")
-	}
-
-	return eventDataBig.String(), nil
 }
 
 func CalculateProofSelector(p SelectorParams) int {

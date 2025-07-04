@@ -35,7 +35,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			r.With(authMW).Post("/verification-link", handlers.VerificationLink)
 		})
 		r.Route("/public", func(r chi.Router) {
-			r.Post("/callback/{user_id}", handlers.VerificationCallback)
+			r.Post("/callback/{user_id_hash}", handlers.VerificationCallback)
 			r.Get("/proof-params/{user_id_hash}", handlers.GetProofParamsById)
 		})
 
