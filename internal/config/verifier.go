@@ -62,6 +62,10 @@ func (c *config) Verifiers() Verifiers {
 			panic(fmt.Errorf("event_id must be less than field modulo"))
 		}
 
+		if string(cfg.EventID[0]) == "0" {
+			panic("event_id could not start with zero")
+		}
+
 		return Verifiers{
 			Passport:              pass,
 			ServiceStartTimestamp: cfg.AllowedIdentityTimestamp,

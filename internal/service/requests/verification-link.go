@@ -47,5 +47,9 @@ func validateEventID(value string) bool {
 		return false
 	}
 
+	if string(value[0]) == "0" {
+		return false
+	}
+
 	return true
 }
